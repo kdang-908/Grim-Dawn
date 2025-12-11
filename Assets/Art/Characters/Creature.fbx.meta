@@ -22,7 +22,7 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 3
+    animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -80,227 +80,7 @@ ModelImporter:
   humanDescription:
     serializedVersion: 3
     human: []
-    skeleton:
-    - name: Creature(Clone)
-      parentName: 
-      position: {x: 0, y: 0, z: 0}
-      rotation: {x: 0, y: 0, z: 0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: Creature
-      parentName: Creature(Clone)
-      position: {x: -0, y: 0, z: 0}
-      rotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: 6.123234e-17}
-      scale: {x: 1, y: 1.0000002, z: 1.0000002}
-    - name: Mesh
-      parentName: Creature
-      position: {x: 0.012, y: 1.0849999, z: 0}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1.11, y: 1.11, z: 1.11}
-    - name: characters3d.com___Hips
-      parentName: Creature(Clone)
-      position: {x: -0.00052222033, y: 0.8698072, z: -0.019571163}
-      rotation: {x: -0.00011102204, y: -0.000072096496, z: 0.00097337214, w: 0.9999995}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Upper_Leg
-      parentName: characters3d.com___Hips
-      position: {x: -0.171061, y: -0.07931823, z: -0.0035674428}
-      rotation: {x: -0.019565878, y: 0.1113947, z: 0.99241996, w: 0.04807381}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Lower_Leg
-      parentName: characters3d.com___L_Upper_Leg
-      position: {x: 0.0000000020656454, y: 0.36213323, z: -1.8798693e-10}
-      rotation: {x: -0.27398002, y: 0.18301538, z: 0.04936247, w: 0.94286996}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Foot
-      parentName: characters3d.com___L_Lower_Leg
-      position: {x: 0.0000000010432157, y: 0.28015125, z: -0.0000000011391699}
-      rotation: {x: 0.5734789, y: -0.24150634, z: 0.13309444, w: 0.771416}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Toes
-      parentName: characters3d.com___L_Foot
-      position: {x: -0.000000001740731, y: 0.2875138, z: -0.0000000034648566}
-      rotation: {x: 0.28342903, y: -0.007786917, z: 0.0023014888, w: 0.95895886}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Toes_Tip
-      parentName: characters3d.com___L_Toes
-      position: {x: 3.661671e-10, y: 0.12883979, z: -1.08502936e-10}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Upper_Leg
-      parentName: characters3d.com___Hips
-      position: {x: 0.171061, y: -0.07931823, z: 0.03545351}
-      rotation: {x: 0.007754258, y: 0.087580115, z: 0.99476856, w: -0.052010573}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Lower_Leg
-      parentName: characters3d.com___R_Upper_Leg
-      position: {x: -0.000000002732634, y: 0.36003494, z: 1.8422606e-10}
-      rotation: {x: -0.24585593, y: -0.20032066, z: -0.043376565, w: 0.9473885}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Foot
-      parentName: characters3d.com___R_Lower_Leg
-      position: {x: 0.0000000024926794, y: 0.28739566, z: 0.0000000035690362}
-      rotation: {x: 0.5575339, y: 0.28987074, z: -0.16910595, w: 0.75929844}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Toes
-      parentName: characters3d.com___R_Foot
-      position: {x: 0.0000000044476467, y: 0.29074425, z: -0.000000004941653}
-      rotation: {x: 0.27955732, y: 0.027123617, z: -0.007900804, w: 0.9597133}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Toes_Tip
-      parentName: characters3d.com___R_Toes
-      position: {x: -2.500368e-10, y: 0.1275879, z: -1.0863593e-10}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___Spine
-      parentName: characters3d.com___Hips
-      position: {x: -0, y: 0.14047126, z: -0.015046048}
-      rotation: {x: -0.05321598, y: 0.00012390062, z: -0.00096814235, w: 0.99858254}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___Chest
-      parentName: characters3d.com___Spine
-      position: {x: -0, y: 0.16482055, z: 7.420823e-11}
-      rotation: {x: -6.938894e-18, y: -1.1503618e-13, z: 6.736872e-13, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___Upper_Chest
-      parentName: characters3d.com___Chest
-      position: {x: -0, y: 0.18836641, z: 3.1708394e-10}
-      rotation: {x: -6.938894e-18, y: 1.12e-43, z: -1.6105384e-26, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Shoulder
-      parentName: characters3d.com___Upper_Chest
-      position: {x: -0.1244536, y: 0.13632278, z: -0.008661863}
-      rotation: {x: 0.5626956, y: -0.41229934, z: 0.5946012, w: 0.3997903}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Upper_Arm
-      parentName: characters3d.com___L_Shoulder
-      position: {x: 0.000000001158478, y: 0.28762212, z: -0.000000009240629}
-      rotation: {x: -0.17399056, y: -0.15491773, z: 0.0035090798, w: 0.97247905}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Lower_Arm
-      parentName: characters3d.com___L_Upper_Arm
-      position: {x: 0.0000000018548386, y: 0.42611152, z: 0.0000000023708788}
-      rotation: {x: -0.00000017879952, y: 0.036044355, z: -0.00000018176203, w: 0.9993502}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Hand
-      parentName: characters3d.com___L_Lower_Arm
-      position: {x: -4.957283e-10, y: 0.3010281, z: 0.0000000014078859}
-      rotation: {x: 0.07642583, y: -0.15546562, z: 0.012065117, w: 0.9848066}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Index_Proximal
-      parentName: characters3d.com___L_Hand
-      position: {x: 0.000000006296179, y: 0.12365713, z: -0.019308822}
-      rotation: {x: -0.073640555, y: -0.027943645, z: -0.17126064, w: 0.98207235}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Index_Intermediate
-      parentName: characters3d.com___L_Index_Proximal
-      position: {x: -0.03807891, y: 0.105098635, z: 0.0000000010989375}
-      rotation: {x: -0.00058296375, y: 0.011649307, z: 0.29320195, w: 0.9559794}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Index_Distal
-      parentName: characters3d.com___L_Index_Intermediate
-      position: {x: 0.027740322, y: 0.10974337, z: 0.0000000010706468}
-      rotation: {x: 0.0014226536, y: 0.007179894, z: -0.05194255, w: 0.99862325}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Index_Distal_Tip
-      parentName: characters3d.com___L_Index_Distal
-      position: {x: 0.010338592, y: 0.071476616, z: -3.046621e-10}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Thumb_Proximal
-      parentName: characters3d.com___L_Hand
-      position: {x: 0.033219203, y: 0.09776849, z: -0.0000000062606436}
-      rotation: {x: -0.15610597, y: 0.078270175, z: -0.23303996, w: 0.9566594}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Thumb_Intermediate
-      parentName: characters3d.com___L_Thumb_Proximal
-      position: {x: 0.016064897, y: 0.08102916, z: -0.000000007455917}
-      rotation: {x: 0.0013223437, y: 0.0151633015, z: -0.108483516, w: 0.9939817}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Thumb_Distal
-      parentName: characters3d.com___L_Thumb_Intermediate
-      position: {x: -0.0018674297, y: 0.08604007, z: -1.8958929e-10}
-      rotation: {x: -0.0010805436, y: 0.007580903, z: -0.11959146, w: 0.9927937}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___L_Thumb_Distal_Tip
-      parentName: characters3d.com___L_Thumb_Distal
-      position: {x: -0.014197466, y: 0.05305616, z: -5.9764727e-10}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Shoulder
-      parentName: characters3d.com___Upper_Chest
-      position: {x: 0.1244536, y: 0.13620304, z: -0.007543895}
-      rotation: {x: -0.56141543, y: -0.41734263, z: 0.5838079, w: -0.41207555}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Upper_Arm
-      parentName: characters3d.com___R_Shoulder
-      position: {x: -6.3795064e-10, y: 0.28762215, z: -0.0000000047142357}
-      rotation: {x: -0.17388445, y: 0.14918856, z: -0.0070219897, w: 0.97337437}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Lower_Arm
-      parentName: characters3d.com___R_Upper_Arm
-      position: {x: -8.1846646e-10, y: 0.42562228, z: 0.0000000024085338}
-      rotation: {x: 0.0000002937441, y: -0.02594688, z: -0.000000059559618, w: 0.99966335}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Hand
-      parentName: characters3d.com___R_Lower_Arm
-      position: {x: -0.000000004677885, y: 0.29717287, z: -8.699173e-10}
-      rotation: {x: 0.009933272, y: 0.27471554, z: -0.0028384451, w: 0.96147007}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Index_Proximal
-      parentName: characters3d.com___R_Hand
-      position: {x: -0.0000000034900864, y: 0.15518701, z: -0.0032067064}
-      rotation: {x: -0.00039303902, y: 0.060292576, z: 0.16371289, w: 0.9846638}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Index_Intermediate
-      parentName: characters3d.com___R_Index_Proximal
-      position: {x: 0.032417297, y: 0.094412945, z: 0.0000000011687113}
-      rotation: {x: -0.000031823685, y: -0.0029119493, z: -0.31449425, w: 0.94925493}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Index_Distal
-      parentName: characters3d.com___R_Index_Intermediate
-      position: {x: -0.028264262, y: 0.088505924, z: -0.0000000033378482}
-      rotation: {x: 0.0017014388, y: -0.008888356, z: 0.11964197, w: 0.99277586}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Index_Distal_Tip
-      parentName: characters3d.com___R_Index_Distal
-      position: {x: -0.0041530374, y: 0.059882864, z: -6.1791466e-10}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Thumb_Proximal
-      parentName: characters3d.com___R_Hand
-      position: {x: -0.06270917, y: 0.079350896, z: 0.000000016471398}
-      rotation: {x: -0.20190735, y: -0.08137052, z: 0.28022638, w: 0.93492544}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Thumb_Intermediate
-      parentName: characters3d.com___R_Thumb_Proximal
-      position: {x: -0.0068535414, y: 0.08062005, z: 0.0000000023408309}
-      rotation: {x: 0.001394438, y: -0.017611416, z: 0.005813261, w: 0.999827}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Thumb_Distal
-      parentName: characters3d.com___R_Thumb_Intermediate
-      position: {x: -0.006280779, y: 0.08567231, z: 0.0000000041932853}
-      rotation: {x: -0.00025801145, y: -0.0030504232, z: 0.15692468, w: 0.98760587}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___R_Thumb_Distal_Tip
-      parentName: characters3d.com___R_Thumb_Distal
-      position: {x: 0.013134311, y: 0.05321556, z: -5.1285226e-10}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___Neck
-      parentName: characters3d.com___Upper_Chest
-      position: {x: -0, y: 0.21191204, z: -0.0000000108136815}
-      rotation: {x: -0.18614784, y: -0.0001524914, z: 0.00013098409, w: 0.9825218}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___Head
-      parentName: characters3d.com___Neck
-      position: {x: -0, y: 0.1590387, z: 0.16631952}
-      rotation: {x: 0, y: -0, z: -2.9318726e-29, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: characters3d.com___Head_Tip
-      parentName: characters3d.com___Head
-      position: {x: -0, y: 0.046130676, z: 0.048242636}
-      rotation: {x: 0, y: -0, z: -0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
+    skeleton: []
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
@@ -311,13 +91,13 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 3
+  animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 1
+  avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0
