@@ -287,7 +287,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 8
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: aad33eb1b1827f846a4e229f2b66d29b, type: 2}
   m_TargetDisplay: 0
@@ -1010,13 +1010,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866836195}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1142,7 +1142,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 8
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 5fef6f3958129b7408d1699e0f76af58, type: 2}
   m_TargetDisplay: 0
@@ -1761,6 +1761,10 @@ PrefabInstance:
     - target: {fileID: 3981252778593905542, guid: fe1759d965e439f40afda42784090175, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 171.268
+      objectReference: {fileID: 0}
+    - target: {fileID: 4183662845441783524, guid: fe1759d965e439f40afda42784090175, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2693,6 +2697,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[6]'
       value: 
       objectReference: {fileID: 2100000, guid: e532e957eef72bc4eb014940863141a2, type: 2}
+    - target: {fileID: 5191102260782881209, guid: 946d7f4e3fa7d2d4bacba5a0f6581ecd, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

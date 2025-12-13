@@ -23,6 +23,8 @@ public class CharacterSelector : MonoBehaviour
         maleButton.onClick.AddListener(() => SelectCharacter(0));
         femaleButton.onClick.AddListener(() => SelectCharacter(1));
         playButton.onClick.AddListener(OnPlayClicked);
+        GameManager.Instance.LoadMapAdditive();
+
     }
 
     void SelectCharacter(int index)
@@ -54,6 +56,6 @@ public class CharacterSelector : MonoBehaviour
         }
 
         GameManager.Instance.SetPlayerData(selectedIndex, playerName);
-        SceneManager.LoadScene("Gameplay"); // đổi thành tên scene gameplay thực tế
+        GameManager.Instance.GoToGameplay();
     }
 }
