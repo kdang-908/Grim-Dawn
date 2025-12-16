@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
     public Transform target;
 
     [SerializeField]
-    private Vector3 offset = new Vector3(0, 1.7f, -4f);
+    private Vector3 offset;
 
     private float yaw;
     private float pitch;
