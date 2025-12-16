@@ -20,6 +20,10 @@ public class HumanController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
             jumpPressed = true;
+        if (Input.GetMouseButtonDown(0))
+        {
+            HandleAttack();
+        }
     }
 
     void FixedUpdate()
@@ -58,9 +62,10 @@ public class HumanController : MonoBehaviour
             animator.SetBool("isJumping", true);
             isGrounded = false;
         }
-
-        jumpPressed = false;
-
+        else
+        {
+            jumpPressed = false;
+        }
         HandleRotation(movement);
         HandleRunning(movement);
     }
@@ -104,8 +109,11 @@ public class HumanController : MonoBehaviour
                                                   rotationSpeed * Time.deltaTime);
         }
     }
- 
 
+    void HandleAttack()
+    {
+        animator.SetTrigger("Attack");
+    }
 
 
 }
