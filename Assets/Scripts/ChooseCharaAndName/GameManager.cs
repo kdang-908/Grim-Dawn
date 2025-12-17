@@ -5,8 +5,23 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public int selectedCharacter;
+
+    public int selectedCharacter; // 0 = Male, 1 = Female
     public string playerName;
+
+    void LateUpdate()
+    {
+        AudioListener[] listeners = FindObjectsOfType<AudioListener>();
+        if (listeners.Length > 1)
+        {
+            Debug.Log("⚠ AudioListeners:");
+            foreach (var l in listeners)
+            {
+                Debug.Log(l.gameObject.name + " | Enabled=" + l.enabled);
+            }
+        }
+    }
+
 
     void Awake()
     {
@@ -15,34 +30,59 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
+    // ======================================
+    // LƯU DỮ LIỆU NHÂN VẬT
+    // ======================================
     public void SetPlayerData(int index, string name)
     {
         selectedCharacter = index;
         playerName = name;
     }
 
-    // Gọi từ CharacterSelection khi bắt đầu, để load Map đằng sau
-    public void LoadMapAdditive()
+    // ======================================
+    // LOAD MAP + CHUYỂN GAMEPLAY
+    // CHỈ ĐƯỢC GỌI KHI NHẤN PLAY
+    // ======================================
+    public void StartGameplay()
     {
-        // Nếu Map chưa load thì mới load
+        // Nếu Map chưa load → load additive
         if (!SceneManager.GetSceneByName("Map").isLoaded)
         {
-            SceneManager.LoadSceneAsync("Map", LoadSceneMode.Additive);
+            SceneManager.LoadSceneAsync("Map", LoadSceneMode.Additive)
+                .completed += (op) =>
+                {
+                    OnMapLoaded();
+                };
+        }
+        else
+        {
+            // Trường hợp Map đã load sẵn
+            OnMapLoaded();
         }
     }
 
-    // Gọi khi người chơi xác nhận chọn nhân vật
-    public void GoToGameplay()
+    // ======================================
+    // MAP LOAD XONG
+    // ======================================
+    void OnMapLoaded()
     {
-        // Giả sử Map đã load additive rồi, bây giờ chỉ cần unload scene chọn nhân vật
-        var currentScene = SceneManager.GetActiveScene();
-        if (currentScene.name != "Map")
+        Scene mapScene = SceneManager.GetSceneByName("Map");
+
+        // Set Map làm scene active
+        SceneManager.SetActiveScene(mapScene);
+
+        // Unload scene chọn nhân vật
+        Scene selectionScene = SceneManager.GetSceneByName("CharacterSelection");
+        if (selectionScene.isLoaded)
         {
-            SceneManager.UnloadSceneAsync(currentScene);
-            // Map sẽ trở thành scene active nếu chỉ còn nó
+            SceneManager.UnloadSceneAsync(selectionScene);
         }
     }
+
 }

@@ -23,7 +23,7 @@ public class CharacterSelector : MonoBehaviour
         maleButton.onClick.AddListener(() => SelectCharacter(0));
         femaleButton.onClick.AddListener(() => SelectCharacter(1));
         playButton.onClick.AddListener(OnPlayClicked);
-        GameManager.Instance.LoadMapAdditive();
+        playButton.interactable = false;
 
     }
 
@@ -36,6 +36,8 @@ public class CharacterSelector : MonoBehaviour
 
         if (femaleBackground != null)
             femaleBackground.color = (index == 1) ? selectedColor : normalColor;
+
+        playButton.interactable = true;
     }
 
     void OnPlayClicked()
@@ -56,6 +58,7 @@ public class CharacterSelector : MonoBehaviour
         }
 
         GameManager.Instance.SetPlayerData(selectedIndex, playerName);
-        GameManager.Instance.GoToGameplay();
+        //GameManager.Instance.LoadMapAdditive();
+        GameManager.Instance.StartGameplay();
     }
 }
