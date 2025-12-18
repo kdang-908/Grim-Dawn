@@ -5,8 +5,7 @@ public class CameraController : MonoBehaviour
     [Header("Attribute Camera")]
     public Transform target;
 
-    [SerializeField]
-    private Vector3 offset;
+    [SerializeField] private Vector3 offset;
 
     private float yaw;
     private float pitch;
@@ -29,47 +28,42 @@ public class CameraController : MonoBehaviour
         yaw = angles.y;
         pitch = angles.x;
 
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        SetCursorLock(true); // khóa chuột khi vào game
+    }
+
+    // ✅ THÊM HÀM NÀY
+    public void SetCursorLock(bool locked)
+    {
+        Cursor.visible = !locked;
+        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
     void Update()
     {
-        // Zoom
         currentZoom -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
         currentZoom = Mathf.Clamp(currentZoom, minZoom, maxZoom);
     }
 
     void LateUpdate()
     {
-        // Toggle chuột
+        // (Bạn có thể giữ Q nếu muốn)
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
+            bool locked = Cursor.lockState != CursorLockMode.Locked;
+            SetCursorLock(locked);
         }
 
-        CameraMove();
-
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-
-        // Công thức zoom đúng
-        Vector3 zoomedOffset = rotation * (offset * currentZoom);
-
-        // Cập nhật vị trí camera
-        transform.position = target.position + zoomedOffset;
-
-        // Nhìn vào nhân vật (có cộng thêm Vector3.up nếu muốn nhìn cao hơn)
-        transform.LookAt(target.position + Vector3.up * 1.5f);
-    }
-
-    private void CameraMove()
-    {
         if (Cursor.lockState == CursorLockMode.Locked)
         {
             yaw += Input.GetAxis("Mouse X") * yawSpeed * Time.deltaTime;
             pitch -= Input.GetAxis("Mouse Y") * pitchSpeed * Time.deltaTime;
             pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
         }
+
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+        Vector3 zoomedOffset = rotation * (offset * currentZoom);
+
+        transform.position = target.position + zoomedOffset;
+        transform.LookAt(target.position + Vector3.up * 1.5f);
     }
 }
