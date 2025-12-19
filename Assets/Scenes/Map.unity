@@ -39375,6 +39375,10 @@ PrefabInstance:
       value: Remy@Breathing Idle
       objectReference: {fileID: 0}
     - target: {fileID: 5517217837557656155, guid: 2dc362089d3b4f94b8340bdd96041b0f, type: 3}
+      propertyPath: State
+      value: 
+      objectReference: {fileID: 1389196077}
+    - target: {fileID: 5517217837557656155, guid: 2dc362089d3b4f94b8340bdd96041b0f, type: 3}
       propertyPath: hitbox
       value: 
       objectReference: {fileID: 1188542483}

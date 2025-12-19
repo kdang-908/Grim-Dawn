@@ -13,6 +13,7 @@ public class SkeletonAI : MonoBehaviour
 
     private Animator anim;
     private float lastAttackTime;
+    public CharacterStats State;
 
     void Start()
     {
@@ -23,15 +24,21 @@ public class SkeletonAI : MonoBehaviour
 
         if (player != null)
             playerHealth = player.GetComponent<PlayerHealth>();
-        else
-            Debug.LogWarning("⚠ SkeletonAI không tìm thấy Player! Hãy chắc chắn Player có Tag = Player");
+        //    else
+        //        Debug.LogWarning("⚠ SkeletonAI không tìm thấy Player! Hãy chắc chắn Player có Tag = Player");
+        //}
     }
-
     void Update()
     {
         if (player == null) return;
 
-        float dist = Vector3.Distance(transform.position, player.transform.position);
+            if (State != null && State.currentHP <= 0)
+            {
+                HandleDead();
+                return;
+            }
+
+            float dist = Vector3.Distance(transform.position, player.transform.position);
 
         // Ngoài tầm đuổi → đứng yên
         if (dist > chaseRange)
@@ -49,7 +56,9 @@ public class SkeletonAI : MonoBehaviour
         {
             Attack();
         }
+        
     }
+
 
     void MoveTowardsPlayer()
     {
@@ -83,5 +92,40 @@ public class SkeletonAI : MonoBehaviour
 
         // gây damage
         playerHealth.TakeDamage(10);
+    }
+    void HandleDead()
+    {
+        anim.SetTrigger("Dead");
+
+        // Tắt các thành phần vật lý
+        if (GetComponent<Collider>()) GetComponent<Collider>().enabled = false;
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true;
+
+        // Bắt đầu quá trình tan biến
+        StartCoroutine(Disappear());
+
+        this.enabled = false;
+    }
+    System.Collections.IEnumerator Disappear()
+    {
+        // Đợi 3 giây để người chơi nhìn thấy xác quái
+        yield return new WaitForSeconds(3f);
+
+        float timer = 0;
+        float disappearDuration = 2f; // Biến mất trong 2 giây
+        Vector3 startPos = transform.position;
+        Vector3 endPos = startPos + Vector3.down * 2f; // Chìm xuống 2 mét
+
+        while (timer < disappearDuration)
+        {
+            // Vừa cho chìm xuống đất nhẹ nhàng
+            transform.position = Vector3.Lerp(startPos, endPos, timer / disappearDuration);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Sau khi chìm xong thì mới xóa khỏi game
+        Destroy(gameObject);
     }
 }
