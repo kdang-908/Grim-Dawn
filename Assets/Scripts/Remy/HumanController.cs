@@ -13,7 +13,7 @@ public class HumanController : MonoBehaviour
 
     public float runSpeed = 8f;   // tốc độ khi chạy
     private bool isRunning = false;
-
+    public DamageHitbox hitbox;
 
 
     void Update()
@@ -113,7 +113,20 @@ public class HumanController : MonoBehaviour
     void HandleAttack()
     {
         animator.SetTrigger("Attack");
+
+        // bật hitbox 1 khoảng ngắn đúng lúc ra đòn (tạm thời)
+        if (hitbox != null)
+            StartCoroutine(AttackWindow());
     }
+
+    System.Collections.IEnumerator AttackWindow()
+    {
+        Debug.Log("[Player] EnableHit");
+        hitbox.EnableHit();                 // bật vùng gây damage
+        yield return new WaitForSeconds(0.4f);// thời gian chém "ăn"
+        hitbox.DisableHit();                // tắt lại
+    }
+
 
 
 }
