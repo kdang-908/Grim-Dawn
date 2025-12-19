@@ -8,6 +8,7 @@ public class WeaponData : ScriptableObject
 
     public Sprite icon;
     public GameObject prefab;
+    public int animationID;
 
     [Header("Attach Offset (local)")]
     public Vector3 localPos = Vector3.zero;

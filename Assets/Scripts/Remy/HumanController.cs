@@ -15,6 +15,7 @@ public class HumanController : MonoBehaviour
     private bool isRunning = false;
     public DamageHitbox hitbox;
 
+    public CharacterStats State;
 
     void Update()
     {
@@ -23,6 +24,11 @@ public class HumanController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             HandleAttack();
+        }
+        if (State != null && State.currentHP <= 0)
+        {
+            animator.SetTrigger("Dead");
+            this.enabled = false;
         }
     }
 
@@ -112,6 +118,7 @@ public class HumanController : MonoBehaviour
 
     void HandleAttack()
     {
+        int currentWeaponID = animator.GetInteger("WeaponType");
         animator.SetTrigger("Attack");
 
         // bật hitbox 1 khoảng ngắn đúng lúc ra đòn (tạm thời)
@@ -127,6 +134,12 @@ public class HumanController : MonoBehaviour
         hitbox.DisableHit();                // tắt lại
     }
 
-
+    void HandleDead()
+    {
+        if (State != null)
+        {
+            int currentHP = State.currentHP;
+        }
+    }
 
 }

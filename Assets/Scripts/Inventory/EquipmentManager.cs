@@ -25,6 +25,7 @@ public class EquipmentManager : MonoBehaviour
     public Transform previewRoot;
     public string previewLayerName = "UIPreview";
 
+
     [System.Serializable]
     public class WeaponIconMap
     {
@@ -235,6 +236,8 @@ public class EquipmentManager : MonoBehaviour
     public void EquipWeapon3D(WeaponData weaponData)
     {
         if (weaponData == null) return;
+        int weaponType = weaponData.animationID;
+        playerWeaponEquipper.GetComponent<Animator>().SetInteger("WeaponType", weaponType);
         currentWeaponData = weaponData;
 
         // 1) ngoài map luôn equip được
@@ -253,6 +256,7 @@ public class EquipmentManager : MonoBehaviour
 
     public void UnequipWeapon3D()
     {
+        playerWeaponEquipper.GetComponent<Animator>().SetInteger("WeaponType", 0);
         currentWeaponData = null;
 
         if (playerWeaponEquipper != null) playerWeaponEquipper.Unequip();
