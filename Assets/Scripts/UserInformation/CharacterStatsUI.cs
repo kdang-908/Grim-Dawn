@@ -12,7 +12,7 @@ public class CharacterStatsUI : MonoBehaviour
     public TMP_Text txtEnergy;
 
     [Header("Data")]
-    public HeroStats hero; // kéo object có HeroStats vào
+    public CharacterStats stats; // kéo Player (hoặc hero object) có CharacterStats vào
 
     void OnEnable()
     {
@@ -21,13 +21,15 @@ public class CharacterStatsUI : MonoBehaviour
 
     public void Refresh()
     {
-        if (hero == null) return;
+        if (stats == null) return;
 
-        txtName.text = hero.heroName;
-        txtLevel.text = "Level: " + hero.level;
-        txtHP.text = "HP: " + hero.hp;          // ✅ CHỈ 1 SỐ
-        txtATK.text = "ATK: " + hero.atk;
-        txtDEF.text = "DEF: " + hero.def;
-        txtEnergy.text = "Energy: " + hero.energy;
+        txtName.text = stats.characterName;
+        txtLevel.text = "Level: " + stats.level;
+
+        // Hiện kiểu panel (1 số) hoặc kiểu combat (current/max) đều được:
+        txtHP.text = "HP: " + stats.maxHP;
+        txtATK.text = "ATK: " + stats.atk;
+        txtDEF.text = "DEF: " + stats.def;
+        txtEnergy.text = "Energy: " + stats.energy;
     }
 }
