@@ -18349,11 +18349,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 282554703}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &935916614 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4329676669390037082, guid: 2dc362089d3b4f94b8340bdd96041b0f, type: 3}
-  m_PrefabInstance: {fileID: 7518711237112414086}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &938397420
 GameObject:
   m_ObjectHideFlags: 0
@@ -25871,9 +25866,6 @@ MonoBehaviour:
   - {fileID: 1512601218}
   - {fileID: 1738697449}
   startWeapon: {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
-  startWeapon2: {fileID: 11400000, guid: f0325ba6d3d5baf499b0329f4cf9b311, type: 2}
-  startHelmet: {fileID: 11400000, guid: b364ebd6cc1a4f549b4058060be41a37, type: 2}
-  startChest: {fileID: 11400000, guid: 2dbd395209264c243b07a54ee5c5fe99, type: 2}
 --- !u!114 &1336979272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26551,17 +26543,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Niche
   level: 12
-  baseATK: 120
-  baseDEF: 75
-  baseMaxHP: 1000
-  equipATK: 0
-  equipDEF: 0
-  equipHP: 0
+  maxHP: 1000
   currentHP: 1000
+  atk: 120
+  def: 75
   energy: 60
-  atkText: {fileID: 569134073}
-  defText: {fileID: 1499175119}
-  hpText: {fileID: 1070867656}
 --- !u!4 &1390818331 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4866800480449944, guid: 2ac9bf91aae386d4e879dc4eeaf3c678, type: 3}
@@ -27643,11 +27629,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4866800480449944, guid: 2ac9bf91aae386d4e879dc4eeaf3c678, type: 3}
   m_PrefabInstance: {fileID: 1414029054}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1442070909 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1851331078532055879, guid: 2dc362089d3b4f94b8340bdd96041b0f, type: 3}
-  m_PrefabInstance: {fileID: 7518711237112414086}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1446518311
 GameObject:
@@ -35597,7 +35578,6 @@ MonoBehaviour:
   btnRemoveChest: {fileID: 2028816960}
   btnRemoveLegs: {fileID: 1139122219}
   btnRemoveWeapon: {fileID: 1479098615}
-  playerStats: {fileID: 1389196077}
   playerWeaponEquipper: {fileID: 1389196067}
   previewWeaponEquipper: {fileID: 0}
   previewRoot: {fileID: 6368850966352020216, guid: 330578b2b0d72fd4dab0f9197cdac4c4, type: 3}
@@ -35605,18 +35585,6 @@ MonoBehaviour:
   weaponMaps:
   - icon: {fileID: 21300000, guid: b91f3b5f1bb3c89468be3f35d9396bac, type: 3}
     data: {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
-  - icon: {fileID: 21300000, guid: 73de6b75584e1a64983ca5c6699ca0cd, type: 3}
-    data: {fileID: 11400000, guid: f0325ba6d3d5baf499b0329f4cf9b311, type: 2}
-  helmetMaps:
-  - icon: {fileID: 21300000, guid: 341aa97f7c3976a4bbdd29efb85f7f9a, type: 3}
-    data: {fileID: 11400000, guid: b364ebd6cc1a4f549b4058060be41a37, type: 2}
-  chestMaps:
-  - icon: {fileID: 21300000, guid: b82bc727059498b4daac6ccbf38de5da, type: 3}
-    data: {fileID: 11400000, guid: 2dbd395209264c243b07a54ee5c5fe99, type: 2}
-  playerHeadBone: {fileID: 935916614}
-  playerChestBone: {fileID: 1442070909}
-  previewHeadBone: {fileID: 0}
-  previewChestBone: {fileID: 0}
 --- !u!114 &1885075647
 MonoBehaviour:
   m_ObjectHideFlags: 0
