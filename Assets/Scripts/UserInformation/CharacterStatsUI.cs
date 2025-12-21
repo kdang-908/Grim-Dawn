@@ -27,9 +27,9 @@ public class CharacterStatsUI : MonoBehaviour
         txtLevel.text = "Level: " + stats.level;
 
         // Hiện kiểu panel (1 số) hoặc kiểu combat (current/max) đều được:
-        txtHP.text = "HP: " + stats.maxHP;
-        txtATK.text = "ATK: " + stats.atk;
-        txtDEF.text = "DEF: " + stats.def;
+        txtHP.text = "HP: " + stats.TotalMaxHP;
+        txtATK.text = "ATK: " + stats.TotalATK;
+        txtDEF.text = "DEF: " + stats.TotalDEF;
         txtEnergy.text = "Energy: " + stats.energy;
     }
 }

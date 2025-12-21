@@ -33,7 +33,7 @@ public class DamageHitbox : MonoBehaviour
         if (target == null) return;
         if (target == owner) return;
 
-        int damage = Mathf.Max(1, owner.atk - target.def);
+        int damage = Mathf.Max(1, owner.TotalATK - target.TotalDEF);
         target.TakeDamage(damage);
 
         Debug.Log($"{owner.characterName} hit {target.characterName} for {damage}");
