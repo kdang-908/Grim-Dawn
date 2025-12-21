@@ -6,7 +6,7 @@ public class InventoryUI : MonoBehaviour
     public GameObject inventoryPanel;
 
     [Header("Camera")]
-    public CameraController cameraController; // KÉO UI_PreviewCam / Main Cam vào đây
+    public PlayerCameraController cameraController;    // KÉO UI_PreviewCam / Main Cam vào đây
 
     [Header("Audio Settings")]
     public AudioSource audioSource;
