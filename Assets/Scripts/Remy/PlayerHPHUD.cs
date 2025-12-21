@@ -4,42 +4,58 @@ using TMPro;
 
 public class PlayerHPHUD : MonoBehaviour
 {
+    [Header("Kết nối Stats")]
     public CharacterStats stats;
 
+    [Header("UI Components")]
     public Image fill;
     public TMP_Text levelText;
     public TMP_Text hpText;
 
     [Header("Smooth HP")]
-    public float smoothSpeed = 8f;        // càng lớn càng bám nhanh
+    public float smoothSpeed = 8f;        // Tốc độ thanh máu chạy
     float shownFill = 1f;
 
     [Header("Low HP Color")]
-    [Range(0f, 1f)] public float lowHpThreshold = 0.3f;
+    [Range(0f, 1f)] public float lowHpThreshold = 0.3f; // Dưới 30% máu sẽ đỏ lòm
     public Color highColor = Color.green;
     public Color lowColor = Color.red;
 
     void Start()
     {
-        if (stats != null) shownFill = stats.HPPercent;
+        // Khởi đầu gán thanh máu đầy luôn cho đỡ bị giật
+        if (stats != null && stats.TotalMaxHP > 0)
+        {
+            shownFill = (float)stats.currentHP / stats.TotalMaxHP;
+            if (fill != null) fill.fillAmount = shownFill;
+        }
     }
 
     void Update()
     {
         if (stats == null || fill == null) return;
 
-        float targetFill = stats.HPPercent;
+        
+        // Lấy TotalMaxHP (Máu tổng) thay vì maxHP cũ
+        float maxHP = stats.TotalMaxHP;
+        float currentHP = stats.currentHP;
 
-        // 1) HP tuột mượt
+        // Tính phần trăm máu (Tránh lỗi chia cho 0)
+        float targetFill = (maxHP > 0) ? currentHP / maxHP : 0;
+
+        // 1) Hiệu ứng HP tuột mượt mà (Lerp)
         shownFill = Mathf.MoveTowards(shownFill, targetFill, Time.deltaTime * smoothSpeed);
         fill.fillAmount = shownFill;
 
-        // 2) Text
+        // 2) Cập nhật chữ số
         if (levelText != null) levelText.text = $"Lv.{stats.level}";
-        if (hpText != null) hpText.text = $"{stats.currentHP} / {stats.maxHP}";
 
-        // 3) Đổi màu khi thấp (mượt luôn)
-        float t = Mathf.InverseLerp(lowHpThreshold, 1f, targetFill); // thấp -> 0, cao -> 1
+        // Hiển thị: Máu hiện tại / Máu tổng
+        if (hpText != null) hpText.text = $"{currentHP} / {maxHP}";
+
+        // 3) Đổi màu thanh máu (Xanh -> Đỏ khi máu thấp)
+        // targetFill thấp -> màu đỏ, targetFill cao -> màu xanh
+        float t = Mathf.InverseLerp(lowHpThreshold, 1f, targetFill);
         fill.color = Color.Lerp(lowColor, highColor, t);
     }
 }

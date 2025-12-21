@@ -85,7 +85,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &3657887427829769803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,6 +117,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 5364449932426923058, guid: ab0ae1dafb93bc642969cf8fe3503489, type: 3}
   fillImage: {fileID: 5589747396827843675}
+  followPoint: {fileID: 0}
+  offset: {x: 0, y: 0.2, z: 0}
+  cam: {fileID: 0}
+  followPointName: HPBarPoint
+  autoHeadHeightPadding: 0.25
 --- !u!1 &3198976739741756636
 GameObject:
   m_ObjectHideFlags: 0
