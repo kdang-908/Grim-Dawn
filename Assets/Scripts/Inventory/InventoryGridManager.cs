@@ -6,11 +6,8 @@ public class InventoryGridManager : MonoBehaviour
 {
     public List<Image> inventorySlots = new List<Image>();
 
-    [Header("Starter Items")]
+    [Header("Starter WeaponData (kéo Sword_01_Data vào đây)")]
     public WeaponData startWeapon;
-    public WeaponData startWeapon2;
-    public ArmorData startHelmet;
-    public ArmorData startChest;
 
     void Start()
     {
@@ -20,21 +17,6 @@ public class InventoryGridManager : MonoBehaviour
         if (startWeapon != null && startWeapon.icon != null)
         {
             AddItemBackToInventory(startWeapon.icon, InventoryItem.ItemType.Weapon);
-        }
-        if (startWeapon2 != null && startWeapon2.icon != null)
-        {
-            
-            AddItemBackToInventory(startWeapon2.icon, InventoryItem.ItemType.Weapon);
-        }
-        if (startHelmet != null && startHelmet.icon != null)
-        {
-            // Thêm nón vào túi (Loại Head)
-            AddItemBackToInventory(startHelmet.icon, InventoryItem.ItemType.Head);
-        }
-        if (startChest != null && startChest.icon != null)
-        {
-            // Thêm áo vào túi (Loại Chest)
-            AddItemBackToInventory(startChest.icon, InventoryItem.ItemType.Chest);
         }
 
         Debug.Log("[InventoryGridManager] Slots = " + inventorySlots.Count);
