@@ -1,37 +1,34 @@
 ﻿using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class FollowPlayerCamera : MonoBehaviour
 {
-    [Header("Attribute Camera")]
+    [Header("Target")]
     public Transform target;
 
-    [SerializeField] private Vector3 offset;
-
-    private float yaw;
-    private float pitch;
-
-    [Header("Zoom Settings")]
-    [SerializeField] private float currentZoom = 10f;
+    [Header("Offset & Zoom")]
+    public Vector3 offset = new Vector3(0, 2, -4);
+    public float currentZoom = 10f;
     public float zoomSpeed = 4f;
     public float minZoom = 5f;
     public float maxZoom = 15f;
 
-    [Header("Rotation Settings")]
-    [SerializeField] private float yawSpeed = 200f;
-    [SerializeField] private float pitchSpeed = 120f;
-    [SerializeField] private float pitchMin = -20f;
-    [SerializeField] private float pitchMax = 60f;
+    [Header("Rotation")]
+    public float yawSpeed = 200f;
+    public float pitchSpeed = 120f;
+    public float pitchMin = -20f;
+    public float pitchMax = 60f;
+
+    float yaw;
+    float pitch;
 
     void Start()
     {
         Vector3 angles = transform.eulerAngles;
         yaw = angles.y;
         pitch = angles.x;
-
-        SetCursorLock(true); // khóa chuột khi vào game
+        SetCursorLock(true);
     }
 
-    // ✅ THÊM HÀM NÀY
     public void SetCursorLock(bool locked)
     {
         Cursor.visible = !locked;
@@ -46,24 +43,33 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
-        // (Bạn có thể giữ Q nếu muốn)
+        if (target == null) return;
+
+        // Toggle khóa chuột
         if (Input.GetKeyDown(KeyCode.Q))
         {
             bool locked = Cursor.lockState != CursorLockMode.Locked;
             SetCursorLock(locked);
         }
 
+        // Chỉ xoay quanh player khi chuột đang lock
         if (Cursor.lockState == CursorLockMode.Locked)
         {
             yaw += Input.GetAxis("Mouse X") * yawSpeed * Time.deltaTime;
             pitch -= Input.GetAxis("Mouse Y") * pitchSpeed * Time.deltaTime;
             pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
         }
+        // Chỉ dùng yaw/pitch từ chuột
 
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-        Vector3 zoomedOffset = rotation * (offset * currentZoom);
+        Quaternion camRot = Quaternion.Euler(pitch, yaw, 0);
 
-        transform.position = target.position + zoomedOffset;
+
+        // Vị trí camera = target + offset quay theo camRot và zoom
+        Vector3 camOffset = camRot * (offset.normalized * currentZoom);
+        transform.position = target.position + camOffset;
+
+        // Nhìn vào điểm hơi cao hơn (ngực/đầu)
         transform.LookAt(target.position + Vector3.up * 1.5f);
     }
+
 }
