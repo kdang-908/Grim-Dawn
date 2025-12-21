@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     public int selectedCharacter; // 0 = Male, 1 = Female
     public string playerName;
+    [Header("Gameplay prefabs (0=Remy, 1=A03)")]
+    public GameObject[] gameplayPrefabs;    
 
     void LateUpdate()
     {
@@ -43,12 +45,19 @@ public class GameManager : MonoBehaviour
     {
         selectedCharacter = index;
         playerName = name;
+        Debug.Log($"[GM] SetPlayerData selectedCharacter={selectedCharacter}, name={playerName}");
     }
 
     // ======================================
-    // LOAD MAP + CHUYỂN GAMEPLAY
+    // LOAD MAP + CHUYỂN GAMEPLAY + HIỆN NHÂN VẬT
     // CHỈ ĐƯỢC GỌI KHI NHẤN PLAY
-    // ======================================
+    //
+    public GameObject GetSelectedPrefab()
+    {
+        if (gameplayPrefabs == null) return null;
+        if (selectedCharacter < 0 || selectedCharacter >= gameplayPrefabs.Length) return null;
+        return gameplayPrefabs[selectedCharacter];
+    }
     public void StartGameplay()
     {
         // Nếu Map chưa load → load additive
@@ -76,6 +85,8 @@ public class GameManager : MonoBehaviour
 
         // Set Map làm scene active
         SceneManager.SetActiveScene(mapScene);
+        //log để biết đã chọn ai
+        Debug.Log($"[GM] Map loaded. selectedCharacter={selectedCharacter}, prefab={GetSelectedPrefab()?.name}");
 
         // Unload scene chọn nhân vật
         Scene selectionScene = SceneManager.GetSceneByName("CharacterSelection");
