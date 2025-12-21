@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59e181f3f54428d4aa73e86e707f1248, type: 3}
+  m_Name: Armor1
+  m_EditorClassIdentifier: 
+  id: 
+  displayName: 
+  icon: {fileID: 21300000, guid: b82bc727059498b4daac6ccbf38de5da, type: 3}
+  prefab: {fileID: 957065280021696300, guid: aee8bedce5ef35d418113a85f51d9af5, type: 3}
+  defense: 0
+  localPos: {x: -0.0349, y: -0.2096, z: 0.08714}
+  localEuler: {x: -7.426, y: 0, z: 0}
+  localScale: {x: 0.94679, y: 0.96162, z: 1.05375}
+  atkBonus: 0
+  defBonus: 50
+  hpBonus: 100
