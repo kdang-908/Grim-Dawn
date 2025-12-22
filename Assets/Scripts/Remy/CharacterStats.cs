@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CharacterStats : MonoBehaviour
 {
@@ -14,12 +15,28 @@ public class CharacterStats : MonoBehaviour
     public int def = 75;
     public int energy = 60;
 
+    [Header("Death")]
+    public UnityEvent onDeath;
+    bool isDead = false;
+
     public float HPPercent => maxHP <= 0 ? 0 : (float)currentHP / maxHP;
 
     public void TakeDamage(int dmg)
     {
         currentHP -= dmg;
-        if (currentHP < 0) currentHP = 0;
+        if (currentHP < 0) { 
+            currentHP = 0;
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        Debug.Log("[CharacterStats] Player ch?t");
+        onDeath?.Invoke();
     }
 
     public void Heal(int amount)
