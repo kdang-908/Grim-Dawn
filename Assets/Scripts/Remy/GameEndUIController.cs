@@ -4,13 +4,32 @@ using System.Collections;
 
 public class GameEndUIController : MonoBehaviour
 {
+    public static GameEndUIController Instance;
+
+    [Header("UI")]
     public GameObject deathScreen;
+    public GameObject victoryScreen;
+
+    [Header("Timing")]
     public float showDelay = 1.5f;
 
     void Awake()
     {
-        if (deathScreen != null)
-            deathScreen.SetActive(false);
+        // Singleton
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        gameObject.SetActive(true);
+
+        deathScreen?.SetActive(false);
+        victoryScreen?.SetActive(false);
     }
 
     void Start()
@@ -21,15 +40,14 @@ public class GameEndUIController : MonoBehaviour
     IEnumerator WaitForPlayerAndHook()
     {
         GameObject player = null;
-        CharacterStats stats = null;
 
         while (player == null)
         {
             player = GameObject.FindGameObjectWithTag("Player");
-            yield return null; // ??i frame ti?p theo
+            yield return null;
         }
 
-        stats = player.GetComponent<CharacterStats>();
+        CharacterStats stats = player.GetComponent<CharacterStats>();
         if (stats == null)
         {
             Debug.LogError("[GameEndUI] Player không có CharacterStats!");
@@ -37,10 +55,10 @@ public class GameEndUIController : MonoBehaviour
         }
 
         stats.onDeath.AddListener(OnPlayerDeath);
-        Debug.Log("[GameEndUI] ?ã hook OnDeath thành công (waited)");
+        Debug.Log("[GameEndUI] ?ã hook OnDeath");
     }
 
-
+    // ================= DEATH =================
     public void OnPlayerDeath()
     {
         StartCoroutine(ShowDeathScreenDelay());
@@ -50,12 +68,42 @@ public class GameEndUIController : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(showDelay);
 
-        if (deathScreen != null)
-            deathScreen.SetActive(true);
+        gameObject.SetActive(true);
+        victoryScreen?.SetActive(false);
+        deathScreen?.SetActive(true);
 
         Time.timeScale = 0f;
     }
 
+    // ================= VICTORY =================
+    public void ShowVictory()
+    {
+        StartCoroutine(ShowVictoryDelay());
+    }
+
+    IEnumerator ShowVictoryDelay()
+    {
+        yield return new WaitForSecondsRealtime(showDelay);
+
+        gameObject.SetActive(true);
+        deathScreen?.SetActive(false);
+        victoryScreen?.SetActive(true);
+
+        Time.timeScale = 0f;
+    }
+
+    // ================= CONTINUE =================
+    public void ContinueGame()
+    {
+        Debug.Log("[GameEndUI] Continue Game");
+
+        victoryScreen?.SetActive(false);
+        deathScreen?.SetActive(false);
+
+        Time.timeScale = 1f;
+    }
+
+    // ================= RETRY =================
     public void Retry()
     {
         Time.timeScale = 1f;

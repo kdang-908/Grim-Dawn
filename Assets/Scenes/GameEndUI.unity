@@ -342,7 +342,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathScreen: {fileID: 2084584182}
-  showDelay: 3
+  victoryScreen: {fileID: 737024714}
+  showDelay: 4
 --- !u!1 &350866844
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,7 +871,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 705488071}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 101327568}
+        m_TargetAssemblyTypeName: GameEndUIController, Assembly-CSharp
+        m_MethodName: ContinueGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &705488071
 MonoBehaviour:
   m_ObjectHideFlags: 0

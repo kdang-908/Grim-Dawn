@@ -19,7 +19,15 @@ public class CharacterStats : MonoBehaviour
     public UnityEvent onDeath;
     bool isDead = false;
 
+    PlayerDeathSound deathSound;
+
     public float HPPercent => maxHP <= 0 ? 0 : (float)currentHP / maxHP;
+
+    void Awake()
+    {
+        // T? tìm PlayerDeathSound trên cùng GameObject
+        deathSound = GetComponent<PlayerDeathSound>();
+    }
 
     public void TakeDamage(int dmg)
     {
@@ -36,6 +44,9 @@ public class CharacterStats : MonoBehaviour
         isDead = true;
 
         Debug.Log("[CharacterStats] Player ch?t");
+
+        deathSound?.PlayDeathSound();
+
         onDeath?.Invoke();
     }
 
