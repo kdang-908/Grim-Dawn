@@ -84,4 +84,9 @@ public class WeaponEquipper : MonoBehaviour
         foreach (Transform child in go.transform)
             SetLayerRecursively(child.gameObject, layer);
     }
+    public bool HasWeapon()
+    {
+        return currentWeapon != null;
+    }
+
 }

@@ -513,6 +513,27 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-645356261961862731
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0725540782e10f84b8f96e3dda96bd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slashPrefab: {fileID: 607914935907159708, guid: 22b9fc8929c1f1e43b844b37ab4cb21b, type: 3}
+  requireWeapon: 1
+  vfxSpeed: 1.4
+  lifeTime: 0.3
+  spawnAtNormalizedTime: 0.35
+  slashPointName: SlashPoint
+  faceForward: 1
+  rotationOffsetEuler: {x: 0, y: 0, z: 0}
+  destroyOnExit: 1
 --- !u!1101 &-628328478149397623
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -811,7 +832,8 @@ AnimatorState:
   - {fileID: -5615156532975716807}
   - {fileID: -4925084374370856674}
   - {fileID: -8079634428513245244}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -645356261961862731}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -921,7 +943,8 @@ AnimatorState:
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 9108483451591245254}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -993,6 +1016,21 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &5714682171525921084
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee283c78040942f4d937ba5d9c03fdd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slashPrefab: {fileID: 607914935907159708, guid: 22b9fc8929c1f1e43b844b37ab4cb21b, type: 3}
+  requireWeapon: 1
+  spawnedSlash: {fileID: 0}
 --- !u!1107 &6105827021214414800
 AnimatorStateMachine:
   serializedVersion: 6
@@ -1058,6 +1096,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &9108483451591245254
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb33a15f7c17ec245bbbefd2838040e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPrefab: {fileID: 7275548786892498063, guid: 5bc9a0bf98f67d240a936bf476ba2082, type: 3}
+  spawnAtNormalizedTime: 0.2
+  pointName: 
+  vfxSpeed: 1
+  lifeTime: 2
+  rotationOffsetEuler: {x: 0, y: 0, z: 0}
+  faceForward: 1
 --- !u!1101 &9157903121549560007
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
