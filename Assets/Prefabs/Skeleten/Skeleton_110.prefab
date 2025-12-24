@@ -752,6 +752,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyHPBar
       objectReference: {fileID: 0}
+    - target: {fileID: 2538837645768709919, guid: 48d194ece67fa7f40818b565627bc1a3, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4488728601780448171, guid: 48d194ece67fa7f40818b565627bc1a3, type: 3}
       propertyPath: m_SizeDelta.x
       value: 180

@@ -17,14 +17,13 @@ public class EquipmentManager : MonoBehaviour
 
     private InventoryGridManager gridManager;
 
-    [Header("3D Weapon Equip (ngoài map + preview)")]
-    public WeaponEquipper playerWeaponEquipper;   // Remy ngoài map
-    public WeaponEquipper previewWeaponEquipper;  // Remy preview (UI)
+    [Header("3D Weapon Equip (runtime player + preview)")]
+    public WeaponEquipper playerWeaponEquipper;   // runtime PlayerRuntime
+    public WeaponEquipper previewWeaponEquipper;  // Preview_Player (UI)
 
     [Header("Preview")]
-    public Transform previewRoot;
+    public Transform previewRoot;                 // UI_PreviewRoot
     public string previewLayerName = "UIPreview";
-
 
     [System.Serializable]
     public class WeaponIconMap
@@ -36,19 +35,19 @@ public class EquipmentManager : MonoBehaviour
     [Header("Map icon -> WeaponData")]
     public WeaponIconMap[] weaponMaps;
 
-    // nhớ vũ khí đang equip để khi mở inventory sẽ auto hiện preview
     private WeaponData currentWeaponData;
 
     void Start()
     {
         gridManager = FindFirstObjectByType<InventoryGridManager>();
 
-        // ✅ CHỈ TÌM ROOT, KHÔNG BIND SOCKET Ở ĐÂY
+        // Find preview root in loaded scenes
         if (previewRoot == null)
         {
             var go = GameObject.Find("UI_PreviewRoot");
             if (go != null) previewRoot = go.transform;
         }
+
         AutoBindRemoveButtons();
         UpdateButtons();
     }
@@ -96,7 +95,6 @@ public class EquipmentManager : MonoBehaviour
 
     public void UnequipItem(InventoryItem.ItemType type)
     {
-        Debug.Log($"[UnequipItem] called type={type}");
         Image targetSlot = GetTargetSlot(type);
         if (targetSlot == null) return;
         if (!targetSlot.enabled || targetSlot.sprite == null) return;
@@ -138,54 +136,28 @@ public class EquipmentManager : MonoBehaviour
         return null;
     }
 
-    // ===================== PREVIEW BIND (CHỈ GỌI KHI UI OPEN) =====================
+    // ===================== PREVIEW BIND =====================
     public void BindPreviewNow()
     {
-        // ✅ tìm đúng UI_PreviewRoot nào thực sự chứa WeaponSocket_R
-        if (previewRoot == null || !previewRoot.gameObject.scene.IsValid())
-        {
-            previewRoot = FindPreviewRootContainsSocket();
-        }
+        // Always refind preview root (additive scene / unload selection scene)
+        var go = GameObject.Find("UI_PreviewRoot");
+        if (go != null) previewRoot = go.transform;
 
         if (previewRoot == null)
         {
-            Debug.LogError("[BindPreviewNow] Không tìm thấy UI_PreviewRoot chứa WeaponSocket_R");
+            Debug.LogError("[BindPreviewNow] UI_PreviewRoot NULL (không có trong Map?)");
             return;
         }
 
         LateBindPreviewEquipperIfNeeded();
 
-        // ✅ nếu đang có weapon thì auto hiện preview khi mở UI
+        // If currently has weapon => show on preview immediately
         if (currentWeaponData != null && previewWeaponEquipper != null)
         {
             int layer = LayerMask.NameToLayer(previewLayerName);
             previewWeaponEquipper.Equip(currentWeaponData, layer);
-            Debug.Log("[BindPreviewNow] Auto preview equipped: " + currentWeaponData.name);
+            Debug.Log("[BindPreviewNow] Preview equipped: " + currentWeaponData.name);
         }
-    }
-
-    Transform FindPreviewRootContainsSocket()
-    {
-        var all = Object.FindObjectsByType<Transform>(
-            FindObjectsInactive.Include,
-            FindObjectsSortMode.None
-        );
-
-        foreach (var t in all)
-        {
-            if (t.name != "UI_PreviewRoot") continue;
-
-            foreach (var c in t.GetComponentsInChildren<Transform>(true))
-            {
-                if (c.name == "WeaponSocket_R")
-                {
-                    Debug.Log("[FindPreviewRoot] Picked: " + GetPath(t));
-                    return t;
-                }
-            }
-        }
-
-        return null;
     }
 
     void LateBindPreviewEquipperIfNeeded()
@@ -193,17 +165,11 @@ public class EquipmentManager : MonoBehaviour
         if (previewWeaponEquipper != null && previewWeaponEquipper.socketR != null)
             return;
 
-        if (previewRoot == null)
-        {
-            Debug.LogError("[Preview] previewRoot NULL");
-            return;
-        }
-
-        // ✅ tìm socket trong previewRoot (kể cả inactive)
+        // Find WeaponSocket_R inside previewRoot (robust trim)
         Transform socket = null;
         foreach (var t in previewRoot.GetComponentsInChildren<Transform>(true))
         {
-            if (t.name == "WeaponSocket_R")
+            if (t.name.Trim() == "WeaponSocket_R")
             {
                 socket = t;
                 break;
@@ -212,14 +178,14 @@ public class EquipmentManager : MonoBehaviour
 
         if (socket == null)
         {
-            Debug.LogError("[Preview] Không tìm thấy WeaponSocket_R trong " + GetPath(previewRoot));
+            Debug.LogError("[BindPreviewNow] Không tìm thấy WeaponSocket_R trong UI_PreviewRoot. (check tên socket có đúng/không có dấu cách)");
             return;
         }
 
         var anim = socket.GetComponentInParent<Animator>(true);
         if (anim == null)
         {
-            Debug.LogError("[Preview] Không tìm thấy Animator cho preview model (parent của socket)");
+            Debug.LogError("[BindPreviewNow] Preview model không có Animator (parent của socket)");
             return;
         }
 
@@ -229,24 +195,40 @@ public class EquipmentManager : MonoBehaviour
 
         previewWeaponEquipper.socketR = socket;
 
-        Debug.Log("[Preview] Bind OK socket path=" + GetPath(socket));
+        // optional: auto find WeaponGrip in preview too
+        // (WeaponEquipper will auto find, but ok to keep)
+        Debug.Log("[BindPreviewNow] Preview bind OK socket=" + GetPath(socket));
     }
 
     // ===================== EQUIP 3D =====================
     public void EquipWeapon3D(WeaponData weaponData)
     {
         if (weaponData == null) return;
-        int weaponType = weaponData.animationID;
-        playerWeaponEquipper.GetComponent<Animator>().SetInteger("WeaponType", weaponType);
+
+        // Find runtime player equipper if missing
+        if (playerWeaponEquipper == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+                playerWeaponEquipper = player.GetComponentInChildren<WeaponEquipper>(true);
+        }
+
+        if (playerWeaponEquipper == null)
+        {
+            Debug.LogError("[EquipWeapon3D] playerWeaponEquipper NULL (runtime player chưa có WeaponEquipper?)");
+            return;
+        }
+
+        // set anim param
+        var anim = playerWeaponEquipper.GetComponentInChildren<Animator>(true);
+        if (anim != null) anim.SetInteger("WeaponType", weaponData.animationID);
+
         currentWeaponData = weaponData;
 
-        // 1) ngoài map luôn equip được
-        if (playerWeaponEquipper == null)
-            Debug.LogError("[EquipWeapon3D] playerWeaponEquipper NULL -> kéo WeaponEquipper của Remy ngoài map vào EquipmentManager!");
-        else
-            playerWeaponEquipper.Equip(weaponData);
+        // equip on runtime player
+        playerWeaponEquipper.Equip(weaponData);
 
-        // 2) preview chỉ equip nếu đã bind rồi
+        // equip on preview if already bound
         if (previewWeaponEquipper != null)
         {
             int layer = LayerMask.NameToLayer(previewLayerName);
@@ -256,11 +238,18 @@ public class EquipmentManager : MonoBehaviour
 
     public void UnequipWeapon3D()
     {
-        playerWeaponEquipper.GetComponent<Animator>().SetInteger("WeaponType", 0);
-        currentWeaponData = null;
+        if (playerWeaponEquipper != null)
+        {
+            var anim = playerWeaponEquipper.GetComponentInChildren<Animator>(true);
+            if (anim != null) anim.SetInteger("WeaponType", 0);
 
-        if (playerWeaponEquipper != null) playerWeaponEquipper.Unequip();
-        if (previewWeaponEquipper != null) previewWeaponEquipper.Unequip();
+            playerWeaponEquipper.Unequip();
+        }
+
+        if (previewWeaponEquipper != null)
+            previewWeaponEquipper.Unequip();
+
+        currentWeaponData = null;
     }
 
     static string GetPath(Transform t)
@@ -269,6 +258,7 @@ public class EquipmentManager : MonoBehaviour
         while (t.parent != null) { t = t.parent; p = t.name + "/" + p; }
         return p;
     }
+
     void AutoBindRemoveButtons()
     {
         Bind(btnRemoveHead, InventoryItem.ItemType.Head);
@@ -279,18 +269,12 @@ public class EquipmentManager : MonoBehaviour
 
     void Bind(GameObject btn, InventoryItem.ItemType type)
     {
-        if (btn == null) { Debug.LogWarning($"[Bind] btn null: {type}"); return; }
+        if (btn == null) return;
 
         var b = btn.GetComponent<Button>();
-        if (b == null) { Debug.LogWarning($"[Bind] no Button on {btn.name}"); return; }
+        if (b == null) return;
 
         b.onClick.RemoveAllListeners();
-        b.onClick.AddListener(() =>
-        {
-            Debug.Log($"[CLICK X] {type}  btn={btn.name}");
-            UnequipItem(type);
-        });
-
-        Debug.Log($"[Bind OK] {type} -> {btn.name}");
+        b.onClick.AddListener(() => UnequipItem(type));
     }
 }

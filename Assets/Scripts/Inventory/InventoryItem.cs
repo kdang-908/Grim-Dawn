@@ -17,7 +17,8 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
         if (itemImage == null) itemImage = GetComponent<Image>();
         if (itemImage == null) itemImage = GetComponentInChildren<Image>(true);
 
-        equipmentManager = FindFirstObjectByType<EquipmentManager>();
+        // ✅ include inactive để vẫn tìm được EquipmentManager dù inventoryPanel đang tắt
+        equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
         // Icon -> ItemButton -> InventorySlot -> RemoveButton
         if (transform.parent != null && transform.parent.parent != null)
@@ -33,15 +34,21 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
     public void SetItem(Sprite sprite, ItemType type)
     {
         itemType = type;
-        itemImage.sprite = sprite;
-        itemImage.enabled = (sprite != null);
+        if (itemImage != null)
+        {
+            itemImage.sprite = sprite;
+            itemImage.enabled = (sprite != null);
+        }
         RefreshRemoveButton();
     }
 
     public void ClearItem()
     {
-        itemImage.sprite = null;
-        itemImage.enabled = false;
+        if (itemImage != null)
+        {
+            itemImage.sprite = null;
+            itemImage.enabled = false;
+        }
         RefreshRemoveButton();
     }
 
@@ -54,7 +61,13 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        // Double click mới equip
         if (eventData.clickCount != 2) return;
+
+        // nếu chưa tìm thấy do load scene, tìm lại
+        if (equipmentManager == null)
+            equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+
         if (equipmentManager == null || itemImage == null) return;
         if (!itemImage.enabled || itemImage.sprite == null) return;
 
@@ -71,5 +84,8 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
         }
 
         RefreshRemoveButton();
+
+        // ✅ QUAN TRỌNG: cập nhật preview + vũ khí NGAY LẬP TỨC
+        equipmentManager.BindPreviewNow();
     }
 }

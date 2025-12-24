@@ -2,11 +2,11 @@
 
 public class SkeletonAI : MonoBehaviour
 {
-    private GameObject player;          // Player object
-    private PlayerHealth playerHealth; 
+    private GameObject player;
+    private CharacterStats playerStats;  // Dùng CharacterStats thay vì PlayerHealth
 
     [Header("AI Settings")]
-    public float chaseRange = 10f;
+    public float chaseRange = 100f;
     public float attackRange = 1.8f;
     public float moveSpeed = 2f;
     public float attackCooldown = 1.3f;
@@ -18,36 +18,56 @@ public class SkeletonAI : MonoBehaviour
     void Start()
     {
         anim = GetComponent<Animator>();
+        RefreshPlayer();
+    }
 
-        //Tự tìm Player theo Tag
+    public void RefreshPlayer()
+    {
         player = GameObject.FindGameObjectWithTag("Player");
 
         if (player != null)
-            playerHealth = player.GetComponent<PlayerHealth>();
-        //    else
-        //        Debug.LogWarning("⚠ SkeletonAI không tìm thấy Player! Hãy chắc chắn Player có Tag = Player");
-        //}
+        {
+            playerStats = player.GetComponent<CharacterStats>();
+            if (playerStats == null) playerStats = player.GetComponentInChildren<CharacterStats>();
+            if (playerStats == null) playerStats = player.GetComponentInParent<CharacterStats>();
+
+            if (playerStats != null)
+                Debug.Log($"[SkeletonAI] {name} tìm thấy player: {player.name}");
+            else
+                Debug.LogError($"[SkeletonAI] {name} player có Tag=Player nhưng KHÔNG tìm thấy CharacterStats ở root/child/parent!");
+        }
+        else
+        {
+            Debug.LogWarning($"[SkeletonAI] {name} không tìm thấy Player! (Tag Player)");
+        }
     }
+
+
     void Update()
     {
-        if (player == null) return;
-
-            if (State != null && State.currentHP <= 0)
+        if (player == null)
+        {
+            if (Time.frameCount % 60 == 0)
             {
-                HandleDead();
-                return;
+                RefreshPlayer();
             }
+            return;
+        }
 
-            float dist = Vector3.Distance(transform.position, player.transform.position);
+        if (State != null && State.currentHP <= 0)
+        {
+            HandleDead();
+            return;
+        }
 
-        // Ngoài tầm đuổi → đứng yên
+        float dist = Vector3.Distance(transform.position, player.transform.position);
+
         if (dist > chaseRange)
         {
             anim.SetBool("isMoving", false);
             return;
         }
 
-        // Trong tầm đuổi nhưng chưa tới tầm đánh → đi đến player
         if (dist > attackRange)
         {
             MoveTowardsPlayer();
@@ -56,9 +76,7 @@ public class SkeletonAI : MonoBehaviour
         {
             Attack();
         }
-        
     }
-
 
     void MoveTowardsPlayer()
     {
@@ -67,10 +85,9 @@ public class SkeletonAI : MonoBehaviour
         Vector3 dir = (player.transform.position - transform.position).normalized;
         dir.y = 0;
 
-        // quay mặt về phía player
-        transform.rotation = Quaternion.LookRotation(dir);
+        if (dir.sqrMagnitude > 0.0001f)
+            transform.rotation = Quaternion.LookRotation(dir);
 
-        // di chuyển
         transform.position += dir * moveSpeed * Time.deltaTime;
     }
 
@@ -78,54 +95,59 @@ public class SkeletonAI : MonoBehaviour
     {
         anim.SetBool("isMoving", false);
 
-        // cooldown chưa kết thúc
         if (Time.time - lastAttackTime < attackCooldown)
+        {
             return;
+        }
 
         lastAttackTime = Time.time;
-
-        // Animation đánh
         anim.SetTrigger("attack");
 
-        // Player đã chết → không đánh nữa
-        if (playerHealth == null) return;
+        // SỬA: Kiểm tra playerStats thay vì playerHealth
+        if (playerStats == null)
+        {
+            Debug.LogWarning("[SkeletonAI] playerStats == null, không gây damage");
+            return;
+        }
 
-        // gây damage
-        playerHealth.TakeDamage(10);
+        // SỬA: Gọi TakeDamage của CharacterStats
+        playerStats.TakeDamage(10);
+        Debug.Log($"[SkeletonAI] {name} gây 10 damage, player HP: {playerStats.currentHP}/{playerStats.maxHP}");
     }
+
     void HandleDead()
     {
+        Debug.Log($"[SkeletonAI] {name} HandleDead()");
+
         anim.SetTrigger("Dead");
 
-        // Tắt các thành phần vật lý
-        if (GetComponent<Collider>()) GetComponent<Collider>().enabled = false;
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null) rb.isKinematic = true;
 
-        // Bắt đầu quá trình tan biến
         StartCoroutine(Disappear());
-
         this.enabled = false;
     }
+
     System.Collections.IEnumerator Disappear()
     {
-        // Đợi 3 giây để người chơi nhìn thấy xác quái
         yield return new WaitForSeconds(3f);
 
         float timer = 0;
-        float disappearDuration = 2f; // Biến mất trong 2 giây
+        float disappearDuration = 2f;
         Vector3 startPos = transform.position;
-        Vector3 endPos = startPos + Vector3.down * 2f; // Chìm xuống 2 mét
+        Vector3 endPos = startPos + Vector3.down * 2f;
 
         while (timer < disappearDuration)
         {
-            // Vừa cho chìm xuống đất nhẹ nhàng
             transform.position = Vector3.Lerp(startPos, endPos, timer / disappearDuration);
             timer += Time.deltaTime;
             yield return null;
         }
 
-        // Sau khi chìm xong thì mới xóa khỏi game
+        Debug.Log($"[SkeletonAI] {name} Destroy after disappear");
         Destroy(gameObject);
     }
 }
