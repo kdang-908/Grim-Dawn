@@ -1461,7 +1461,7 @@ GameObject:
   - component: {fileID: -5348699260533614558}
   m_Layer: 0
   m_Name: A03_Gameplay
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1527,11 +1527,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: -5682574121528800800}
   animator: {fileID: 8336804078676250359}
-  moveSpeed: 5
-  rotationSpeed: 10
-  runSpeed: 8
   hitbox: {fileID: 6747716806228177594}
   State: {fileID: -7213126817987106080}
+  moveSpeed: 5
+  runSpeed: 8
+  rotationSpeed: 10
+  jumpForce: 5
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckDistance: 0.2
+  characterSelectScene: CharacterSelection
+  disableColliderInSelection: 1
+  freezeAllInSelection: 1
 --- !u!54 &-5682574121528800800
 Rigidbody:
   m_ObjectHideFlags: 0

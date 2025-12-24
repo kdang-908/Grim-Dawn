@@ -27,22 +27,21 @@ public class SkeletonAI : MonoBehaviour
 
         if (player != null)
         {
-            playerStats = player.GetComponent<CharacterStats>();  // SỬA: Lấy CharacterStats
+            playerStats = player.GetComponent<CharacterStats>();
+            if (playerStats == null) playerStats = player.GetComponentInChildren<CharacterStats>();
+            if (playerStats == null) playerStats = player.GetComponentInParent<CharacterStats>();
 
             if (playerStats != null)
-            {
-                Debug.Log($"[SkeletonAI] {name} tìm thấy player: {player.name} tại {player.transform.position}");
-            }
+                Debug.Log($"[SkeletonAI] {name} tìm thấy player: {player.name}");
             else
-            {
-                Debug.LogError($"[SkeletonAI] {name} player không có CharacterStats component!");
-            }
+                Debug.LogError($"[SkeletonAI] {name} player có Tag=Player nhưng KHÔNG tìm thấy CharacterStats ở root/child/parent!");
         }
         else
         {
-            Debug.LogWarning($"[SkeletonAI] {name} không tìm thấy Player! Gán Tag = Player cho nhân vật.");
+            Debug.LogWarning($"[SkeletonAI] {name} không tìm thấy Player! (Tag Player)");
         }
     }
+
 
     void Update()
     {

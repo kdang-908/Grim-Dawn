@@ -2,65 +2,39 @@
 
 public class PlayerSpawner : MonoBehaviour
 {
-    public Transform spawnPoint;
+    public string playerTag = "Player";
 
     void Start()
     {
-        Debug.Log("[PlayerSpawner] Start");
-
-        var gm = GameManager.Instance;
-        if (gm == null)
+        // Nếu đã có Player => khỏi spawn
+        var exist = GameObject.FindGameObjectWithTag(playerTag);
+        if (exist != null)
         {
-            Debug.LogError("[PlayerSpawner] GameManager.Instance == null");
+            Debug.Log("[PlayerSpawner] Player already exists, skip spawn.");
             return;
         }
 
-        var prefab = gm.GetSelectedPrefab();
-        Debug.Log($"[PlayerSpawner] selectedCharacter={gm.selectedCharacter}, prefab={(prefab ? prefab.name : "null")}");
+        // Lấy prefab từ GameManager (ưu tiên)
+        GameObject prefab = null;
+        if (GameManager.Instance != null)
+            prefab = GameManager.Instance.GetSelectedPrefab();
+
+        // fallback PlayerPrefs (nếu cần)
+        if (prefab == null && GameManager.Instance != null && GameManager.Instance.gameplayPrefabs != null)
+        {
+            int gender = PlayerPrefs.GetInt("SelectedGender", 0);
+            if (gender >= 0 && gender < GameManager.Instance.gameplayPrefabs.Length)
+                prefab = GameManager.Instance.gameplayPrefabs[gender];
+        }
 
         if (prefab == null)
         {
-            Debug.LogError("[PlayerSpawner] No selected prefab.");
+            Debug.LogError("[PlayerSpawner] Selected prefab NULL. Check GameManager.gameplayPrefabs");
             return;
         }
 
-        // XÓA TẤT CẢ PLAYER CŨ (nếu có)
-        GameObject[] oldPlayers = GameObject.FindGameObjectsWithTag("Player");
-        foreach (var old in oldPlayers)
-        {
-            Debug.Log($"[PlayerSpawner] Xóa player cũ: {old.name}");
-            Destroy(old);
-        }
-
-        // SPAWN PLAYER MỚI
-        var p = spawnPoint != null ? spawnPoint : transform;
-        GameObject player = Instantiate(prefab, p.position, p.rotation);
-        player.name = "Player"; // đổi tên cho dễ nhận
-
-        // GÁN TAG "Player"
-        if (player.tag != "Player")
-        {
-            player.tag = "Player";
-            Debug.Log($"[PlayerSpawner] Đã gán tag 'Player' cho {player.name}");
-        }
-
-        Debug.Log($"[PlayerSpawner] Player spawned: {player.name} tại {player.transform.position}");
-
-        // Lưu reference
-        PlayerRef.Instance = player.transform;
-
-        // BẮT SKELETON TÌM LẠI PLAYER
-        NotifyEnemies();
-    }
-
-    // Gọi tất cả skeleton tìm lại player
-    void NotifyEnemies()
-    {
-        SkeletonAI[] skeletons = FindObjectsOfType<SkeletonAI>();
-        foreach (var sk in skeletons)
-        {
-            sk.RefreshPlayer();
-        }
-        Debug.Log($"[PlayerSpawner] Đã thông báo {skeletons.Length} skeleton tìm lại player");
+        var p = Instantiate(prefab, transform.position, transform.rotation);
+        p.tag = playerTag;
+        p.name = "PlayerRuntime";
     }
 }

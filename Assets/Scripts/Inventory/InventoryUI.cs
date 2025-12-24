@@ -52,12 +52,22 @@ public class InventoryUI : MonoBehaviour
     }
     System.Collections.IEnumerator BindPreviewNextFrame()
     {
-        yield return null; // đợi 1 frame cho UI + Animator init xong
+        yield return null;
 
-        var em = FindFirstObjectByType<EquipmentManager>();
-        if (em != null)
-            em.BindPreviewNow();   // gọi bind tại đây
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogError("[InventoryUI] Player not found (tag Player).");
+            yield break;
+        }
+
+        var preview = FindFirstObjectByType<UICharacterPreview>();
+        if (preview != null)
+            preview.BindFromPlayer(player);
+        else
+            Debug.LogError("[InventoryUI] UICharacterPreview not found in scene!");
     }
+
 
 
 }

@@ -1,145 +1,273 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using System.Collections;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class HumanController : MonoBehaviour
 {
+    [Header("Refs")]
     public Rigidbody rb;
-    private bool isGrounded = false;
-
     public Animator animator;
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 10f;
-
-    private bool jumpPressed = false;
-
-    public float runSpeed = 8f;   // tốc độ khi chạy
-    private bool isRunning = false;
     public DamageHitbox hitbox;
-
     public CharacterStats State;
+
+    [Header("Move")]
+    public float moveSpeed = 5f;
+    public float runSpeed = 8f;
+    public float rotationSpeed = 12f;
+
+    [Header("Jump")]
+    public float jumpForce = 5f;
+    public LayerMask groundMask;
+    public float groundCheckDistance = 0.2f;
+
+    [Header("Input Blocking")]
+    public string characterSelectScene = "CharacterSelection";
+
+    [Header("Selection Mode (Preview)")]
+    public bool disableColliderInSelection = true;
+    public bool freezeAllInSelection = true;
+
+    [Header("UI State")]
+    [Tooltip("Bật TRUE khi đang mở Inventory/Shop/Dialog để chặn điều khiển nhân vật")]
+    public bool isUIOpen = false;
+
+    private bool isRunning;
+    private bool jumpPressed;
+    private bool isGrounded;
+
+    private CapsuleCollider col;
+
+    void Awake()
+    {
+        if (rb == null) rb = GetComponent<Rigidbody>();
+        if (animator == null) animator = GetComponentInChildren<Animator>();
+        col = GetComponent<CapsuleCollider>();
+
+        if (animator != null) animator.applyRootMotion = false;
+
+        if (rb != null)
+        {
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        }
+
+        ApplySceneMode(SceneManager.GetActiveScene().name);
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        ApplySceneMode(newScene.name);
+    }
+
+    void ApplySceneMode(string sceneName)
+    {
+        bool isSelection = (sceneName == characterSelectScene);
+        if (rb == null) return;
+
+        // stop trước khi đổi mode
+        if (!rb.isKinematic)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        if (isSelection)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+
+            rb.constraints = freezeAllInSelection
+                ? RigidbodyConstraints.FreezeAll
+                : RigidbodyConstraints.FreezeRotation;
+
+            if (disableColliderInSelection && col != null)
+                col.enabled = false;
+        }
+        else
+        {
+            if (col != null) col.enabled = true;
+
+            rb.isKinematic = false;
+            rb.useGravity = true;
+
+            // khóa lật người theo X/Z
+            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            jumpPressed = true;
-        if (Input.GetMouseButtonDown(0))
-        {
-            HandleAttack();
-        }
+        // scene chọn nhân vật: không điều khiển
+        if (SceneManager.GetActiveScene().name == characterSelectScene)
+            return;
+
+        // chết thì stop
         if (State != null && State.currentHP <= 0)
         {
-            animator.SetTrigger("Dead");
-            this.enabled = false;
+            if (animator != null) animator.SetTrigger("Dead");
+            enabled = false;
+            return;
+        }
+
+        // UI đang mở: chặn input + đứng yên
+        if (isUIOpen)
+        {
+            StopMotionAndAnim();
+            jumpPressed = false;
+            return;
+        }
+
+        isRunning = Input.GetKey(KeyCode.LeftShift);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            jumpPressed = true;
+
+        // Attack: chỉ khi click vào game world (không click UI)
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            HandleAttack();
         }
     }
 
     void FixedUpdate()
     {
+        if (SceneManager.GetActiveScene().name == characterSelectScene)
+            return;
+
+        if (isUIOpen)
+        {
+            // UI mở thì không di chuyển bằng physics
+            if (rb != null && !rb.isKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+            return;
+        }
+
+        GroundCheck();
         HandleMovement();
+        HandleJump();
     }
 
     void HandleMovement()
     {
+        if (rb == null) return;
 
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
 
-        float ipHorizontal = Input.GetAxis("Horizontal");
-        float ipVertical = Input.GetAxis("Vertical");
+        Vector3 moveDir;
 
-        // Camera-relative movement
-        Transform cam = Camera.main.transform;
-
-        Vector3 camForward = cam.forward; camForward.y = 0; camForward.Normalize();
-        Vector3 camRight = cam.right; camRight.y = 0; camRight.Normalize();
-
-        Vector3 movement = ipHorizontal * camRight + ipVertical * camForward;
-
-        if (movement.magnitude > 1f)
-            movement.Normalize();
-
-        animator.SetBool("isWalking", movement.sqrMagnitude > 0.01f);
-
-        float finalSpeed = isRunning ? runSpeed : moveSpeed;
-
-        rb.MovePosition(transform.position + movement * finalSpeed * Time.fixedDeltaTime);
-
-        // --- JUMP ---
-        if (jumpPressed && isGrounded)
+        if (Camera.main != null)
         {
-            rb.AddForce(Vector3.up * 5f, ForceMode.Impulse);
-            animator.SetBool("isJumping", true);
-            isGrounded = false;
+            Transform cam = Camera.main.transform;
+            Vector3 camForward = cam.forward; camForward.y = 0; camForward.Normalize();
+            Vector3 camRight = cam.right; camRight.y = 0; camRight.Normalize();
+            moveDir = camRight * h + camForward * v;
         }
         else
         {
-            jumpPressed = false;
+            moveDir = new Vector3(h, 0, v);
         }
-        HandleRotation(movement);
-        HandleRunning(movement);
+
+        if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
+
+        bool moving = moveDir.sqrMagnitude > 0.01f;
+        if (animator != null)
+        {
+            animator.SetBool("isWalking", moving);
+            animator.SetBool("isRunning", moving && isRunning);
+        }
+
+        float speed = isRunning ? runSpeed : moveSpeed;
+
+        Vector3 nextPos = rb.position + moveDir * speed * Time.fixedDeltaTime;
+        rb.MovePosition(nextPos);
+
+        if (moving)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(moveDir);
+            Quaternion newRot = Quaternion.Slerp(rb.rotation, targetRot, rotationSpeed * Time.fixedDeltaTime);
+            rb.MoveRotation(newRot);
+        }
     }
 
-
-    private void OnCollisionEnter(Collision collision)
+    void HandleJump()
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (rb == null) return;
+        if (!jumpPressed) return;
+
+        if (isGrounded)
         {
-            isGrounded = true;
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            if (animator != null) animator.SetBool("isJumping", true);
+        }
+
+        jumpPressed = false;
+    }
+
+    void GroundCheck()
+    {
+        if (col == null) return;
+
+        Vector3 origin = transform.position + Vector3.up * 0.05f;
+        float rayLen = (col.height * 0.5f) + groundCheckDistance;
+
+        if (groundMask.value != 0)
+            isGrounded = Physics.Raycast(origin, Vector3.down, rayLen, groundMask, QueryTriggerInteraction.Ignore);
+        else
+            isGrounded = Physics.Raycast(origin, Vector3.down, rayLen, ~0, QueryTriggerInteraction.Ignore);
+
+        if (isGrounded && animator != null)
             animator.SetBool("isJumping", false);
-        }
-    }
-    void HandleRunning(Vector3 movement)
-    {
-        // Chỉ chạy khi có lực di chuyển
-        bool moving = movement.sqrMagnitude > 0.01f;
-
-        // Giữ shift để chạy
-        if (moving && Input.GetKey(KeyCode.LeftShift))
-        {
-            isRunning = true;
-            animator.SetBool("isRunning", true);
-        }
-        else
-        {
-            isRunning = false;
-            animator.SetBool("isRunning", false);
-        }
-    }
-
-    void HandleRotation(Vector3 movement)
-    {
-        movement.y = 0;
-
-        if (movement.sqrMagnitude > 0.01f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation,
-                                                  targetRotation,
-                                                  rotationSpeed * Time.deltaTime);
-        }
     }
 
     void HandleAttack()
     {
-        int currentWeaponID = animator.GetInteger("WeaponType");
-        animator.SetTrigger("Attack");
+        if (animator != null) animator.SetTrigger("Attack");
 
-        // bật hitbox 1 khoảng ngắn đúng lúc ra đòn (tạm thời)
         if (hitbox != null)
             StartCoroutine(AttackWindow());
     }
 
-    System.Collections.IEnumerator AttackWindow()
+    IEnumerator AttackWindow()
     {
-        Debug.Log("[Player] EnableHit");
-        hitbox.EnableHit();                 // bật vùng gây damage
-        yield return new WaitForSeconds(0.4f);// thời gian chém "ăn"
-        hitbox.DisableHit();                // tắt lại
+        hitbox.EnableHit();
+        yield return new WaitForSeconds(0.4f);
+        hitbox.DisableHit();
     }
 
-    void HandleDead()
+    void StopMotionAndAnim()
     {
-        if (State != null)
+        // đứng yên
+        if (rb != null && !rb.isKinematic)
         {
-            int currentHP = State.currentHP;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // tránh kẹt anim đang chạy
+        if (animator != null)
+        {
+            animator.SetBool("isWalking", false);
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isJumping", false);
         }
     }
-
 }
