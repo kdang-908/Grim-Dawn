@@ -11,6 +11,7 @@ public class PlayerSpawner : MonoBehaviour
         if (exist != null)
         {
             Debug.Log("[PlayerSpawner] Player already exists, skip spawn.");
+            BindPotionManager(exist);
             return;
         }
 
@@ -36,5 +37,27 @@ public class PlayerSpawner : MonoBehaviour
         var p = Instantiate(prefab, transform.position, transform.rotation);
         p.tag = playerTag;
         p.name = "PlayerRuntime";
+
+        // ✅ Gắn CharacterStats vào PotionManager
+        BindPotionManager(p);
+    }
+
+    private void BindPotionManager(GameObject playerObj)
+    {
+        var potion = FindObjectOfType<PotionManager>();
+        if (potion == null)
+        {
+            Debug.LogWarning("[PlayerSpawner] PotionManager not found in scene.");
+            return;
+        }
+
+        var stats = playerObj.GetComponent<CharacterStats>();
+        if (stats == null)
+        {
+            Debug.LogWarning("[PlayerSpawner] CharacterStats not found on spawned player.");
+            return;
+        }
+
+        potion.RegisterCharacter(stats);   // <- hàm bạn có trong PotionManager bản RegisterCharacter
     }
 }
