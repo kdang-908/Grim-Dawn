@@ -2263,7 +2263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5768957, g: 0.6516127, b: 0.6603774, a: 1}
+  m_Color: {r: 0.5768957, g: 0.6516127, b: 0.6603774, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3640,7 +3640,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5803922, g: 0.654902, b: 0.6627451, a: 1}
+  m_Color: {r: 0.5803922, g: 0.654902, b: 0.6627451, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3939,7 +3939,7 @@ MonoBehaviour:
   nameInput: {fileID: 1262999210}
   maleBackground: {fileID: 939527531}
   femaleBackground: {fileID: 1541736531}
-  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 0.09900318, g: 0.41531858, b: 0.509434, a: 1}
 --- !u!1 &1703606088
 GameObject:
