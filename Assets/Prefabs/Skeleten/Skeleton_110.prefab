@@ -342,6 +342,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 1111292475204979539, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}
       propertyPath: m_Layer
       value: 9
@@ -650,6 +654,9 @@ MonoBehaviour:
   atk: 200
   def: 10
   energy: 10
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3142071906304263204
 MonoBehaviour:
   m_ObjectHideFlags: 0

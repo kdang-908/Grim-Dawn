@@ -16,6 +16,9 @@ public class EnemySpawner : MonoBehaviour
     // Tránh quái bị spawn chồng lên nhau
     public float spawnRadius = 3f;
 
+    [HideInInspector]
+    public bool finishedSpawning = false;
+
     private void Start()
     {
         // Bắt đầu coroutine spawn từng con theo thời gian
@@ -33,6 +36,9 @@ public class EnemySpawner : MonoBehaviour
             // Chờ spawnDelay giây rồi spawn tiếp
             yield return new WaitForSeconds(spawnDelay);
         }
+
+        finishedSpawning = true;
+        Debug.Log("EnemySpawner: Spawn xong toàn bộ");
     }
 
     void SpawnOneEnemy()
