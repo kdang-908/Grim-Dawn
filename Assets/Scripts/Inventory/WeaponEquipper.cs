@@ -120,4 +120,9 @@ public class WeaponEquipper : MonoBehaviour
         while (t.parent != null) { t = t.parent; p = t.name + "/" + p; }
         return p;
     }
+    public bool HasWeapon()
+    {
+        return currentWeapon != null;
+    }
 }
+

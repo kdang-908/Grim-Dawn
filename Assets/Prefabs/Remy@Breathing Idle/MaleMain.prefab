@@ -509,13 +509,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1500312075712727920}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.35355338, y: -0.35355338, z: 0.1464466, w: 0.8535535}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8679757435360638751}
-  m_LocalEulerAnglesHint: {x: 45, y: -45, z: 0}
+  m_LocalEulerAnglesHint: {x: 180, y: 180, z: 90}
 --- !u!1 &1866336233893588810
 GameObject:
   m_ObjectHideFlags: 0
@@ -2470,6 +2470,65 @@ Transform:
   - {fileID: 6622102323849874828}
   m_Father: {fileID: 5832831534633741820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7607629224002611467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5379173301562917900}
+  - component: {fileID: 989482811970614020}
+  m_Layer: 9
+  m_Name: 'SkillOrigin '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5379173301562917900
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607629224002611467}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.02, y: 1.83, z: 0.782}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 748706353881486650}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &989482811970614020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607629224002611467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ea9cb8c104f7c247a6c925523a13439, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  owner: {fileID: 3841657572761979296}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  range: 10
+  width: 2
+  height: 3
+  vfxPrefab: {fileID: 3020920808754819069, guid: d860dbff6d19af4448c7d0e478fa5cef, type: 3}
+  vfxSpawn: {fileID: 5379173301562917900}
+  vfxLifeTime: 1.5
+  vfxRotationOffsetEuler: {x: 0, y: 0, z: -130}
+  vfxForwardOffset: 1
+  vfxHeightOffset: 0.5
+  skillSfx: {fileID: 8300000, guid: 3fcf015437042fc42a68006133b9e56e, type: 3}
+  sfxVolume: 1
 --- !u!1 &7640309133363822279
 GameObject:
   m_ObjectHideFlags: 0
@@ -3025,6 +3084,8 @@ GameObject:
   - component: {fileID: -3310607899756782912}
   - component: {fileID: 648694878344581054}
   - component: {fileID: 4432537951179705087}
+  - component: {fileID: 927711790318569398}
+  - component: {fileID: -5125582162719894909}
   m_Layer: 9
   m_Name: MaleMain
   m_TagString: Player
@@ -3053,6 +3114,7 @@ Transform:
   - {fileID: 6684949583141525502}
   - {fileID: 6289256480577962374}
   - {fileID: 4967529350434952253}
+  - {fileID: 5379173301562917900}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &4744597665485558973
@@ -3104,6 +3166,9 @@ MonoBehaviour:
   characterSelectScene: CharacterSelection
   disableColliderInSelection: 1
   freezeAllInSelection: 1
+  skillTriggerName: SkillAttack
+  skillHitbox: {fileID: 0}
+  skillCooldown: 1
   isUIOpen: 0
 --- !u!54 &8098037336797364032
 Rigidbody:
@@ -3168,7 +3233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Niche
-  level: 12
+  level: 1
   maxHP: 1000
   currentHP: 1000
   atk: 120
@@ -3229,7 +3294,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -3314,3 +3379,37 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &927711790318569398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8952777963030538478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76b7934cdebbeb14ba65a831d81c64d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skill: {fileID: 989482811970614020}
+--- !u!114 &-5125582162719894909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8952777963030538478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 610b9c54a60ecdb43aeea77da84e6c50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stats: {fileID: 3841657572761979296}
+  currentExp: 0
+  expToNextLevel: 50
+  audioSource: {fileID: 4432537951179705087}
+  levelUpClip: {fileID: 8300000, guid: 1f27ff952df243d4d9e709b5356dc94d, type: 3}
+  levelUpVolume: 0.85
+  levelUpVfxPrefab: {fileID: 3125908671876608230, guid: 2e07e5ba5a6e8b74d8206f9be0e29d37, type: 3}
+  levelUpVfxLifeTime: 2
+  levelUpVfxOffset: {x: 0, y: 1.6, z: 0}

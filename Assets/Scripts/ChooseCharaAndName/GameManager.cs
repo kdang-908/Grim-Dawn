@@ -6,11 +6,15 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public int selectedCharacter; // 0 = Remy, 1 = A03
-    public string playerName;
+    [Header("Player data")]
+    public int selectedCharacter;          // 0 = Remy, 1 = A03
+    public string playerName = "Niche";    // tên mặc định, sẽ bị override khi nhập
 
     [Header("Gameplay prefabs (0=Remy, 1=A03)")]
     public GameObject[] gameplayPrefabs;
+
+    [Header("Currency")]
+    public int gold = 0;                   // tổng vàng hiện có
 
     [Header("Spawn")]
     public string playerTag = "Player";
@@ -23,9 +27,13 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
+    // Gọi ở màn hình chọn nhân vật
     public void SetPlayerData(int index, string name)
     {
         selectedCharacter = index;
@@ -35,11 +43,12 @@ public class GameManager : MonoBehaviour
 
     public GameObject GetSelectedPrefab()
     {
-        if (gameplayPrefabs == null) return null;
+        if (gameplayPrefabs == null || gameplayPrefabs.Length == 0) return null;
         if (selectedCharacter < 0 || selectedCharacter >= gameplayPrefabs.Length) return null;
         return gameplayPrefabs[selectedCharacter];
     }
 
+    // Gọi khi bấm nút Play ở CharacterSelection
     public void StartGameplay()
     {
         if (!SceneManager.GetSceneByName("Map").isLoaded)
@@ -71,8 +80,10 @@ public class GameManager : MonoBehaviour
 
     IEnumerator SpawnPlayerNextFrame()
     {
+        // đợi 1 frame để tất cả object trong Map spawn xong
         yield return null;
 
+        // nếu đã có player rồi thì khỏi spawn nữa
         var exist = GameObject.FindGameObjectWithTag(playerTag);
         if (exist != null)
         {
@@ -96,26 +107,70 @@ public class GameManager : MonoBehaviour
             pos = sp.transform.position;
             rot = sp.transform.rotation;
         }
-        else Debug.LogWarning($"[GM] SpawnPoint '{spawnPointName}' not found. Spawning at (0,0,0).");
+        else
+        {
+            Debug.LogWarning($"[GM] SpawnPoint '{spawnPointName}' not found. Spawning at (0,0,0).");
+        }
 
+        // Spawn player
         var p = Instantiate(prefab, pos, rot);
+
+        // Gán tên vào CharacterStats
+        var stats = p.GetComponent<CharacterStats>();
+        if (stats == null) stats = p.GetComponentInChildren<CharacterStats>();
+        if (stats != null && !string.IsNullOrEmpty(playerName))
+        {
+            stats.characterName = playerName;
+        }
+
+        // Gắn weapon equipper cho EquipmentManager (nếu có)
         var em = FindFirstObjectByType<EquipmentManager>();
         if (em != null)
         {
             em.playerWeaponEquipper = p.GetComponentInChildren<WeaponEquipper>(true);
         }
+
         p.tag = playerTag;
         p.name = "PlayerRuntime";
 
-        // ✅ gán camera follow player sau khi spawn
+        // Gán camera follow player nếu có component FollowPlayerCamera
         var cam = Camera.main;
         if (cam != null)
         {
             var follow = cam.GetComponent<FollowPlayerCamera>();
-            if (follow != null) follow.target = p.transform; // hoặc p.transform.Find("PlayerRoot")
+            if (follow != null)
+                follow.target = p.transform;
         }
 
         Debug.Log($"[GM] Spawned player: {p.name} ({prefab.name}) | PlayerName='{playerName}'");
     }
 
+    // =========================
+    //  CURRENCY: GOLD
+    // =========================
+
+    // Cộng vàng
+    public void AddGold(int amount)
+    {
+        if (amount <= 0) return;
+
+        gold += amount;
+        Debug.Log($"[GM] +{amount} gold. Total = {gold}");
+    }
+
+    // Trừ vàng (khi mua đồ)
+    public bool SpendGold(int amount)
+    {
+        if (amount <= 0) return true;
+
+        if (gold < amount)
+        {
+            Debug.Log($"[GM] Not enough gold. Have {gold}, need {amount}");
+            return false;
+        }
+
+        gold -= amount;
+        Debug.Log($"[GM] Spend {amount} gold. Left = {gold}");
+        return true;
+    }
 }

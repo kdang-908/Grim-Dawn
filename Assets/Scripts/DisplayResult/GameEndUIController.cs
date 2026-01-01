@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
@@ -28,8 +28,8 @@ public class GameEndUIController : MonoBehaviour
 
         gameObject.SetActive(true);
 
-        deathScreen?.SetActive(false);
-        victoryScreen?.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(false);
     }
 
     void Start()
@@ -41,6 +41,7 @@ public class GameEndUIController : MonoBehaviour
     {
         GameObject player = null;
 
+        // chờ player sinh ra (nếu spawn bằng script)
         while (player == null)
         {
             player = GameObject.FindGameObjectWithTag("Player");
@@ -50,12 +51,12 @@ public class GameEndUIController : MonoBehaviour
         CharacterStats stats = player.GetComponent<CharacterStats>();
         if (stats == null)
         {
-            Debug.LogError("[GameEndUI] Player kh�ng c� CharacterStats!");
+            Debug.LogError("[GameEndUI] Player không có CharacterStats!");
             yield break;
         }
 
         stats.onDeath.AddListener(OnPlayerDeath);
-        Debug.Log("[GameEndUI] ?� hook OnDeath");
+        Debug.Log("[GameEndUI] Đã hook OnDeath");
     }
 
     // ================= DEATH =================
@@ -66,11 +67,16 @@ public class GameEndUIController : MonoBehaviour
 
     IEnumerator ShowDeathScreenDelay()
     {
+        // dùng Realtime để không bị Time.timeScale ảnh hưởng
         yield return new WaitForSecondsRealtime(showDelay);
 
         gameObject.SetActive(true);
-        victoryScreen?.SetActive(false);
-        deathScreen?.SetActive(true);
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(true);
+
+        // hiển thị chuột để bấm Retry
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         Time.timeScale = 0f;
     }
@@ -86,8 +92,11 @@ public class GameEndUIController : MonoBehaviour
         yield return new WaitForSecondsRealtime(showDelay);
 
         gameObject.SetActive(true);
-        deathScreen?.SetActive(false);
-        victoryScreen?.SetActive(true);
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         Time.timeScale = 0f;
     }
@@ -97,8 +106,11 @@ public class GameEndUIController : MonoBehaviour
     {
         Debug.Log("[GameEndUI] Continue Game");
 
-        victoryScreen?.SetActive(false);
-        deathScreen?.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
         Time.timeScale = 1f;
     }
@@ -106,7 +118,16 @@ public class GameEndUIController : MonoBehaviour
     // ================= RETRY =================
     public void Retry()
     {
+        Debug.Log("[GameEndUI] Retry");
+
+        // bỏ pause game
         Time.timeScale = 1f;
+
+        // khóa chuột lại như bình thường khi chơi
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // load lại scene Map (tên phải đúng y như file trong folder Scenes)
         SceneManager.LoadScene("Map");
     }
 }
