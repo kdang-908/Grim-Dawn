@@ -30,6 +30,11 @@ public class HumanController : MonoBehaviour
     public bool disableColliderInSelection = true;
     public bool freezeAllInSelection = true;
 
+    [Header("Skill Attack")]
+    public string skillTriggerName = "SkillAttack";   // đúng tên trigger trong Animator
+    public SkillLineHitbox skillHitbox;               // gắn SkillOrigin
+    public float skillCooldown = 1.0f;
+
     [Header("UI State")]
     [Tooltip("Bật TRUE khi đang mở Inventory/Shop/Dialog để chặn điều khiển nhân vật")]
     public bool isUIOpen = false;
@@ -37,6 +42,10 @@ public class HumanController : MonoBehaviour
     private bool isRunning;
     private bool jumpPressed;
     private bool isGrounded;
+
+    // state skill
+    //private bool isCastingSkill = false;   // đang chơi animation skill
+    //private bool skillOnCooldown = false;  // đang hồi chiêu
 
     private CapsuleCollider col;
 
@@ -53,6 +62,10 @@ public class HumanController : MonoBehaviour
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
+
+        // tự tìm skill hitbox nếu quên kéo
+        if (skillHitbox == null)
+            skillHitbox = GetComponentInChildren<SkillLineHitbox>();
 
         ApplySceneMode(SceneManager.GetActiveScene().name);
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
@@ -73,7 +86,6 @@ public class HumanController : MonoBehaviour
         bool isSelection = (sceneName == characterSelectScene);
         if (rb == null) return;
 
-        // stop trước khi đổi mode
         if (!rb.isKinematic)
         {
             rb.linearVelocity = Vector3.zero;
@@ -99,7 +111,6 @@ public class HumanController : MonoBehaviour
             rb.isKinematic = false;
             rb.useGravity = true;
 
-            // khóa lật người theo X/Z
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
             rb.linearVelocity = Vector3.zero;
@@ -109,11 +120,11 @@ public class HumanController : MonoBehaviour
 
     void Update()
     {
-        // scene chọn nhân vật: không điều khiển
+        // 1) Scene chọn nhân vật thì không điều khiển
         if (SceneManager.GetActiveScene().name == characterSelectScene)
             return;
 
-        // chết thì stop
+        // 2) Chết thì dừng luôn
         if (State != null && State.currentHP <= 0)
         {
             if (animator != null) animator.SetTrigger("Dead");
@@ -121,26 +132,35 @@ public class HumanController : MonoBehaviour
             return;
         }
 
-        // UI đang mở: chặn input + đứng yên
-        if (isUIOpen)
-        {
-            StopMotionAndAnim();
-            jumpPressed = false;
-            return;
-        }
+        // 3) UI mở thì chặn input
+        //if (isUIOpen)
+        //{
+        //    StopMotionAndAnim();
+        //    jumpPressed = false;
+        //    return;
+        //}
 
         isRunning = Input.GetKey(KeyCode.LeftShift);
 
         if (Input.GetKeyDown(KeyCode.Space))
             jumpPressed = true;
 
-        // Attack: chỉ khi click vào game world (không click UI)
+        // Chuột trái: đánh thường
         if (Input.GetMouseButtonDown(0))
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
             HandleAttack();
+        }
+
+        // Chuột phải: dùng skill
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            HandleSkillAttack();
         }
     }
 
@@ -151,7 +171,6 @@ public class HumanController : MonoBehaviour
 
         if (isUIOpen)
         {
-            // UI mở thì không di chuyển bằng physics
             if (rb != null && !rb.isKinematic)
             {
                 rb.linearVelocity = Vector3.zero;
@@ -169,6 +188,7 @@ public class HumanController : MonoBehaviour
     {
         if (rb == null) return;
 
+        // *** KHÔNG còn chặn di chuyển khi isCastingSkill nữa ***
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
@@ -238,9 +258,11 @@ public class HumanController : MonoBehaviour
             animator.SetBool("isJumping", false);
     }
 
+    // ================== ATTACK THƯỜNG ==================
     void HandleAttack()
     {
-        if (animator != null) animator.SetTrigger("Attack");
+        if (animator != null)
+            animator.SetTrigger("Attack");
 
         if (hitbox != null)
             StartCoroutine(AttackWindow());
@@ -253,21 +275,85 @@ public class HumanController : MonoBehaviour
         hitbox.DisableHit();
     }
 
-    void StopMotionAndAnim()
+    // ================== SKILL (CHUỘT PHẢI) =============
+    void HandleSkillAttack()
     {
-        // đứng yên
-        if (rb != null && !rb.isKinematic)
+        //if (skillOnCooldown || isCastingSkill) return;
+
+        //if (skillHitbox == null)
+        //{
+        //    Debug.LogWarning("[HumanController] SkillHitbox is null!");
+        //    return;
+        //}
+
+        //isCastingSkill = true;
+        //skillOnCooldown = true;
+
+        if (animator != null )
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            animator.SetTrigger("SkillAttack");
+            
         }
 
-        // tránh kẹt anim đang chạy
-        if (animator != null)
+        // lo cooldown thôi
+        //StartCoroutine(SkillCooldownRoutine());
+    }
+
+    //IEnumerator SkillCooldownRoutine()
+    //{
+    //    if (skillCooldown > 0f)
+    //        yield return new WaitForSeconds(skillCooldown);
+
+    //    skillOnCooldown = false;
+    //}
+
+    // ====== HÀM CHO ANIMATION EVENT GỌI ======
+
+    //Gọi ở frame skill chém mạnh nhất
+    // ====== HÀM CHO ANIMATION EVENT GỌI ======
+
+    // Gọi ở frame skill chém mạnh nhất
+    public void OnSkillImpact()
+    {
+        Debug.Log("[HumanController] OnSkillImpact()");
+
+        // Nếu chưa gán trong Inspector thì tự tìm trong con
+        if (skillHitbox == null)
+            skillHitbox = GetComponentInChildren<SkillLineHitbox>();
+
+        if (skillHitbox != null)
         {
-            animator.SetBool("isWalking", false);
-            animator.SetBool("isRunning", false);
-            animator.SetBool("isJumping", false);
+            skillHitbox.DoSkillAttack();
+        }
+        else
+        {
+            Debug.LogWarning("[HumanController] skillHitbox NULL, không gọi được DoSkillAttack");
         }
     }
+
+    // Gọi ở cuối clip skill (có thể để trống)
+    public void OnSkillEnd()
+    {
+        Debug.Log("[HumanController] OnSkillEnd()");
+        // Sau này nếu bạn có state isCastingSkill thì reset ở đây
+    }
+
+
+    // =========================================
+
+    //void StopMotionAndAnim()
+    //{
+    //    if (rb != null && !rb.isKinematic)
+    //    {
+    //        rb.linearVelocity = Vector3.zero;
+    //        rb.angularVelocity = Vector3.zero;
+    //    }
+
+    //    if (animator != null)
+    //    {
+    //        animator.SetBool("isWalking", false);
+    //        animator.SetBool("isRunning", false);
+    //        animator.SetBool("isJumping", false);
+    //    }
+    //}
 }

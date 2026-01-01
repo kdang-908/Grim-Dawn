@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class EnemyLeftChecker : MonoBehaviour
@@ -14,7 +14,7 @@ public class EnemyLeftChecker : MonoBehaviour
 
         if (spawner == null)
         {
-            Debug.LogError("[EnemyLeftChecker] Kh�ng t�m th?y EnemySpawner!");
+            Debug.LogError("[EnemyLeftChecker] Không tìm thấy EnemySpawner!");
             return;
         }
 
@@ -27,7 +27,7 @@ public class EnemyLeftChecker : MonoBehaviour
         {
             yield return new WaitForSeconds(checkInterval);
 
-            // ? Ch?a spawn xong th� b? qua
+            // Chưa spawn xong thì bỏ qua
             if (!spawner.finishedSpawning)
                 continue;
 
@@ -36,7 +36,7 @@ public class EnemyLeftChecker : MonoBehaviour
             if (enemies.Length == 0)
             {
                 victoryTriggered = true;
-                Debug.Log("?? NO ENEMY LEFT + SPAWN FINISHED ? VICTORY");
+                Debug.Log("== NO ENEMY LEFT + SPAWN FINISHED => VICTORY ==");
 
                 TriggerVictoryUI();
             }

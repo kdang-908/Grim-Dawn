@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +7,12 @@ public class PotionManager : MonoBehaviour
     [Header("Target (runtime)")]
     [SerializeField] private CharacterStats activeCharacter;
 
+    public static PotionManager Instance;
+
     [Header("UI")]
     [SerializeField] private Image potionIcon;
     [SerializeField] private TMP_Text potionCountText;
-    [SerializeField] private TMP_Text cooldownText;   // ? text hi?n th? cooldown
+    [SerializeField] private TMP_Text cooldownText;
 
     [Header("Potion Settings")]
     [SerializeField] private int potions = 5;
@@ -18,7 +20,7 @@ public class PotionManager : MonoBehaviour
     [SerializeField] private KeyCode healKey = KeyCode.H;
 
     [Header("Cooldown")]
-    [SerializeField] private float healCooldown = 5f; // ? delay d�ng l?i
+    [SerializeField] private float healCooldown = 5f;
     private float cooldownTimer = 0f;
     private bool isOnCooldown = false;
 
@@ -30,14 +32,28 @@ public class PotionManager : MonoBehaviour
     [Header("Visual")]
     [Range(0f, 1f)][SerializeField] private float emptyAlpha = 0.35f;
 
+
+    // ============================
+    // ⭐ THÊM VFX HỒI MÁU ⭐
+    // ============================
+    [Header("Heal VFX")]
+    [SerializeField] private GameObject healVfxPrefab;
+    [SerializeField] private float healVfxLifeTime = 2f;
+    [SerializeField] private Vector3 healVfxOffset = new Vector3(0, 1.2f, 0);
+
+
     void Awake()
     {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+
         UpdateUI();
     }
 
     void Update()
     {
-        // T�m player n?u ch?a c�
         if (activeCharacter == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -45,7 +61,6 @@ public class PotionManager : MonoBehaviour
                 activeCharacter = player.GetComponent<CharacterStats>();
         }
 
-        // ? Update cooldown
         UpdateCooldown();
 
         if (Input.GetKeyDown(healKey))
@@ -55,6 +70,11 @@ public class PotionManager : MonoBehaviour
     public void RegisterCharacter(CharacterStats stats)
     {
         activeCharacter = stats;
+    }
+
+    public int GetPotionCount()
+    {
+        return potions;
     }
 
     public void TryHeal()
@@ -67,12 +87,38 @@ public class PotionManager : MonoBehaviour
         potions--;
         activeCharacter.Heal(healAmount);
 
+        // 🔊 Sound
         if (audioSource != null && healClip != null)
             audioSource.PlayOneShot(healClip, healVolume);
+
+        // ✨ Spawn hiệu ứng hồi máu
+        SpawnHealVfx();
 
         StartCooldown();
         UpdateUI();
     }
+
+
+    // ============================
+    // 🎇 HÀM TẠO VFX HỒI MÁU
+    // ============================
+    void SpawnHealVfx()
+    {
+        if (healVfxPrefab == null || activeCharacter == null)
+            return;
+
+        Vector3 pos = activeCharacter.transform.position + healVfxOffset;
+
+        GameObject vfx =
+            Instantiate(healVfxPrefab, pos, Quaternion.identity);
+
+        // Cho effect bám theo player (đi chuyển vẫn dính)
+        vfx.transform.SetParent(activeCharacter.transform);
+
+        if (healVfxLifeTime > 0f)
+            Destroy(vfx, healVfxLifeTime);
+    }
+
 
     void StartCooldown()
     {

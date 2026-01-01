@@ -11,7 +11,19 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
 
     private EquipmentManager equipmentManager;
     private GameObject removeButtonObj;
+    [Header("Upgrade")]
+    public int upgradeLevel = 1;             // cấp hiện tại
+    public const int MaxUpgradeLevel = 4;
+    public int GetUpgradeLevel()
+    {
+        return upgradeLevel;
+    }
 
+    public void SetUpgradeLevel(int level)
+    {
+        upgradeLevel = Mathf.Clamp(level, 1, MaxUpgradeLevel);
+
+    }
     private void Awake()
     {
         if (itemImage == null) itemImage = GetComponent<Image>();
@@ -61,15 +73,31 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Double click mới equip
-        if (eventData.clickCount != 2) return;
+        // chỉ nhận chuột trái
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
 
-        // nếu chưa tìm thấy do load scene, tìm lại
+        if (itemImage == null || !itemImage.enabled || itemImage.sprite == null)
+            return;
+
+        bool enhanceMode =
+            EnhancementPanel.Instance != null &&
+            EnhancementPanel.Instance.IsOpen();
+
+        Debug.Log($"[InventoryItem] Click on {name} | enhanceMode={enhanceMode}");
+
+        // 🔸 1) Đang ở màn NÂNG CẤP → đưa item sang ô dấu +
+        if (enhanceMode)
+        {
+            EnhancementPanel.Instance.TryInsert(this);
+            return; // ⛔ không equip
+        }
+
+        // 🔸 2) Bình thường → EQUIP / tháo trang bị như cũ
         if (equipmentManager == null)
             equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
-        if (equipmentManager == null || itemImage == null) return;
-        if (!itemImage.enabled || itemImage.sprite == null) return;
+        if (equipmentManager == null) return;
 
         Sprite returned = equipmentManager.EquipItem(itemType, itemImage.sprite);
 
@@ -84,8 +112,15 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
         }
 
         RefreshRemoveButton();
-
-        // ✅ QUAN TRỌNG: cập nhật preview + vũ khí NGAY LẬP TỨC
         equipmentManager.BindPreviewNow();
     }
+
+
+    public Sprite GetItemSprite()
+    {
+        if (itemImage == null) return null;
+        return itemImage.sprite;
+    }
+
+
 }
