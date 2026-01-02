@@ -11,7 +11,7 @@ public class CharacterSelector : MonoBehaviour
     public TMP_InputField nameInput;
     public Image maleBackground;   // Ô xanh phía sau model nam
     public Image femaleBackground; // Ô xanh phía sau model nữ
-    public Color normalColor = new Color(0.49f, 0.78f, 0.99f); // màu xanh nhạt
+    public Color normalColor = new Color(0.49f, 0.78f, 0.99f,0f); // màu xanh nhạt
     public Color selectedColor = Color.yellow;                 // màu khi chọn
 
 
