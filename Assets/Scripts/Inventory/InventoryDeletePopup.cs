@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class InventoryDeletePopup : MonoBehaviour
 {
-    // --- MỚI: Tạo biến Instance (Số điện thoại nóng) ---
+    
     public static InventoryDeletePopup Instance;
 
     [Header("Kéo 2 nút Có và Không vào đây")]
@@ -11,11 +11,11 @@ public class InventoryDeletePopup : MonoBehaviour
     public Button btnNo;
 
     private Image itemPendingDelete;
-
-    // Đổi từ Start thành Awake để chạy sớm nhất có thể
+    private GameObject trashButtonPendingHide;
+    
     void Awake()
     {
-        // Gán chính mình vào biến Instance
+        
         if (Instance == null)
         {
             Instance = this;
@@ -31,9 +31,10 @@ public class InventoryDeletePopup : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ShowConfirmation(Image itemIcon)
+    public void ShowConfirmation(Image itemIcon, GameObject trashBtnObj)
     {
         itemPendingDelete = itemIcon;
+        trashButtonPendingHide = trashBtnObj;
         gameObject.SetActive(true); // Bật lên
     }
 
@@ -45,6 +46,11 @@ public class InventoryDeletePopup : MonoBehaviour
             itemPendingDelete.enabled = false;
             Debug.Log("Đã xóa đồ!");
         }
+        if (trashButtonPendingHide != null)
+        {
+            trashButtonPendingHide.SetActive(false);
+        }
+        Debug.Log("Đã xóa đồ và ẩn nút thùng rác!");
         ClosePopup();
     }
 

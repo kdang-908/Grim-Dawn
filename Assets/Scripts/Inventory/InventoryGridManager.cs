@@ -1,22 +1,31 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 
 public class InventoryGridManager : MonoBehaviour
 {
     public List<Image> inventorySlots = new List<Image>();
 
-    [Header("Starter WeaponData (kéo Sword_01_Data vào đây)")]
-    public WeaponData startWeapon;
+    
+    [Header("Danh sách đồ khởi đầu (Kéo các WeaponData vào đây)")]
+    public List<WeaponData> startItems = new List<WeaponData>();
 
     void Start()
     {
         RefreshInventorySlots();
 
-        // ✅ nạp icon bằng chính WeaponData.icon (để không lệch sprite)
-        if (startWeapon != null && startWeapon.icon != null)
+        
+        if (startItems != null && startItems.Count > 0)
         {
-            AddItemBackToInventory(startWeapon.icon, InventoryItem.ItemType.Weapon);
+            foreach (WeaponData itemData in startItems)
+            {
+                
+                if (itemData != null && itemData.icon != null)
+                {
+
+                    AddItemBackToInventory(itemData.icon, itemData.itemType,itemData.prefab);
+                }
+            }
         }
 
         Debug.Log("[InventoryGridManager] Slots = " + inventorySlots.Count);
@@ -26,7 +35,7 @@ public class InventoryGridManager : MonoBehaviour
     {
         inventorySlots.Clear();
 
-        foreach (Transform slotTransform in transform) // ItemsParent
+        foreach (Transform slotTransform in transform)
         {
             Transform itemButton = slotTransform.Find("ItemButton");
             if (itemButton == null) continue;
@@ -39,7 +48,7 @@ public class InventoryGridManager : MonoBehaviour
         }
     }
 
-    public bool AddItemBackToInventory(Sprite itemSprite, InventoryItem.ItemType newType)
+    public bool AddItemBackToInventory(Sprite itemSprite, InventoryItem.ItemType newType, GameObject itemPrefab)
     {
         if (itemSprite == null) return false;
 
@@ -51,7 +60,10 @@ public class InventoryGridManager : MonoBehaviour
             if (!empty) continue;
 
             InventoryItem item = slotImage.GetComponent<InventoryItem>();
-            if (item != null) item.SetItem(itemSprite, newType);
+            if (item != null)
+            {
+                item.SetItem(itemSprite, newType, itemPrefab);
+            }
             else
             {
                 slotImage.sprite = itemSprite;
@@ -61,7 +73,7 @@ public class InventoryGridManager : MonoBehaviour
             return true;
         }
 
-        Debug.LogWarning("[InventoryGridManager] Inventory FULL!");
+        Debug.LogWarning("[InventoryGridManager] Inventory FULL! (Kho đồ đã đầy)");
         return false;
     }
 }

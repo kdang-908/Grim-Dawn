@@ -66,7 +66,7 @@ public class CharacterSelector : MonoBehaviour
         }
 
         // 3) Lưu PlayerPrefs (phòng khi GameManager chưa kịp có)
-        PlayerPrefs.SetInt("SelectedGender", selectedIndex);   // 0/1
+        PlayerPrefs.SetInt("SelectedGender", selectedIndex);   
         PlayerPrefs.SetString("PlayerName", playerName);
         PlayerPrefs.Save();
 

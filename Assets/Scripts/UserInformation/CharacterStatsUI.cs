@@ -32,8 +32,6 @@ public class CharacterStatsUI : MonoBehaviour
             Refresh();
             return;
         }
-
-        // nếu muốn nhẹ hơn: chỉ Refresh khi mở inventory, hoặc khi HP đổi
         Refresh();
     }
 
@@ -50,18 +48,15 @@ public class CharacterStatsUI : MonoBehaviour
     {
         if (stats == null) return;
 
-        // ✅ NAME có label + đúng hoa thường
         if (txtName) txtName.text = $"Name: {stats.characterName}";
-
-        // ✅ Level có label
         if (txtLevel) txtLevel.text = $"Level: {stats.level}";
 
-        // ✅ Trong túi đồ chỉ hiện currentHP (1000)
-        if (txtHP) txtHP.text = $"HP: {stats.currentHP}";
+        // Hiển thị HP hiện tại 
+        if (txtHP) txtHP.text = $"HP: {stats.maxHP_Total}";
 
-        // ✅ Các chỉ số có label
-        if (txtATK) txtATK.text = $"ATK: {stats.atk}";
-        if (txtDEF) txtDEF.text = $"DEF: {stats.def}";
-        if (txtEnergy) txtEnergy.text = $"Energy: {stats.energy}";
+        // HIỂN THỊ CHỈ SỐ ĐÃ CỘNG ĐỒ (_Total)
+        if (txtATK) txtATK.text = $"ATK: {stats.atk_Total}";
+        if (txtDEF) txtDEF.text = $"DEF: {stats.def_Total}";
+        if (txtEnergy) txtEnergy.text = $"Energy: {stats.energy_Total}";
     }
 }
