@@ -69,12 +69,11 @@ public class CharacterStats : MonoBehaviour
             if (em.currentHelmet != null) AddBonus(em.currentHelmet);
             if (em.currentChest != null) AddBonus(em.currentChest);
         }
-
-        // Clamp currentHP cho an toàn (KHÔNG reset full máu ở đây)
-        currentHP = Mathf.Clamp(currentHP, 0, maxHP_Total);
+        currentHP = maxHP_Total;
 
         // Cập nhật UI
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+        
     }
 
     private void AddBonus(WeaponData data)
@@ -92,7 +91,7 @@ public class CharacterStats : MonoBehaviour
 
         currentHP -= dmg;
 
-        // ✅ SỬA LỖI QUAN TRỌNG: phải check <= 0 (vì currentHP bị Clamp nên không bao giờ < 0)
+        
         if (currentHP <= 0)
         {
             currentHP = 0;
