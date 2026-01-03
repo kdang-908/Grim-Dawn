@@ -25,7 +25,7 @@ public class PlayerHPHUD : MonoBehaviour
 
     void Update()
     {
-        // SỬA: Tìm lại player nếu mất reference
+       
         if (stats == null)
         {
             TryFindPlayer();
@@ -42,14 +42,15 @@ public class PlayerHPHUD : MonoBehaviour
 
         // 2) Text
         if (levelText != null) levelText.text = $"Lv.{stats.level}";
-        if (hpText != null) hpText.text = $"{stats.currentHP} / {stats.maxHP}";
+        if (hpText != null) hpText.text = $"{stats.currentHP} / {stats.maxHP_Total}";
 
         // 3) Đổi màu khi thấp
         float t = Mathf.InverseLerp(lowHpThreshold, 1f, targetFill);
         fill.color = Color.Lerp(lowColor, highColor, t);
+
     }
 
-    // THÊM method riêng để tìm player
+    
     void TryFindPlayer()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");

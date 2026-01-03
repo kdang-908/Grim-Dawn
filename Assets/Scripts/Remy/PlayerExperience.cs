@@ -65,6 +65,7 @@ public class PlayerExperience : MonoBehaviour
         stats.energy = Mathf.RoundToInt(stats.energy * 1.2f);
 
         // hồi máu = full theo chỉ số mới
+        stats.UpdateFinalStats();
         stats.currentHP = stats.maxHP;
 
         Debug.Log(

@@ -4,11 +4,18 @@ using UnityEngine.EventSystems;
 
 public class InventoryItem : MonoBehaviour, IPointerClickHandler
 {
+    [System.Serializable]
+    public class HeadIconMap
+    {
+        public Sprite icon;
+        public GameObject helmetPrefab;
+    }
+    public HeadIconMap[] headMaps;
     public enum ItemType { Weapon, Head, Chest, Legs }
     public ItemType itemType;
-
+    private GameObject myPrefab;
     [SerializeField] private Image itemImage;
-
+    private GameObject itemPrefab;
     private EquipmentManager equipmentManager;
     private GameObject removeButtonObj;
     [Header("Upgrade")]
@@ -43,9 +50,10 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
         RefreshRemoveButton();
     }
 
-    public void SetItem(Sprite sprite, ItemType type)
+    public void SetItem(Sprite sprite, ItemType type, GameObject prefab)
     {
         itemType = type;
+        myPrefab = prefab;
         if (itemImage != null)
         {
             itemImage.sprite = sprite;
@@ -77,8 +85,12 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
 
-        if (itemImage == null || !itemImage.enabled || itemImage.sprite == null)
+        if (itemImage == null || !itemImage.enabled || itemImage.sprite == null ||
+            itemImage.sprite.name == "Icon" || itemImage.sprite.name == "EmptySlot")
+        {
+            Debug.Log("Đây là ô trống, không gửi lệnh trang bị.");
             return;
+        }
 
         bool enhanceMode =
             EnhancementPanel.Instance != null &&
@@ -99,7 +111,7 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
 
         if (equipmentManager == null) return;
 
-        Sprite returned = equipmentManager.EquipItem(itemType, itemImage.sprite);
+        Sprite returned = equipmentManager.EquipItem(itemType, itemImage.sprite, myPrefab);
 
         if (returned != null)
         {
@@ -111,6 +123,7 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
             ClearItem();
         }
 
+        
         RefreshRemoveButton();
         equipmentManager.BindPreviewNow();
     }

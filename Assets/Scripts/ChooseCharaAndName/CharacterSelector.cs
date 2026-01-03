@@ -9,10 +9,10 @@ public class CharacterSelector : MonoBehaviour
     public Button femaleButton;
     public Button playButton;
     public TMP_InputField nameInput;
-    public Image maleBackground;   // Ô xanh phía sau model nam
-    public Image femaleBackground; // Ô xanh phía sau model nữ
-    public Color normalColor = new Color(0.49f, 0.78f, 0.99f); // màu xanh nhạt
-    public Color selectedColor = Color.yellow;                 // màu khi chọn
+    public Image maleBackground;   
+    public Image femaleBackground; 
+    public Color normalColor = new Color(0.49f, 0.78f, 0.99f); 
+    public Color selectedColor = Color.yellow;                 
 
 
     // 0 = Male, 1 = Female, -1 = chưa chọn
@@ -66,7 +66,7 @@ public class CharacterSelector : MonoBehaviour
         }
 
         // 3) Lưu PlayerPrefs (phòng khi GameManager chưa kịp có)
-        PlayerPrefs.SetInt("SelectedGender", selectedIndex);   // 0/1
+        PlayerPrefs.SetInt("SelectedGender", selectedIndex);   
         PlayerPrefs.SetString("PlayerName", playerName);
         PlayerPrefs.Save();
 

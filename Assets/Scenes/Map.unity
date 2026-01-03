@@ -649,6 +649,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -1107,6 +1108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -2044,6 +2046,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -2415,6 +2418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -2797,6 +2801,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -3187,6 +3192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -4025,6 +4031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -4442,6 +4449,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -4777,6 +4785,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -10063,6 +10072,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -10086,6 +10096,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: ea1e926194f79e149802e19665eae9f3, type: 3}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -10210,7 +10224,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 268357199}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 268357202}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -10239,6 +10253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -10419,6 +10434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -10727,6 +10743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -10742,6 +10759,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -11251,6 +11269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -11897,6 +11916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -11931,7 +11951,11 @@ PrefabInstance:
     - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: ccb77db3bd89d1c4a80915fb06191f18, type: 3}
+      objectReference: {fileID: 0}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -12056,7 +12080,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 345619933}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 345619936}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -12085,6 +12109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -12373,6 +12398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -13251,6 +13277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -13637,6 +13664,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -14368,6 +14396,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 4138f523b1187734fa47eb4591c999d2, type: 3}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -14495,7 +14527,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 464830574}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 464830577}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -14529,7 +14561,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 0
+  headMaps: []
+  itemType: 3
   itemImage: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &464830582
@@ -14544,6 +14577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -15607,6 +15641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -15931,6 +15966,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -16611,6 +16647,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -16626,6 +16663,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -16810,6 +16848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -16825,6 +16864,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -17543,6 +17583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -17566,6 +17607,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 0c07dc3911b7dee4897337e0d540c9a1, type: 3}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -17690,7 +17735,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 601708796}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 601708799}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -17719,6 +17764,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 2
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -18962,6 +19008,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -19536,6 +19583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -19782,6 +19830,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -20470,6 +20519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -20768,6 +20818,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -23746,7 +23797,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &920263803
 RectTransform:
   m_ObjectHideFlags: 0
@@ -24849,6 +24900,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -25540,6 +25592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -25720,6 +25773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -25970,6 +26024,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -26286,6 +26341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -26806,6 +26862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -27104,7 +27161,11 @@ PrefabInstance:
     - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 64149fe777bdc2b4488935b1876bd1a5, type: 3}
+      objectReference: {fileID: 0}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -27232,7 +27293,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1075215311}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1075215314}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -27266,7 +27327,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 0
+  headMaps: []
+  itemType: 3
   itemImage: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &1075215319
@@ -27281,6 +27343,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -27461,6 +27524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -27726,6 +27790,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -28302,6 +28367,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -29159,6 +29225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -29795,6 +29862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -30735,6 +30803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -32656,7 +32725,20 @@ MonoBehaviour:
   - {fileID: 1877827973}
   - {fileID: 1512601218}
   - {fileID: 1738697449}
-  startWeapon: {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
+  startItems:
+  - {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
+  - {fileID: 11400000, guid: ec14bcbea9b390343bf66fe088035b8c, type: 2}
+  - {fileID: 11400000, guid: 739010fbb6c7b35458c4d410734f3b06, type: 2}
+  - {fileID: 11400000, guid: a01b71da38b85774cbe3ae773c206e7d, type: 2}
+  - {fileID: 11400000, guid: 38c2dd7ddb045464bbd8cf380ef1a61a, type: 2}
+  - {fileID: 11400000, guid: 8477ab5c476df2d4d918356445b84817, type: 2}
+  - {fileID: 11400000, guid: 77c6b263f34723b45b691a37bb7c5156, type: 2}
+  - {fileID: 11400000, guid: 470499d924ef3b34389bb6ce1269e340, type: 2}
+  - {fileID: 11400000, guid: db05373e0f5881446b0c0bbdc89509fc, type: 2}
+  - {fileID: 11400000, guid: 4e6ce0a51552b2846a73486c28255034, type: 2}
+  - {fileID: 11400000, guid: b78da7e4878c75549b52300b017e705a, type: 2}
+  - {fileID: 11400000, guid: 4b5223e7f301546498c4e1428fe6e46f, type: 2}
+  - {fileID: 11400000, guid: 6069297a2ca875b418e124bf018dc61d, type: 2}
 --- !u!114 &1336979272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33220,6 +33302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -33466,6 +33549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -33885,6 +33969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -34154,6 +34239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -34690,6 +34776,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -36483,6 +36570,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 4ff8200a7bc99e84bae7fcc92ebd8564, type: 3}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -36575,6 +36666,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8793546466863943519, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -36607,7 +36702,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1512601214}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1512601217}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -36636,6 +36731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -36886,6 +36982,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -37811,6 +37908,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -38713,6 +38811,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -39235,7 +39334,7 @@ MonoBehaviour:
   - {fileID: 999890526}
   - {fileID: 266198032}
   - {fileID: 1703265382}
-  startWeapon: {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
+  startItems: []
 --- !u!114 &1638070286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39842,6 +39941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -40084,6 +40184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -40642,6 +40743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -41273,6 +41375,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 9b90c1f151902594bb79a3a35ad846e6, type: 3}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -41397,7 +41503,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1738697445}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1738697448}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -41426,6 +41532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -42203,6 +42310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -42967,6 +43075,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -44540,6 +44649,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -44939,6 +45049,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 0acd306c19b99be45a99c06a10f43245, type: 3}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -45066,7 +45180,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 1873908530}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873908533}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -45100,6 +45214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -45115,6 +45230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -45327,6 +45443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -45393,13 +45510,43 @@ MonoBehaviour:
   btnRemoveChest: {fileID: 2028816960}
   btnRemoveLegs: {fileID: 1139122219}
   btnRemoveWeapon: {fileID: 1479098615}
+  helmetScaleRuntime: {x: 0.23, y: 0.2, z: 0.22}
+  helmetScaleUI: {x: 0.254415, y: 0.18957, z: 0.21072}
+  previewHeadBone: {fileID: 0}
   playerWeaponEquipper: {fileID: 0}
   previewWeaponEquipper: {fileID: 0}
   previewRoot: {fileID: 6368850966352020216, guid: 330578b2b0d72fd4dab0f9197cdac4c4, type: 3}
   previewLayerName: UIPreview
+  isFemale: 0
+  helmetMaps:
+  - icon: {fileID: 21300000, guid: 341aa97f7c3976a4bbdd29efb85f7f9a, type: 3}
+    data: {fileID: 11400000, guid: 739010fbb6c7b35458c4d410734f3b06, type: 2}
+  - icon: {fileID: 21300000, guid: 5dc8939a3b5cd284987646323306d74d, type: 3}
+    data: {fileID: 11400000, guid: a01b71da38b85774cbe3ae773c206e7d, type: 2}
+  - icon: {fileID: 21300000, guid: ce16e334823e4ff4081331417ee9c527, type: 3}
+    data: {fileID: 11400000, guid: 38c2dd7ddb045464bbd8cf380ef1a61a, type: 2}
   weaponMaps:
   - icon: {fileID: 21300000, guid: b91f3b5f1bb3c89468be3f35d9396bac, type: 3}
     data: {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
+  - icon: {fileID: 21300000, guid: 73de6b75584e1a64983ca5c6699ca0cd, type: 3}
+    data: {fileID: 11400000, guid: ec14bcbea9b390343bf66fe088035b8c, type: 2}
+  - icon: {fileID: 21300000, guid: 65c7fa2c610c58a4e90c5f722c8904ff, type: 3}
+    data: {fileID: 11400000, guid: 4b5223e7f301546498c4e1428fe6e46f, type: 2}
+  - icon: {fileID: 21300000, guid: db0411b78ad319644a64962704742907, type: 3}
+    data: {fileID: 11400000, guid: b78da7e4878c75549b52300b017e705a, type: 2}
+  - icon: {fileID: 21300000, guid: f3f689b5caf043746ad83059d75f9f50, type: 3}
+    data: {fileID: 11400000, guid: 6069297a2ca875b418e124bf018dc61d, type: 2}
+  - icon: {fileID: 21300000, guid: 92503f1c14d725b45801630c1f879f39, type: 3}
+    data: {fileID: 11400000, guid: 4e6ce0a51552b2846a73486c28255034, type: 2}
+  chestMaps:
+  - icon: {fileID: 21300000, guid: b82bc727059498b4daac6ccbf38de5da, type: 3}
+    data: {fileID: 11400000, guid: 8477ab5c476df2d4d918356445b84817, type: 2}
+  - icon: {fileID: 21300000, guid: e75f0e5831dc387419f6c20030d0ce43, type: 3}
+    data: {fileID: 11400000, guid: 77c6b263f34723b45b691a37bb7c5156, type: 2}
+  - icon: {fileID: 21300000, guid: 913a6228ca14f8948a1f43982b722c7b, type: 3}
+    data: {fileID: 11400000, guid: 470499d924ef3b34389bb6ce1269e340, type: 2}
+  - icon: {fileID: 21300000, guid: 6a473b0dc504eaf4bb737ec1b0f62542, type: 3}
+    data: {fileID: 11400000, guid: db05373e0f5881446b0c0bbdc89509fc, type: 2}
 --- !u!114 &1885075647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45923,6 +46070,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -46506,6 +46654,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -46756,6 +46905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -47768,6 +47918,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 2
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -48041,6 +48192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -49160,6 +49312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -49417,6 +49570,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1
@@ -50779,6 +50933,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dd5fde981b90b45b72122c4783490a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
   upgradeLevel: 1

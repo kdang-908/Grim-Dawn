@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1fe1b2a578fcf64aaf7c7f381daf541, type: 3}
+  m_Name: Armor4_Data
+  m_EditorClassIdentifier: 
+  id: armor4
+  displayName: armor4
+  itemType: 2
+  icon: {fileID: 21300000, guid: 6a473b0dc504eaf4bb737ec1b0f62542, type: 3}
+  prefab: {fileID: 2265542019411121939, guid: 98ea212fec1c6c541af667cf338e6cb7, type: 3}
+  animationID: 0
+  localPos: {x: 0, y: 0, z: 0}
+  localEuler: {x: 0, y: 0, z: 0}
+  localScale: {x: 1, y: 1, z: 1}
+  headPos: {x: 0.002, y: 0.09, z: 0.001}
+  headEuler: {x: -14.6, y: 0.7, z: -4.7}
+  headScaleUI: {x: 0.15, y: 0.15, z: 0.15}
+  headScaleRuntime: {x: 0.23, y: 0.2, z: 0.22}
+  femaleHeadPos: {x: 0.002, y: 0.08, z: 0.001}
+  femaleHeadEuler: {x: -10, y: 0, z: 0}
+  femaleHeadScaleUI: {x: 0.35, y: 0.35, z: 0.35}
+  femaleHeadScaleRuntime: {x: 0.2, y: 0.18, z: 0.2}
+  chestPos: {x: -0.02, y: -3.153, z: 0.285}
+  chestEuler: {x: -3.223, y: 0, z: 0}
+  chestScaleUI: {x: 0.025, y: 0.0231255, z: 0.03162423}
+  chestScaleRuntime: {x: 0.025, y: 0.0231255, z: 0.03162423}
+  femaleChestPos: {x: 1.267, y: -0.19, z: 0.01}
+  femaleChestEuler: {x: -80.35, y: 67.746, z: 21.957}
+  femaleChestScaleUI: {x: 0.01, y: 0.01, z: 0.012738}
+  femaleChestScaleRuntime: {x: 0.01, y: 0.01, z: 0.012738}
+  bonusATK: 0
+  bonusDEF: 60
+  bonusMaxHP: 130
+  bonusEnergy: 0
