@@ -9,9 +9,9 @@ public class UIFireflies : MonoBehaviour
     [SerializeField] int count = 40;
 
     [Header("Motion")]
-    [SerializeField] float followSpeed = 18f;   // tốc độ bám theo target (Lerp)
+    [SerializeField] float followSpeed = 100f;   // tốc độ bám theo target (Lerp)
     [SerializeField] float wander = 20f;        // biên độ lượn
-    [SerializeField] float driftSpeed = 0.35f;  // tốc độ đổi hướng (Perlin)
+    [SerializeField] float driftSpeed = 1f;  // tốc độ đổi hướng (Perlin)
 
     [Header("Pulse (Blink)")]
     [SerializeField] float pulseSpeed = 1.2f; // tăng để nhấp nháy nhanh hơn
