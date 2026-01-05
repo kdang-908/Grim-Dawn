@@ -420,7 +420,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!224 &1929189189
 RectTransform:
@@ -657,7 +657,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6207997427163433298, guid: 841e165d9323aa24c951402283693a85, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7285386202376837976, guid: 841e165d9323aa24c951402283693a85, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: NextMap
+      objectReference: {fileID: 0}
+    - target: {fileID: 8716069635194214202, guid: 841e165d9323aa24c951402283693a85, type: 3}
+      propertyPath: showDelay
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -200,14 +200,19 @@ public class SkeletonAI : MonoBehaviour
         anim.SetTrigger("attack");
 
         if (playerStats == null)
-        {
-            Debug.LogWarning("[SkeletonAI] playerStats == null, không gây damage");
             return;
-        }
 
-        playerStats.TakeDamage(10);
-        Debug.Log($"[SkeletonAI] {name} gây 10 damage, player HP: {playerStats.currentHP}/{playerStats.maxHP}");
+        // ===== Damage lấy từ CharacterStats =====
+        int atk = State != null ? State.atk_Total : 10;
+        int def = playerStats.def_Total;
+
+        int finalDamage = Mathf.Max(1, atk - def);
+
+        playerStats.TakeDamage(finalDamage);
+
+        Debug.Log($"[SkeletonAI] {name} đánh {finalDamage} dmg  (ATK={atk}, DEF={def})");
     }
+
 
     // =========================================
     // GROUND – GIỮ QUÁI ĐỨNG TRÊN MẶT ĐẤT

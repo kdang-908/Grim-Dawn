@@ -3086,6 +3086,7 @@ GameObject:
   - component: {fileID: 4432537951179705087}
   - component: {fileID: 927711790318569398}
   - component: {fileID: -5125582162719894909}
+  - component: {fileID: -4160116592489226355}
   m_Layer: 9
   m_Name: MaleMain
   m_TagString: Player
@@ -3158,7 +3159,7 @@ MonoBehaviour:
   moveSpeed: 5
   runSpeed: 8
   rotationSpeed: 10
-  jumpForce: 5
+  jumpForce: 3
   groundMask:
     serializedVersion: 2
     m_Bits: 0
@@ -3234,11 +3235,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Niche
   level: 1
-  maxHP: 1000
-  currentHP: 1000
+  maxHP: 500
   atk: 120
   def: 75
   energy: 60
+  maxHP_Total: 0
+  atk_Total: 0
+  def_Total: 0
+  energy_Total: 0
+  _currentHP: 0
   onDeath:
     m_PersistentCalls:
       m_Calls:
@@ -3254,6 +3259,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  isDead: 0
 --- !u!114 &-3310607899756782912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3413,3 +3419,15 @@ MonoBehaviour:
   levelUpVfxPrefab: {fileID: 3125908671876608230, guid: 2e07e5ba5a6e8b74d8206f9be0e29d37, type: 3}
   levelUpVfxLifeTime: 2
   levelUpVfxOffset: {x: 0, y: 1.6, z: 0}
+--- !u!114 &-4160116592489226355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8952777963030538478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b5d00640988544bbe7121ad47c848d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

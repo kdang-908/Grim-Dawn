@@ -31,6 +31,10 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
         upgradeLevel = Mathf.Clamp(level, 1, MaxUpgradeLevel);
 
     }
+    public void IncreaseUpgradeLevel()
+    {
+        SetUpgradeLevel(upgradeLevel + 1);
+    }
     private void Awake()
     {
         if (itemImage == null) itemImage = GetComponent<Image>();
@@ -111,7 +115,7 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler
 
         if (equipmentManager == null) return;
 
-        Sprite returned = equipmentManager.EquipItem(itemType, itemImage.sprite, myPrefab);
+        Sprite returned = equipmentManager.EquipItem(itemType, itemImage.sprite, myPrefab, upgradeLevel);
 
         if (returned != null)
         {

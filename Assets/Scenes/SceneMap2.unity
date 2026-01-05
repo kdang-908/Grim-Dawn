@@ -4261,15 +4261,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 185428863}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 345.73685, y: 6.192399, z: 332.44644}
+  m_LocalRotation: {x: 0, y: -0.40986726, z: 0, w: 0.9121452}
+  m_LocalPosition: {x: 753.82, y: 9.53, z: 154.14}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1601803134}
   - {fileID: 1531238600}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -48.393, z: 0}
 --- !u!114 &185428865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9958,7 +9958,7 @@ Transform:
   m_GameObject: {fileID: 242078234}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 437.18, y: 3.23, z: 352.4}
+  m_LocalPosition: {x: 679.24, y: 2.85, z: 184.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24913,7 +24913,7 @@ Transform:
   m_GameObject: {fileID: 955764198}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 344.649, y: 6.2, z: 340.1}
+  m_LocalPosition: {x: 748.32, y: 9.91, z: 163.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26651,7 +26651,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4438656222355180, guid: 4047ab01be7298e4e827f73bf31ba088, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.53
+      value: 6.57
       objectReference: {fileID: 0}
     - target: {fileID: 4438656222355180, guid: 4047ab01be7298e4e827f73bf31ba088, type: 3}
       propertyPath: m_LocalPosition.z
@@ -28475,7 +28475,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 174.8, y: 0}
+  m_AnchoredPosition: {x: 175.3, y: 0}
   m_SizeDelta: {x: 350, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1110343740
