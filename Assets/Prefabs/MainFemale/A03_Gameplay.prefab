@@ -1544,6 +1544,9 @@ MonoBehaviour:
   characterSelectScene: CharacterSelection
   disableColliderInSelection: 1
   freezeAllInSelection: 1
+  skillTriggerName: SkillAttack
+  skillHitbox: {fileID: 0}
+  skillCooldown: 1
   isUIOpen: 0
 --- !u!54 &-5682574121528800800
 Rigidbody:
@@ -1610,10 +1613,14 @@ MonoBehaviour:
   characterName: Niche
   level: 12
   maxHP: 1000
-  currentHP: 1000
   atk: 120
   def: 75
   energy: 60
+  maxHP_Total: 0
+  atk_Total: 0
+  def_Total: 0
+  energy_Total: 0
+  _currentHP: 0
   onDeath:
     m_PersistentCalls:
       m_Calls:
@@ -1629,6 +1636,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  isDead: 0
 --- !u!114 &-5348699260533614558
 MonoBehaviour:
   m_ObjectHideFlags: 0

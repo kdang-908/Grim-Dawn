@@ -11,9 +11,19 @@ public class GameEndUIController : MonoBehaviour
     public GameObject victoryScreen;
 
     [Header("Timing")]
+    [Tooltip("Delay trước khi hiện UI Death/Victory")]
     public float showDelay = 1.5f;
 
-    void Awake()
+    [Tooltip("Giữ lại nếu sau này muốn auto load, hiện tại KHÔNG dùng")]
+    public float autoLoadDelay = 2f;
+
+    [Header("Scene Names")]
+    [Tooltip("Tên scene khi Retry (nếu muốn ép về 1 scene cụ thể)")]
+    public string retrySceneName = "Map";       // hiện tại mình sẽ lấy scene hiện tại luôn
+    [Tooltip("Tên scene map kế tiếp khi Victory")]
+    public string nextSceneName = "SceneMap2";
+
+    private void Awake()
     {
         // Singleton
         if (Instance == null)
@@ -32,7 +42,7 @@ public class GameEndUIController : MonoBehaviour
         if (victoryScreen != null) victoryScreen.SetActive(false);
     }
 
-    void Start()
+    private void Start()
     {
         StartCoroutine(WaitForPlayerAndHook());
     }
@@ -59,7 +69,7 @@ public class GameEndUIController : MonoBehaviour
         Debug.Log("[GameEndUI] Đã hook OnDeath");
     }
 
-    // ================= DEATH =================
+    // ===================== DEATH =====================
     public void OnPlayerDeath()
     {
         StartCoroutine(ShowDeathScreenDelay());
@@ -78,10 +88,11 @@ public class GameEndUIController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        // pause game
         Time.timeScale = 0f;
     }
 
-    // ================= VICTORY =================
+    // ===================== VICTORY =====================
     public void ShowVictory()
     {
         StartCoroutine(ShowVictoryDelay());
@@ -89,19 +100,64 @@ public class GameEndUIController : MonoBehaviour
 
     IEnumerator ShowVictoryDelay()
     {
+        // chờ 1 chút trước khi hiện UI Victory
         yield return new WaitForSecondsRealtime(showDelay);
 
         gameObject.SetActive(true);
         if (deathScreen != null) deathScreen.SetActive(false);
         if (victoryScreen != null) victoryScreen.SetActive(true);
 
+        // hiện chuột để người chơi thấy màn hình Victory
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        // dừng game lại
         Time.timeScale = 0f;
+
+        // ⛔ TỪ ĐÂY TRỞ ĐI KHÔNG AUTO LOAD NỮA
+        // Người chơi sẽ bấm nút (Next / Continue) để qua map
     }
 
-    // ================= CONTINUE =================
+    /// <summary>
+    /// Gán hàm này cho nút "Next" / "Continue" ở màn hình Victory
+    /// </summary>
+    public void NextMap()
+    {
+        Debug.Log("[GameEndUI] Next Map (Button)");
+
+        // 🔹 SAVE PLAYER TRƯỚC KHI QUA MAP MỚI
+        var gm = GameManager.Instance;
+        if (gm != null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                var stats = player.GetComponent<CharacterStats>();
+                if (stats != null)
+                {
+                    gm.SavePlayer(stats);
+                }
+                else
+                {
+                    Debug.LogWarning("[GameEndUI] Không tìm thấy CharacterStats trên Player để Save");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[GameEndUI] Không tìm thấy Player (tag Player) để Save trước khi qua map mới");
+            }
+        }
+
+        // bỏ pause, khóa chuột lại như đang chơi
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // chuyển sang map kế tiếp
+        SceneManager.LoadScene(nextSceneName);
+    }
+
+    // ===================== CONTINUE (ẩn UI, không đổi scene) =====================
     public void ContinueGame()
     {
         Debug.Log("[GameEndUI] Continue Game");
@@ -115,19 +171,20 @@ public class GameEndUIController : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    // ================= RETRY =================
+    // ===================== RETRY =====================
     public void Retry()
     {
         Debug.Log("[GameEndUI] Retry");
 
-        // bỏ pause game
         Time.timeScale = 1f;
 
-        // khóa chuột lại như bình thường khi chơi
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // load lại scene Map (tên phải đúng y như file trong folder Scenes)
-        SceneManager.LoadScene("Map");
+        // Reload đúng scene hiện tại
+        string currentScene = SceneManager.GetActiveScene().name;
+        // nếu muốn luôn về 1 scene cố định thì dùng:
+        // SceneManager.LoadScene(retrySceneName);
+        SceneManager.LoadScene(currentScene);
     }
 }

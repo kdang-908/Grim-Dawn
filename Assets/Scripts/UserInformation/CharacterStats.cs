@@ -4,11 +4,11 @@ using UnityEngine.Events;
 public class CharacterStats : MonoBehaviour
 {
     [Header("Identity")]
-    public string characterName = "Niche";
+    public string characterName = "N";
     public int level = 12;
 
     [Header("Base Combat Stats")]
-    public int maxHP = 1000;
+    public int maxHP = 10000;
     public int atk = 120;
     public int def = 75;
     public int energy = 60;
@@ -37,7 +37,6 @@ public class CharacterStats : MonoBehaviour
 
     private void Awake()
     {
-        // Lấy script âm thanh chết nếu có trên cùng GameObject
         deathSound = GetComponent<PlayerDeathSound>();
     }
 
@@ -45,43 +44,51 @@ public class CharacterStats : MonoBehaviour
     {
         UpdateFinalStats();
 
-        // Nếu mới vào game, set full máu
         currentHP = maxHP_Total;
         isDead = false;
 
-        // Refresh UI nếu có
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
     }
 
     public void UpdateFinalStats()
     {
+        // base
         atk_Total = atk;
         def_Total = def;
         maxHP_Total = maxHP;
         energy_Total = energy;
 
-        // Tìm equipment manager trong scene
-        EquipmentManager em = FindFirstObjectByType<EquipmentManager>();
+        // equipment
+        EquipmentManager em = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
         if (em != null)
         {
-            if (em.currentWeapon != null) AddBonus(em.currentWeapon);
-            if (em.currentHelmet != null) AddBonus(em.currentHelmet);
-            if (em.currentChest != null) AddBonus(em.currentChest);
+            if (em.currentWeapon != null)
+                AddBonus(em.currentWeapon, em.weaponUpgradeLevel);
+
+            if (em.currentHelmet != null)
+                AddBonus(em.currentHelmet, em.helmetUpgradeLevel);
+
+            if (em.currentChest != null)
+                AddBonus(em.currentChest, em.chestUpgradeLevel);
         }
+
+        // ở game bạn hiện tại đang luôn full máu khi cập nhật stat
         currentHP = maxHP_Total;
 
-        // Cập nhật UI
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
-        
     }
 
-    private void AddBonus(WeaponData data)
+    private void AddBonus(WeaponData data, int level)
     {
-        atk_Total += data.bonusATK;
-        def_Total += data.bonusDEF;
-        maxHP_Total += data.bonusMaxHP;
-        energy_Total += data.bonusEnergy;
+        if (data == null) return;
+
+        int lv = Mathf.Max(level, 1);
+
+        atk_Total += data.GetATK(lv);
+        def_Total += data.GetDEF(lv);
+        maxHP_Total += data.GetMaxHP(lv);
+        energy_Total += data.GetEnergy(lv);
     }
 
     public void TakeDamage(int dmg)
@@ -89,9 +96,11 @@ public class CharacterStats : MonoBehaviour
         if (isDead) return;
         if (dmg <= 0) return;
 
+        // DEBUG: xem nó đang trừ bao nhiêu
+        int before = currentHP;
         currentHP -= dmg;
+        Debug.Log($"[{characterName}] TakeDamage {dmg} | HP: {before} -> {currentHP}");
 
-        
         if (currentHP <= 0)
         {
             currentHP = 0;
@@ -101,6 +110,7 @@ public class CharacterStats : MonoBehaviour
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
     }
 
+
     private void Die()
     {
         if (isDead) return;
@@ -108,10 +118,8 @@ public class CharacterStats : MonoBehaviour
 
         Debug.Log("[CharacterStats] Player chết");
 
-        // ✅ phát âm chết
         if (deathSound != null) deathSound.PlayDeathSound();
 
-        // ✅ gọi event (để hiện DeathScreen)
         onDeath?.Invoke();
     }
 
@@ -124,7 +132,6 @@ public class CharacterStats : MonoBehaviour
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
     }
 
-    // (Optional) dùng khi revive
     public void ReviveFull()
     {
         isDead = false;

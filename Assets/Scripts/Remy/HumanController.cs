@@ -19,7 +19,7 @@ public class HumanController : MonoBehaviour
     public float rotationSpeed = 12f;
 
     [Header("Jump")]
-    public float jumpForce = 5f;
+    public float jumpForce = 2f;
     public LayerMask groundMask;
     public float groundCheckDistance = 0.2f;
 
@@ -111,7 +111,8 @@ public class HumanController : MonoBehaviour
             rb.isKinematic = false;
             rb.useGravity = true;
 
-            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+
 
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
@@ -235,12 +236,20 @@ public class HumanController : MonoBehaviour
 
         if (isGrounded)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            // Xoá vận tốc Y cũ để lần nào cũng nhảy đều
+            Vector3 vel = rb.linearVelocity;
+            vel.y = 0f;
+            rb.linearVelocity = vel;
+
+            // Nhảy – giá trị này chính là độ cao cảm giác
+            rb.linearVelocity += Vector3.up * jumpForce;
+
             if (animator != null) animator.SetBool("isJumping", true);
         }
 
         jumpPressed = false;
     }
+
 
     void GroundCheck()
     {

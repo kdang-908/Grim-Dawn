@@ -20,6 +20,23 @@ public class GameManager : MonoBehaviour
     public string playerTag = "Player";
     public string spawnPointName = "PlayerSpawn"; // đặt 1 empty trong Map tên PlayerSpawn
 
+    // =========================
+    //  LƯU CHỈ SỐ PLAYER
+    // =========================
+    [System.Serializable]
+    public class PlayerSaveData
+    {
+        public int level;
+
+        public int maxHP;
+        public int currentHP;
+        public int atk;
+        public int def;
+    }
+
+    [Header("Saved Stats (debug)")]
+    public PlayerSaveData playerData = new PlayerSaveData();
+
     void Awake()
     {
         if (Instance == null)
@@ -172,5 +189,53 @@ public class GameManager : MonoBehaviour
         gold -= amount;
         Debug.Log($"[GM] Spend {amount} gold. Left = {gold}");
         return true;
+    }
+
+    // =========================
+    //  SAVE / LOAD PLAYER STATS
+    // =========================
+
+    // LƯU từ CharacterStats
+    public void SavePlayer(CharacterStats stats)
+    {
+        if (stats == null)
+        {
+            Debug.LogWarning("[GM] SavePlayer: stats == null");
+            return;
+        }
+
+        playerData.level = stats.level;
+        playerData.maxHP = stats.maxHP_Total;
+        playerData.currentHP = stats.currentHP;
+        playerData.atk = stats.atk_Total;
+        playerData.def = stats.def_Total;
+
+        Debug.Log($"[GM] SavePlayer: LV {playerData.level}, HP {playerData.currentHP}/{playerData.maxHP}, ATK {playerData.atk}, DEF {playerData.def}");
+    }
+
+    // GÁN lại vào CharacterStats
+    public void LoadPlayer(CharacterStats stats)
+    {
+        if (stats == null)
+        {
+            Debug.LogWarning("[GM] LoadPlayer: stats == null");
+            return;
+        }
+
+        if (playerData.maxHP <= 0)
+        {
+            Debug.LogWarning("[GM] Chưa có dữ liệu playerData, bỏ qua LoadPlayer");
+            return;
+        }
+
+        stats.level = playerData.level;
+        stats.maxHP_Total = playerData.maxHP;
+        stats.currentHP = playerData.currentHP;
+        stats.atk_Total = playerData.atk;
+        stats.def_Total = playerData.def;
+
+        FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+
+        Debug.Log($"[GM] LoadPlayer: LV {playerData.level}, HP {playerData.currentHP}/{playerData.maxHP}, ATK {playerData.atk}, DEF {playerData.def}");
     }
 }

@@ -664,13 +664,18 @@ MonoBehaviour:
   characterName: Skeleton
   level: 5
   maxHP: 300
-  currentHP: 300
   atk: 200
   def: 10
   energy: 10
+  maxHP_Total: 0
+  atk_Total: 0
+  def_Total: 0
+  energy_Total: 0
+  _currentHP: 0
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  isDead: 0
 --- !u!114 &3142071906304263204
 MonoBehaviour:
   m_ObjectHideFlags: 0

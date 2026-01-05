@@ -573,6 +573,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100000, guid: 69e6a6ea8e179f445bd248ba46f2a2e9, type: 3}
       insertIndex: -1
       addedObject: {fileID: -7149094441767878939}
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 69e6a6ea8e179f445bd248ba46f2a2e9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1554479642420551578}
   m_SourcePrefab: {fileID: 100100000, guid: 69e6a6ea8e179f445bd248ba46f2a2e9, type: 3}
 --- !u!4 &3706032466966953523 stripped
 Transform:
@@ -706,11 +709,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Niche
   level: 1
-  maxHP: 1000
-  currentHP: 1000
+  maxHP: 500
   atk: 120
   def: 75
   energy: 60
+  maxHP_Total: 0
+  atk_Total: 0
+  def_Total: 0
+  energy_Total: 0
+  _currentHP: 0
   onDeath:
     m_PersistentCalls:
       m_Calls:
@@ -726,6 +733,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  isDead: 0
 --- !u!114 &734730636356838619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -885,3 +893,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skill: {fileID: 2559927287710908904}
+--- !u!114 &-1554479642420551578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3706032466967306769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b5d00640988544bbe7121ad47c848d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
