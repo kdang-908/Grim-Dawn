@@ -66,7 +66,7 @@ public class PlayerExperience : MonoBehaviour
 
         // hồi máu = full theo chỉ số mới
         stats.UpdateFinalStats();
-        stats.currentHP = stats.maxHP;
+        
 
         Debug.Log(
             $"[STATS UP] HP={stats.maxHP}, ATK={stats.atk}, DEF={stats.def}, ENERGY={stats.energy}"

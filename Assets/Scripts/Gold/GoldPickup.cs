@@ -18,7 +18,6 @@ public class GoldPickup : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // chỉ player mới nhặt được
         if (!other.CompareTag(playerTag))
             return;
 
@@ -35,8 +34,6 @@ public class GoldPickup : MonoBehaviour
             Debug.LogWarning("[GoldPickup] GameManager not found, gold not added!");
         }
 
-        // TODO: thêm hiệu ứng âm thanh / VFX ở đây nếu muốn
-
-        Destroy(gameObject); // xoá coin
+        Destroy(gameObject); 
     }
 }

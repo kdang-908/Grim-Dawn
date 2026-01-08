@@ -26,6 +26,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SceneMap2.unity
     guid: e3430deeced742d4b8da6f42b10885c7
+  - enabled: 1
+    path: Assets/Scenes/SceneMap3.unity
+    guid: 369a753bcb2678447a1317c2eaf680f2
+  - enabled: 1
+    path: Assets/Scenes/SelectChapter.unity
+    guid: 685eec762e6e3d441addc615ee4c305e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

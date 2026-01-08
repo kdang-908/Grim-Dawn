@@ -32,33 +32,35 @@ public class PotionManager : MonoBehaviour
     [Header("Visual")]
     [Range(0f, 1f)][SerializeField] private float emptyAlpha = 0.35f;
 
-
-    // ============================
-    // ⭐ THÊM VFX HỒI MÁU ⭐
-    // ============================
     [Header("Heal VFX")]
     [SerializeField] private GameObject healVfxPrefab;
     [SerializeField] private float healVfxLifeTime = 2f;
     [SerializeField] private Vector3 healVfxOffset = new Vector3(0, 1.2f, 0);
 
-
     void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject); // ✅ GIỮ LẠI QUA SCENE
+        }
         else
+        {
             Destroy(gameObject);
+            return; // ✅ QUAN TRỌNG: tránh chạy tiếp
+        }
 
         UpdateUI();
     }
 
     void Update()
     {
+        // auto bind lại player khi qua scene mới
         if (activeCharacter == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
-                activeCharacter = player.GetComponent<CharacterStats>();
+                activeCharacter = player.GetComponent<CharacterStats>() ?? player.GetComponentInChildren<CharacterStats>(true);
         }
 
         UpdateCooldown();
@@ -72,9 +74,13 @@ public class PotionManager : MonoBehaviour
         activeCharacter = stats;
     }
 
-    public int GetPotionCount()
+    public int GetPotionCount() => potions;
+
+    // ✅ Cho GameManager set lại potion sau khi load scene
+    public void SetPotionCount(int value)
     {
-        return potions;
+        potions = Mathf.Max(0, value);
+        UpdateUI();
     }
 
     public void TryHeal()
@@ -82,43 +88,35 @@ public class PotionManager : MonoBehaviour
         if (activeCharacter == null) return;
         if (isOnCooldown) return;
         if (potions <= 0) return;
-        if (activeCharacter.currentHP >= activeCharacter.maxHP) return;
+
+        // bạn đang dùng maxHP hay maxHP_Total tùy CharacterStats của bạn
+        int maxHp = (activeCharacter.maxHP_Total > 0) ? activeCharacter.maxHP_Total : activeCharacter.maxHP;
+        if (activeCharacter.currentHP >= maxHp) return;
 
         potions--;
         activeCharacter.Heal(healAmount);
 
-        // 🔊 Sound
         if (audioSource != null && healClip != null)
             audioSource.PlayOneShot(healClip, healVolume);
 
-        // ✨ Spawn hiệu ứng hồi máu
         SpawnHealVfx();
 
         StartCooldown();
         UpdateUI();
     }
 
-
-    // ============================
-    // 🎇 HÀM TẠO VFX HỒI MÁU
-    // ============================
     void SpawnHealVfx()
     {
-        if (healVfxPrefab == null || activeCharacter == null)
-            return;
+        if (healVfxPrefab == null || activeCharacter == null) return;
 
         Vector3 pos = activeCharacter.transform.position + healVfxOffset;
+        GameObject vfx = Instantiate(healVfxPrefab, pos, Quaternion.identity);
 
-        GameObject vfx =
-            Instantiate(healVfxPrefab, pos, Quaternion.identity);
-
-        // Cho effect bám theo player (đi chuyển vẫn dính)
         vfx.transform.SetParent(activeCharacter.transform);
 
         if (healVfxLifeTime > 0f)
             Destroy(vfx, healVfxLifeTime);
     }
-
 
     void StartCooldown()
     {

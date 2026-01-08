@@ -96,9 +96,7 @@ public class SkillLineHitbox : MonoBehaviour
                            + Vector3.up * vfxHeightOffset;
 
         // hướng nhìn + offset xoay
-        Quaternion spawnRot =
-            Quaternion.LookRotation(forward) *
-            Quaternion.Euler(vfxRotationOffsetEuler);
+        Quaternion spawnRot =Quaternion.LookRotation(forward) *Quaternion.Euler(vfxRotationOffsetEuler);
 
         GameObject vfx = Instantiate(vfxPrefab, spawnPos, spawnRot);
         Debug.Log("[SkillLineHitbox] Spawn VFX at " + spawnPos);

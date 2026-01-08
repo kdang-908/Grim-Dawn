@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33899540581287652}
   - component: {fileID: 23399547592334920}
   - component: {fileID: 64364699476110354}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Pine_stump_LOD2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 33982936521725798}
   - component: {fileID: 23876799658532602}
   - component: {fileID: 64868862035026558}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Pine_stump_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -228,7 +228,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4191413475911042}
   - component: {fileID: 205388090323476004}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Pine_stump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -293,7 +293,7 @@ GameObject:
   - component: {fileID: 23962926859762264}
   - component: {fileID: 64019143479277562}
   - component: {fileID: 136151598196397500}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Pine_stump_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}

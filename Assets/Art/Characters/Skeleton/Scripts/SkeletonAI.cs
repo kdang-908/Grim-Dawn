@@ -1,268 +1,298 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class SkeletonAI : MonoBehaviour
 {
     // ===== PLAYER REF =====
     private GameObject player;
-    private CharacterStats playerStats;  // dùng CharacterStats của player
-
-    [Header("Reward - HP Potion")]
-    [Tooltip("Prefab bình HP (phải có collider + trigger)")]
-    public GameObject hpBottlePrefab;
-
-    [Range(0f, 1f)]
-    [Tooltip("Tỉ lệ rơi bình máu (0.85 = 85%)")]
-    public float hpDropChance = 0.85f;
+    private CharacterStats playerStats;
 
     [Header("AI Settings")]
-    public float chaseRange = 100f;
+    public float chaseRange = 20f;
     public float attackRange = 1.8f;
     public float moveSpeed = 2f;
     public float attackCooldown = 1.3f;
 
-    [Header("Reward - EXP")]
-    public int expReward = 40;   // EXP thưởng khi giết con này
-
-    [Header("Reward - Gold")]
-    [Tooltip("Min vàng có thể rơi")]
-    public int goldRewardMin = 500;
-    [Tooltip("Max vàng có thể rơi")]
-    public int goldRewardMax = 1500;
-
-    [Range(0f, 1f)]
-    [Tooltip("Tỉ lệ rơi vàng (1 = luôn rơi, 0.5 = 50%)")]
-    public float goldDropChance = 1f;
-
-    [Tooltip("Prefab coin (có gắn GoldPickup)")]
-    public GameObject goldDropPrefab;
-
     [Header("State")]
-    [Tooltip("False = đứng yên, chỉ khi player lại gần rồi đánh mới bắt đầu đuổi")]
-    public bool aggroOnStart = false;
+    public bool aggroOnStart = true;
+    private bool hasAggro = false;
 
-    private bool hasAggro = false;   // đã bắt đầu đuổi chưa
-
-    private Animator anim;
-    private float lastAttackTime;
-    [Tooltip("CharacterStats của chính con Skeleton")]
+    [Header("CharacterStats của Skeleton")]
     public CharacterStats State;
 
     [Header("Avoid Clumping")]
-    [Tooltip("Bán kính đứng vòng quanh player để đỡ dính 1 cục")]
-    public float aroundPlayerRadius = 1.2f;   // bán kính đứng quanh player
-
-    // offset riêng cho từng con quanh player
+    public float aroundPlayerRadius = 1.2f;
     private Vector2 personalOffset2D;
 
-    [Header("Ground (giữ quái dính mặt đất)")]
-    [Tooltip("Layer mặt đất / đường / terrain")]
+    [Header("Ground (stick)")]
     public LayerMask groundMask;
-    [Tooltip("Khoảng cách raycast xuống dưới")]
-    public float groundCheckDistance = 5f;
-    [Tooltip("Tinh chỉnh cao thấp nếu cần (+ lên, - xuống)")]
+    public float groundCheckDistance = 3.5f;
     public float groundOffsetY = 0.0f;
 
+    [Header("Obstacle Avoid (NO xuyên cây/đá/nhà)")]
+    public LayerMask obstacleMask;           // set: Environment + Default (nếu nhà/đá ở Default)
+    public float avoidProbeDistance = 1.2f;  // khoảng quét trước mặt
+    [Range(0.1f, 1f)] public float avoidStrength = 0.85f;
+    public int sideRaysPerSide = 3;
+    public float sideRayAngleStep = 20f;
+
+    [Header("Stop push")]
+    public float stopDistance = 1.25f;
+
+    [Header("Reward - HP Potion")]
+    public GameObject hpBottlePrefab;
+    [Range(0f, 1f)] public float hpDropChance = 0.85f;
+
+    [Header("Reward - EXP")]
+    public int expReward = 40;
+
+    [Header("Reward - Gold")]
+    public int goldRewardMin = 500;
+    public int goldRewardMax = 1500;
+    [Range(0f, 1f)] public float goldDropChance = 1f;
+    public GameObject goldDropPrefab;
+
+    // ===== internals =====
+    private Animator anim;
+    private float lastAttackTime;
+
+    private Rigidbody rb;
     private CapsuleCollider capCol;
 
-    // =========================================
-    // LIFE CYCLE
-    // =========================================
-    void Start()
+    private Vector3 desiredMoveDir; // tính ở Update, chạy ở FixedUpdate
+
+    void Awake()
     {
         anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
         capCol = GetComponent<CapsuleCollider>();
 
-        RefreshPlayer();
+        // ✅ PHYSICS chuẩn để không xuyên + mượt
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
-        // nếu muốn quái spawn ra là aggro luôn thì bật aggroOnStart = true
-        hasAggro = aggroOnStart;
-
-        // mỗi con skeleton sẽ có 1 offset riêng quanh player
         personalOffset2D = Random.insideUnitCircle.normalized * aroundPlayerRadius;
+    }
+
+    void Start()
+    {
+        RefreshPlayer();
+        hasAggro = aggroOnStart;
     }
 
     public void RefreshPlayer()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
 
-        if (player != null)
-        {
-            playerStats = player.GetComponent<CharacterStats>();
-            if (playerStats == null) playerStats = player.GetComponentInChildren<CharacterStats>();
-            if (playerStats == null) playerStats = player.GetComponentInParent<CharacterStats>();
-
-            if (playerStats != null)
-                Debug.Log($"[SkeletonAI] {name} tìm thấy player: {player.name}");
-            else
-                Debug.LogError($"[SkeletonAI] {name} player có Tag=Player nhưng KHÔNG tìm thấy CharacterStats!");
-        }
-        else
-        {
-            Debug.LogWarning($"[SkeletonAI] {name} không tìm thấy Player! (Tag Player)");
-        }
+        playerStats = player.GetComponent<CharacterStats>();
+        if (playerStats == null) playerStats = player.GetComponentInChildren<CharacterStats>();
+        if (playerStats == null) playerStats = player.GetComponentInParent<CharacterStats>();
     }
 
     void Update()
     {
+        desiredMoveDir = Vector3.zero;
+
         if (player == null)
         {
-            if (Time.frameCount % 60 == 0)
-                RefreshPlayer();
+            if (Time.frameCount % 60 == 0) RefreshPlayer();
             return;
         }
 
-        // nếu quái chết rồi thì xử lý chết
         if (State != null && State.currentHP <= 0)
         {
             HandleDead();
             return;
         }
 
-        float dist = Vector3.Distance(transform.position, player.transform.position);
+        Vector3 myPos = rb.position;
+        Vector3 playerPos = player.transform.position;
+        float dist = Vector3.Distance(myPos, playerPos);
 
-        // ===== 1) TRẠNG THÁI CHƯA AGGRO =====
+        // chưa aggro
         if (!hasAggro)
         {
             anim.SetBool("isMoving", false);
 
-            // quay mặt nhìn player cho tự nhiên
-            Vector3 dirLook = (player.transform.position - transform.position);
-            dirLook.y = 0;
-            if (dirLook.sqrMagnitude > 0.01f)
-                transform.rotation = Quaternion.LookRotation(dirLook);
+            Vector3 look = playerPos - myPos;
+            look.y = 0;
+            if (look.sqrMagnitude > 0.01f) transform.rotation = Quaternion.LookRotation(look);
 
-            // nếu player CHƯA vào tầm đánh thì không làm gì thêm
-            if (dist > attackRange)
-                return;
-
-            // player ĐÃ vào tầm đánh -> đánh 1 cái trước
-            Attack();
-
-            // sau cú đánh đầu tiên -> bắt đầu AGGRO
-            hasAggro = true;
+            if (dist <= chaseRange) hasAggro = true;
             return;
         }
 
-        // ===== 2) TRẠNG THÁI ĐÃ AGGRO =====
-
+        // ngoài chase range -> đứng
         if (dist > chaseRange)
         {
             anim.SetBool("isMoving", false);
             return;
         }
 
-        if (dist > attackRange)
+        // gần quá thì đứng/đánh (không ép vào cây)
+        if (dist <= Mathf.Max(stopDistance, attackRange))
         {
-            MoveTowardsPlayer();
-        }
-        else
-        {
-            Attack();
+            anim.SetBool("isMoving", false);
+            if (dist <= attackRange) Attack();
+            return;
         }
 
-        // GIỮ QUÁI DÍNH MẶT ĐẤT
-        KeepOnGround();
-    }
+        // tính hướng chạy + né
+        Vector3 target = (dist > attackRange * 1.5f)
+            ? playerPos + new Vector3(personalOffset2D.x, 0f, personalOffset2D.y)
+            : playerPos;
 
-    // =========================================
-    // MOVE / ATTACK
-    // =========================================
-    void MoveTowardsPlayer()
-    {
-        if (player == null) return;
-
-        anim.SetBool("isMoving", true);
-
-        // Mỗi con nhắm tới 1 vị trí lệch quanh player
-        Vector3 targetPos = player.transform.position +
-                            new Vector3(personalOffset2D.x, 0f, personalOffset2D.y);
-
-        Vector3 dir = (targetPos - transform.position);
+        Vector3 dir = target - myPos;
         dir.y = 0f;
 
-        if (dir.sqrMagnitude > 0.0001f)
+        if (dir.sqrMagnitude < 0.0001f)
         {
-            dir = dir.normalized;
-            transform.rotation = Quaternion.LookRotation(dir);
-            transform.position += dir * moveSpeed * Time.deltaTime;
+            anim.SetBool("isMoving", false);
+            return;
+        }
+
+        dir.Normalize();
+
+        // hướng né vật cản
+        dir = ApplyAvoidance(dir);
+
+        desiredMoveDir = dir;
+
+        anim.SetBool("isMoving", desiredMoveDir != Vector3.zero);
+        if (desiredMoveDir != Vector3.zero)
+            transform.rotation = Quaternion.LookRotation(desiredMoveDir);
+    }
+
+    void FixedUpdate()
+    {
+        if (desiredMoveDir == Vector3.zero) return;
+
+        Vector3 myPos = rb.position;
+        Vector3 step = desiredMoveDir * moveSpeed * Time.fixedDeltaTime;
+
+        // giữ quái dính đất bằng raycast (nhẹ thôi)
+        Vector3 next = myPos + step;
+        next = SnapToGround(next);
+
+        // ✅ chặn cứng bằng capsule cast trước khi move
+        if (!CapsuleBlocked(myPos, next, obstacleMask, out RaycastHit hit))
+        {
+            rb.MovePosition(next);
+            return;
+        }
+
+        // bị chặn -> thử slide theo mặt
+        Vector3 slideDir = Vector3.ProjectOnPlane(desiredMoveDir, hit.normal);
+        slideDir.y = 0;
+        if (slideDir.sqrMagnitude < 0.0001f) return;
+        slideDir.Normalize();
+
+        Vector3 slideNext = myPos + slideDir * moveSpeed * Time.fixedDeltaTime;
+        slideNext = SnapToGround(slideNext);
+
+        if (!CapsuleBlocked(myPos, slideNext, obstacleMask, out _))
+        {
+            rb.MovePosition(slideNext);
         }
     }
 
+    // ===================== AVOIDANCE =====================
+    Vector3 ApplyAvoidance(Vector3 forwardDir)
+    {
+        // ray origin ngang bụng (đỡ đâm xuống đất)
+        Vector3 origin = rb.position + Vector3.up * (capCol.center.y + 0.2f);
+
+        // nếu trước mặt trống thì đi thẳng
+        if (!Physics.Raycast(origin, forwardDir, avoidProbeDistance, obstacleMask, QueryTriggerInteraction.Ignore))
+            return forwardDir;
+
+        // thử tìm hướng vòng trái/phải
+        for (int i = 1; i <= sideRaysPerSide; i++)
+        {
+            float ang = sideRayAngleStep * i;
+
+            Vector3 left = Quaternion.Euler(0f, -ang, 0f) * forwardDir;
+            if (!Physics.Raycast(origin, left, avoidProbeDistance, obstacleMask, QueryTriggerInteraction.Ignore))
+                return Vector3.Slerp(forwardDir, left, avoidStrength).normalized;
+
+            Vector3 right = Quaternion.Euler(0f, ang, 0f) * forwardDir;
+            if (!Physics.Raycast(origin, right, avoidProbeDistance, obstacleMask, QueryTriggerInteraction.Ignore))
+                return Vector3.Slerp(forwardDir, right, avoidStrength).normalized;
+        }
+
+        // bí quá -> đứng lại (khỏi giật)
+        return Vector3.zero;
+    }
+
+    bool CapsuleBlocked(Vector3 from, Vector3 to, LayerMask mask, out RaycastHit hit)
+    {
+        Vector3 dir = (to - from);
+        float dist = dir.magnitude;
+        if (dist <= 0.0001f)
+        {
+            hit = new RaycastHit();
+            return false;
+        }
+        dir /= dist;
+
+        float radius = Mathf.Max(0.05f, capCol.radius * 0.95f);
+        float half = Mathf.Max(radius, capCol.height * 0.5f);
+        float centerY = capCol.center.y;
+
+        Vector3 center = from + Vector3.up * centerY;
+        Vector3 p1 = center + Vector3.up * (half - radius);
+        Vector3 p2 = center - Vector3.up * (half - radius);
+
+        return Physics.CapsuleCast(p1, p2, radius, dir, out hit, dist, mask, QueryTriggerInteraction.Ignore);
+    }
+
+    Vector3 SnapToGround(Vector3 pos)
+    {
+        Vector3 origin = pos + Vector3.up * 1.5f;
+        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, groundCheckDistance, groundMask, QueryTriggerInteraction.Ignore))
+        {
+            float footOffset = capCol.height * 0.5f - capCol.center.y;
+            pos.y = hit.point.y + footOffset + groundOffsetY;
+        }
+        return pos;
+    }
+
+    // ===================== ATTACK =====================
     void Attack()
     {
-        anim.SetBool("isMoving", false);
-
-        if (Time.time - lastAttackTime < attackCooldown)
-            return;
-
+        if (Time.time - lastAttackTime < attackCooldown) return;
         lastAttackTime = Time.time;
-        anim.SetTrigger("attack");
 
-        if (playerStats == null)
-            return;
+        if (anim != null) anim.SetTrigger("attack");
+        if (playerStats == null) return;
 
-        // ===== Damage lấy từ CharacterStats =====
-        int atk = State != null ? State.atk_Total : 10;
+        int atk = (State != null) ? State.atk_Total : 10;
         int def = playerStats.def_Total;
+        int dmg = Mathf.Max(1, atk - def);
 
-        int finalDamage = Mathf.Max(1, atk - def);
-
-        playerStats.TakeDamage(finalDamage);
-
-        Debug.Log($"[SkeletonAI] {name} đánh {finalDamage} dmg  (ATK={atk}, DEF={def})");
+        playerStats.TakeDamage(dmg);
     }
 
-
-    // =========================================
-    // GROUND – GIỮ QUÁI ĐỨNG TRÊN MẶT ĐẤT
-    // =========================================
-    void KeepOnGround()
-    {
-        // bắn ray từ trên xuống dưới
-        float rayStartHeight = 2f;
-        Vector3 rayOrigin = transform.position + Vector3.up * rayStartHeight;
-
-        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, groundCheckDistance, groundMask))
-        {
-            float footOffset = 0f;
-
-            // tính khoảng cách từ pivot xuống bàn chân dựa trên CapsuleCollider
-            if (capCol != null)
-            {
-                // chiều cao từ tâm collider xuống đáy
-                footOffset = capCol.height * 0.5f - capCol.center.y;
-            }
-
-            Vector3 pos = transform.position;
-            pos.y = hit.point.y + footOffset + groundOffsetY;
-            transform.position = pos;
-        }
-    }
-
-    // =========================================
-    // DEAD / REWARD
-    // =========================================
+    // ===================== DEAD / REWARD =====================
     void HandleDead()
     {
-        Debug.Log($"[SkeletonAI] {name} HandleDead()");
-
-        // cộng EXP
         GiveExpToPlayer();
-
-        // rơi bình máu
         DropHPBottle();
-
-        // rơi vàng
         DropGold();
 
-        anim.SetTrigger("Dead");
+        if (anim != null) anim.SetTrigger("Dead");
 
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
 
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null) rb.isKinematic = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.isKinematic = true;
 
         StartCoroutine(Disappear());
         this.enabled = false;
@@ -270,103 +300,43 @@ public class SkeletonAI : MonoBehaviour
 
     void GiveExpToPlayer()
     {
-        if (player == null)
-            RefreshPlayer();
+        if (player == null) RefreshPlayer();
+        if (player == null) return;
 
-        if (player == null)
-        {
-            Debug.LogWarning("[SkeletonAI] Không tìm thấy player để cộng EXP");
-            return;
-        }
-
+        // ✅ FIX lỗi CS0029: PlayerExperience phải GetComponent<PlayerExperience>, KHÔNG phải CharacterStats
         PlayerExperience exp = player.GetComponent<PlayerExperience>();
         if (exp == null) exp = player.GetComponentInChildren<PlayerExperience>();
         if (exp == null) exp = player.GetComponentInParent<PlayerExperience>();
-
-        if (exp == null)
-        {
-            Debug.LogWarning("[SkeletonAI] Player không có PlayerExperience, không cộng EXP được");
-            return;
-        }
+        if (exp == null) return;
 
         exp.AddExp(expReward);
-        Debug.Log($"[SkeletonAI] {name} chết → +{expReward} EXP cho player");
     }
 
     void DropGold()
     {
-        // tỉ lệ rơi (0..1)
-        if (Random.value > goldDropChance)
-            return;
+        if (Random.value > goldDropChance) return;
+        if (goldDropPrefab == null) return;
 
-        // random vàng trong khoảng [min, max]
         int goldReward = Random.Range(goldRewardMin, goldRewardMax + 1);
+        Vector3 spawnPos = rb.position + Vector3.up * 0.5f;
 
-        var gm = GameManager.Instance;
-        if (gm != null)
-        {
-            gm.AddGold(goldReward);
-        }
-
-        // không có prefab thì chỉ cộng vàng, không spawn coin
-        if (goldDropPrefab == null)
-        {
-            Debug.Log($"[SkeletonAI] {name} drop {goldReward} gold (no prefab)");
-            return;
-        }
-
-        // spawn coin dưới chân quái
-        Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
-        Quaternion spawnRot = Quaternion.identity;
-
-        var coin = Instantiate(goldDropPrefab, spawnPos, spawnRot);
-
+        var coin = Instantiate(goldDropPrefab, spawnPos, Quaternion.identity);
         var pickup = coin.GetComponent<GoldPickup>();
-        if (pickup != null)
-        {
-            pickup.value = goldReward;
-        }
+        if (pickup != null) pickup.value = goldReward;
+    }
 
-        Debug.Log($"[SkeletonAI] {name} drop {goldReward} gold at {spawnPos}");
+    void DropHPBottle()
+    {
+        if (Random.value > hpDropChance) return;
+        if (hpBottlePrefab == null) return;
+
+        Vector3 spawnPos = rb.position + Vector3.up * 0.4f;
+        Instantiate(hpBottlePrefab, spawnPos, Quaternion.identity);
     }
 
     IEnumerator Disappear()
     {
         yield return new WaitForSeconds(3f);
-
-        float timer = 0;
-        float disappearDuration = 2f;
-        Vector3 startPos = transform.position;
-        Vector3 endPos = startPos + Vector3.down * 2f;
-
-        while (timer < disappearDuration)
-        {
-            transform.position = Vector3.Lerp(startPos, endPos, timer / disappearDuration);
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        Debug.Log($"[SkeletonAI] {name} Destroy after disappear");
         Destroy(gameObject);
-    }
-
-    void DropHPBottle()
-    {
-        // random theo tỉ lệ
-        if (Random.value > hpDropChance)
-            return;
-
-        if (hpBottlePrefab == null)
-        {
-            Debug.LogWarning($"[SkeletonAI] {name} muốn drop HP nhưng chưa assign prefab!");
-            return;
-        }
-
-        // spawn ngay vị trí xác quái
-        Vector3 spawnPos = transform.position + Vector3.up * 0.4f;
-
-        Instantiate(hpBottlePrefab, spawnPos, Quaternion.identity);
-
-        Debug.Log($"[SkeletonAI] {name} drop HP Bottle at {spawnPos}");
     }
 }

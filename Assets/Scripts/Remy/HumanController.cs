@@ -133,13 +133,6 @@ public class HumanController : MonoBehaviour
             return;
         }
 
-        // 3) UI mở thì chặn input
-        //if (isUIOpen)
-        //{
-        //    StopMotionAndAnim();
-        //    jumpPressed = false;
-        //    return;
-        //}
 
         isRunning = Input.GetKey(KeyCode.LeftShift);
 
@@ -189,7 +182,7 @@ public class HumanController : MonoBehaviour
     {
         if (rb == null) return;
 
-        // *** KHÔNG còn chặn di chuyển khi isCastingSkill nữa ***
+        
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
@@ -287,16 +280,7 @@ public class HumanController : MonoBehaviour
     // ================== SKILL (CHUỘT PHẢI) =============
     void HandleSkillAttack()
     {
-        //if (skillOnCooldown || isCastingSkill) return;
 
-        //if (skillHitbox == null)
-        //{
-        //    Debug.LogWarning("[HumanController] SkillHitbox is null!");
-        //    return;
-        //}
-
-        //isCastingSkill = true;
-        //skillOnCooldown = true;
 
         if (animator != null )
         {
@@ -304,29 +288,11 @@ public class HumanController : MonoBehaviour
             
         }
 
-        // lo cooldown thôi
-        //StartCoroutine(SkillCooldownRoutine());
     }
 
-    //IEnumerator SkillCooldownRoutine()
-    //{
-    //    if (skillCooldown > 0f)
-    //        yield return new WaitForSeconds(skillCooldown);
 
-    //    skillOnCooldown = false;
-    //}
-
-    // ====== HÀM CHO ANIMATION EVENT GỌI ======
-
-    //Gọi ở frame skill chém mạnh nhất
-    // ====== HÀM CHO ANIMATION EVENT GỌI ======
-
-    // Gọi ở frame skill chém mạnh nhất
     public void OnSkillImpact()
     {
-        Debug.Log("[HumanController] OnSkillImpact()");
-
-        // Nếu chưa gán trong Inspector thì tự tìm trong con
         if (skillHitbox == null)
             skillHitbox = GetComponentInChildren<SkillLineHitbox>();
 
@@ -348,21 +314,5 @@ public class HumanController : MonoBehaviour
     }
 
 
-    // =========================================
 
-    //void StopMotionAndAnim()
-    //{
-    //    if (rb != null && !rb.isKinematic)
-    //    {
-    //        rb.linearVelocity = Vector3.zero;
-    //        rb.angularVelocity = Vector3.zero;
-    //    }
-
-    //    if (animator != null)
-    //    {
-    //        animator.SetBool("isWalking", false);
-    //        animator.SetBool("isRunning", false);
-    //        animator.SetBool("isJumping", false);
-    //    }
-    //}
 }

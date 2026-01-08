@@ -7,27 +7,33 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [Header("Player data")]
-    public int selectedCharacter;          // 0 = Remy, 1 = A03
-    public string playerName = "Niche";    // tên mặc định, sẽ bị override khi nhập
+    public int selectedCharacter;
+    public string playerName = "Niche";
 
     [Header("Gameplay prefabs (0=Remy, 1=A03)")]
     public GameObject[] gameplayPrefabs;
 
     [Header("Currency")]
-    public int gold = 0;                   // tổng vàng hiện có
+    public int gold = 0;
 
     [Header("Spawn")]
     public string playerTag = "Player";
-    public string spawnPointName = "PlayerSpawn"; // đặt 1 empty trong Map tên PlayerSpawn
+    public string spawnPointName = "PlayerSpawn";
 
     // =========================
-    //  LƯU CHỈ SỐ PLAYER
+    // UNLOCK MAP PROGRESS (RAM ONLY - NOT SAVED)
     // =========================
+    [Header("Chapter Progress (Runtime only)")]
+    [Tooltip("0=Map1, 1=Map2, 2=Map3 (map cao nhất đã mở)")]
+    public int maxUnlockedMap = 0;
+
+    [Tooltip("Nếu true thì mỗi lần bấm Play sẽ reset về chỉ mở Map1")]
+    public bool resetUnlockOnStart = true;
+
     [System.Serializable]
     public class PlayerSaveData
     {
         public int level;
-
         public int maxHP;
         public int currentHP;
         public int atk;
@@ -36,6 +42,12 @@ public class GameManager : MonoBehaviour
 
     [Header("Saved Stats (debug)")]
     public PlayerSaveData playerData = new PlayerSaveData();
+    public bool hasSavedData = false;
+
+    // ✅ SAVE/LOAD POTION (runtime only - currently not persisted)
+    [Header("Saved Potions")]
+    public int savedPotions = 0;
+    public bool hasSavedPotions = false;
 
     void Awake()
     {
@@ -43,14 +55,74 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // ✅ Runtime only: mỗi lần Play reset unlock nếu bạn muốn
+            if (resetUnlockOnStart)
+                maxUnlockedMap = 0; // chỉ mở Map1
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
     }
 
-    // Gọi ở màn hình chọn nhân vật
+    private void OnEnable()
+    {
+        if (Instance == this)
+            SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        if (Instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        StartCoroutine(ApplyAfterSceneLoaded());
+    }
+
+    IEnumerator ApplyAfterSceneLoaded()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return null;
+
+        var player = GameObject.FindGameObjectWithTag(playerTag);
+        if (player == null)
+        {
+            Debug.LogWarning("[GM] ApplyAfterSceneLoaded: Player not found");
+            yield break;
+        }
+
+        var stats = player.GetComponent<CharacterStats>() ?? player.GetComponentInChildren<CharacterStats>(true);
+        if (stats == null)
+        {
+            Debug.LogWarning("[GM] ApplyAfterSceneLoaded: CharacterStats not found");
+            yield break;
+        }
+
+        // ✅ NAME
+        if (!string.IsNullOrEmpty(playerName))
+            stats.characterName = playerName;
+
+        // ✅ STATS
+        if (hasSavedData && playerData != null && playerData.maxHP > 0)
+            LoadPlayer(stats);
+
+        // ✅ POTION
+        LoadPotions();
+
+        // ✅ refresh UI nếu có
+        FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+
+        Debug.Log($"[GM] Applied | Scene={SceneManager.GetActiveScene().name} | HP={stats.currentHP}/{stats.maxHP_Total} | Potions={(PotionManager.Instance ? PotionManager.Instance.GetPotionCount() : -1)} | UnlockedMax={maxUnlockedMap}");
+    }
+
+    // =========================
+    // SETUP
+    // =========================
     public void SetPlayerData(int index, string name)
     {
         selectedCharacter = index;
@@ -65,7 +137,6 @@ public class GameManager : MonoBehaviour
         return gameplayPrefabs[selectedCharacter];
     }
 
-    // Gọi khi bấm nút Play ở CharacterSelection
     public void StartGameplay()
     {
         if (!SceneManager.GetSceneByName("Map").isLoaded)
@@ -84,12 +155,8 @@ public class GameManager : MonoBehaviour
         Scene mapScene = SceneManager.GetSceneByName("Map");
         SceneManager.SetActiveScene(mapScene);
 
-        Debug.Log($"[GM] Map loaded. selectedCharacter={selectedCharacter}, prefab={GetSelectedPrefab()?.name}");
-
-        // Spawn player (đợi 1 frame để object trong Map sẵn sàng)
         StartCoroutine(SpawnPlayerNextFrame());
 
-        // Unload scene chọn
         Scene selectionScene = SceneManager.GetSceneByName("CharacterSelection");
         if (selectionScene.isLoaded)
             SceneManager.UnloadSceneAsync(selectionScene);
@@ -97,14 +164,23 @@ public class GameManager : MonoBehaviour
 
     IEnumerator SpawnPlayerNextFrame()
     {
-        // đợi 1 frame để tất cả object trong Map spawn xong
         yield return null;
 
-        // nếu đã có player rồi thì khỏi spawn nữa
         var exist = GameObject.FindGameObjectWithTag(playerTag);
         if (exist != null)
         {
-            Debug.Log("[GM] Player already exists, skip spawn.");
+            var statsExist = exist.GetComponent<CharacterStats>() ?? exist.GetComponentInChildren<CharacterStats>(true);
+            if (statsExist != null)
+            {
+                if (!string.IsNullOrEmpty(playerName))
+                    statsExist.characterName = playerName;
+
+                if (hasSavedData && playerData != null && playerData.maxHP > 0)
+                    LoadPlayer(statsExist);
+            }
+
+            LoadPotions();
+            FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
             yield break;
         }
 
@@ -124,78 +200,45 @@ public class GameManager : MonoBehaviour
             pos = sp.transform.position;
             rot = sp.transform.rotation;
         }
-        else
-        {
-            Debug.LogWarning($"[GM] SpawnPoint '{spawnPointName}' not found. Spawning at (0,0,0).");
-        }
 
-        // Spawn player
         var p = Instantiate(prefab, pos, rot);
-
-        // Gán tên vào CharacterStats
-        var stats = p.GetComponent<CharacterStats>();
-        if (stats == null) stats = p.GetComponentInChildren<CharacterStats>();
-        if (stats != null && !string.IsNullOrEmpty(playerName))
-        {
-            stats.characterName = playerName;
-        }
-
-        // Gắn weapon equipper cho EquipmentManager (nếu có)
-        var em = FindFirstObjectByType<EquipmentManager>();
-        if (em != null)
-        {
-            em.playerWeaponEquipper = p.GetComponentInChildren<WeaponEquipper>(true);
-        }
-
         p.tag = playerTag;
         p.name = "PlayerRuntime";
 
-        // Gán camera follow player nếu có component FollowPlayerCamera
-        var cam = Camera.main;
-        if (cam != null)
+        var stats = p.GetComponent<CharacterStats>() ?? p.GetComponentInChildren<CharacterStats>(true);
+        if (stats != null)
         {
-            var follow = cam.GetComponent<FollowPlayerCamera>();
-            if (follow != null)
-                follow.target = p.transform;
+            if (!string.IsNullOrEmpty(playerName))
+                stats.characterName = playerName;
+
+            if (hasSavedData && playerData != null && playerData.maxHP > 0)
+                LoadPlayer(stats);
         }
 
-        Debug.Log($"[GM] Spawned player: {p.name} ({prefab.name}) | PlayerName='{playerName}'");
+        LoadPotions();
+        FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
     }
 
     // =========================
-    //  CURRENCY: GOLD
+    // GOLD
     // =========================
-
-    // Cộng vàng
     public void AddGold(int amount)
     {
         if (amount <= 0) return;
-
         gold += amount;
-        Debug.Log($"[GM] +{amount} gold. Total = {gold}");
     }
 
-    // Trừ vàng (khi mua đồ)
     public bool SpendGold(int amount)
     {
         if (amount <= 0) return true;
-
-        if (gold < amount)
-        {
-            Debug.Log($"[GM] Not enough gold. Have {gold}, need {amount}");
-            return false;
-        }
-
+        if (gold < amount) return false;
         gold -= amount;
-        Debug.Log($"[GM] Spend {amount} gold. Left = {gold}");
         return true;
     }
 
     // =========================
-    //  SAVE / LOAD PLAYER STATS
+    // SAVE/LOAD STATS (runtime only)
     // =========================
-
-    // LƯU từ CharacterStats
     public void SavePlayer(CharacterStats stats)
     {
         if (stats == null)
@@ -210,32 +253,74 @@ public class GameManager : MonoBehaviour
         playerData.atk = stats.atk_Total;
         playerData.def = stats.def_Total;
 
-        Debug.Log($"[GM] SavePlayer: LV {playerData.level}, HP {playerData.currentHP}/{playerData.maxHP}, ATK {playerData.atk}, DEF {playerData.def}");
+        hasSavedData = true;
+
+        Debug.Log($"[GM] SavePlayer: LV {playerData.level}, HP {playerData.currentHP}/{playerData.maxHP}");
     }
 
-    // GÁN lại vào CharacterStats
     public void LoadPlayer(CharacterStats stats)
     {
-        if (stats == null)
-        {
-            Debug.LogWarning("[GM] LoadPlayer: stats == null");
-            return;
-        }
-
-        if (playerData.maxHP <= 0)
-        {
-            Debug.LogWarning("[GM] Chưa có dữ liệu playerData, bỏ qua LoadPlayer");
-            return;
-        }
+        if (stats == null) return;
+        if (!hasSavedData || playerData == null || playerData.maxHP <= 0) return;
 
         stats.level = playerData.level;
         stats.maxHP_Total = playerData.maxHP;
-        stats.currentHP = playerData.currentHP;
+        stats.currentHP = Mathf.Clamp(playerData.currentHP, 1, playerData.maxHP);
         stats.atk_Total = playerData.atk;
         stats.def_Total = playerData.def;
 
-        FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+        Debug.Log($"[GM] LoadPlayer: LV {playerData.level}, HP {stats.currentHP}/{playerData.maxHP}");
+    }
 
-        Debug.Log($"[GM] LoadPlayer: LV {playerData.level}, HP {playerData.currentHP}/{playerData.maxHP}, ATK {playerData.atk}, DEF {playerData.def}");
+    // =========================
+    // SAVE/LOAD POTIONS (runtime only)
+    // =========================
+    public void SavePotions()
+    {
+        if (PotionManager.Instance == null)
+        {
+            Debug.LogWarning("[GM] SavePotions: PotionManager.Instance NULL");
+            return;
+        }
+
+        savedPotions = PotionManager.Instance.GetPotionCount();
+        hasSavedPotions = true;
+
+        Debug.Log($"[GM] SavePotions = {savedPotions}");
+    }
+
+    public void LoadPotions()
+    {
+        if (!hasSavedPotions) return;
+        if (PotionManager.Instance == null)
+        {
+            Debug.LogWarning("[GM] LoadPotions: PotionManager.Instance NULL");
+            return;
+        }
+
+        PotionManager.Instance.SetPotionCount(savedPotions);
+        Debug.Log($"[GM] LoadPotions = {savedPotions}");
+    }
+
+    // =========================
+    // UNLOCK MAP API (runtime only)
+    // =========================
+    public bool IsMapUnlocked(int mapIndex)
+    {
+        return mapIndex <= maxUnlockedMap;
+    }
+
+    public void UnlockMap(int mapIndex)
+    {
+        if (mapIndex <= maxUnlockedMap) return;
+
+        maxUnlockedMap = mapIndex;
+        Debug.Log($"[GM] UnlockMap (runtime) -> maxUnlockedMap = {maxUnlockedMap}");
+    }
+
+    public void ResetUnlock()
+    {
+        maxUnlockedMap = 0;
+        Debug.Log("[GM] ResetUnlock (runtime) -> only Map1 unlocked");
     }
 }

@@ -46,7 +46,6 @@ public class InventoryUI : MonoBehaviour
                 audioSource.PlayOneShot(closeSound);
         }
 
-        // 🔥 QUAN TRỌNG
         if (isOpen)
             StartCoroutine(BindPreviewNextFrame());
     }

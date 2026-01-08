@@ -30,3 +30,4 @@ public class PotionPickup : MonoBehaviour
         Destroy(gameObject);
     }
 }
+    

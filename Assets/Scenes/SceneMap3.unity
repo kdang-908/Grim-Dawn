@@ -4261,15 +4261,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 185428863}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.40986726, z: 0, w: 0.9121452}
-  m_LocalPosition: {x: 753.82, y: 9.53, z: 154.14}
+  m_LocalRotation: {x: -0, y: 0.7722824, z: -0, w: 0.6352794}
+  m_LocalPosition: {x: 618.76, y: 6.95, z: 671.88}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1601803134}
   - {fileID: 1531238600}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -48.393, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 101.119, z: 0}
 --- !u!114 &185428865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9958,7 +9958,7 @@ Transform:
   m_GameObject: {fileID: 242078234}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 679.24, y: 2.85, z: 184.6}
+  m_LocalPosition: {x: 627.98, y: 5.7, z: 635.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24987,13 +24987,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 955764198}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.99574727, z: -0, w: 0.09212742}
-  m_LocalPosition: {x: 748.32, y: 9.91, z: 163.3}
+  m_LocalRotation: {x: -0, y: 0.8887722, z: -0, w: 0.45834926}
+  m_LocalPosition: {x: 625.91, y: 6.1, z: 676.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 169.428, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 125.439, z: 0}
 --- !u!114 &955764200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25047,7 +25047,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1.9849434
+  MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -53545,11 +53545,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4602000202983218, guid: aa91054e6f5bee946ba66c9a32a3a5b9, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4602000202983218, guid: aa91054e6f5bee946ba66c9a32a3a5b9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4602000202983218, guid: aa91054e6f5bee946ba66c9a32a3a5b9, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4602000202983218, guid: aa91054e6f5bee946ba66c9a32a3a5b9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -53941,10 +53945,6 @@ PrefabInstance:
     - target: {fileID: 1065002366951867712, guid: 48d194ece67fa7f40818b565627bc1a3, type: 3}
       propertyPath: m_Name
       value: EnemyHPBar
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065002366951867712, guid: 48d194ece67fa7f40818b565627bc1a3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2538837645768709919, guid: 48d194ece67fa7f40818b565627bc1a3, type: 3}
       propertyPath: m_PresetInfoIsWorld

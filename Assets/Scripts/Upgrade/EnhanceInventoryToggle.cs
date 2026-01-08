@@ -16,7 +16,5 @@ public class EnhanceInventoryToggle : MonoBehaviour
 
         bool show = !inventoryPanel.activeSelf;
         inventoryPanel.SetActive(show);
-        // Chuột đã được xử lý bởi BlacksmithInteraction, 
-        // nên không cần đụng tới Cursor ở đây nữa.
     }
 }

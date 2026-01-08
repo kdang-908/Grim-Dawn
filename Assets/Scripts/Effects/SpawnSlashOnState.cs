@@ -112,12 +112,7 @@ public class SpawnSlashOnState : StateMachineBehaviour
 
         rot *= Quaternion.Euler(rotationOffsetEuler);
 
-        spawnedSlash = Object.Instantiate(
-            slashPrefab,
-            slashPoint.position,
-            rot,
-            slashPoint
-        );
+        spawnedSlash = Object.Instantiate(slashPrefab,slashPoint.position,rot,slashPoint );
 
         Debug.Log("[SpawnSlashOnState] SPAWN thành công: " + slashPrefab.name);
 
