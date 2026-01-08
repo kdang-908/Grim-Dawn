@@ -13,6 +13,7 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     public HeadIconMap[] headMaps;
     public enum ItemType { Weapon, Head, Chest, Legs }
     public ItemType itemType;
+
     private GameObject myPrefab;
     [SerializeField] private Image itemImage;
     private GameObject itemPrefab;
@@ -31,7 +32,6 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     {
         return currentData;
     }
-    // ---------------------------------------------
 
     public int GetUpgradeLevel()
     {
@@ -66,6 +66,37 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
 
         RefreshRemoveButton();
     }
+
+    // ================= XỬ LÝ SỰ KIỆN UI (FIX LỖI TOOLTIP) =================
+
+    // 1. Khi tắt object (đóng túi đồ) -> Tắt Tooltip ngay lập tức
+    private void OnDisable()
+    {
+        if (InventoryTooltip.Instance != null)
+        {
+            InventoryTooltip.Instance.HideTooltip();
+        }
+    }
+
+    // 2. Khi di chuột vào -> Hiện Tooltip
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (itemImage.enabled && currentData != null && InventoryTooltip.Instance != null)
+        {
+            InventoryTooltip.Instance.ShowTooltip(currentData, upgradeLevel);
+        }
+    }
+
+    // 3. Khi di chuột ra -> Tắt Tooltip
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (InventoryTooltip.Instance != null)
+        {
+            InventoryTooltip.Instance.HideTooltip();
+        }
+    }
+
+    // ======================================================================
 
     public void SetItem(Sprite sprite, ItemType type, GameObject prefab, WeaponData data)
     {
@@ -163,24 +194,6 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
 
         RefreshRemoveButton();
         equipmentManager.BindPreviewNow();
-    }
-
-   
-    // HÀM NÀY ĐỂ TOOLTIP HIỆN ĐÚNG STATS
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (itemImage.enabled && currentData != null && InventoryTooltip.Instance != null)
-        {
-            InventoryTooltip.Instance.ShowTooltip(currentData, upgradeLevel);
-        }
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (InventoryTooltip.Instance != null)
-        {
-            InventoryTooltip.Instance.HideTooltip();
-        }
     }
 
     public Sprite GetItemSprite()
