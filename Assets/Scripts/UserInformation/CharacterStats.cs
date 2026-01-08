@@ -52,6 +52,7 @@ public class CharacterStats : MonoBehaviour
 
     public void UpdateFinalStats()
     {
+        float hpRatio = (maxHP_Total > 0) ? (float)currentHP / maxHP_Total : 1f;
         // base
         atk_Total = atk;
         def_Total = def;
@@ -73,10 +74,16 @@ public class CharacterStats : MonoBehaviour
                 AddBonus(em.currentChest, em.chestUpgradeLevel);
         }
 
-        // ở game bạn hiện tại đang luôn full máu khi cập nhật stat
-        currentHP = maxHP_Total;
+        // game hiện tại đang luôn full máu khi cập nhật stat
+        //currentHP = maxHP_Total;
+        currentHP = Mathf.RoundToInt(maxHP_Total * hpRatio);
+        currentHP = Mathf.Clamp(currentHP, 0, maxHP_Total);
+
+        // 5. Cập nhật UI
+        FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
 
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+        Debug.Log($"Updated Stats: ATK {atk_Total} | DEF {def_Total} | HP {maxHP_Total}");
     }
 
     private void AddBonus(WeaponData data, int level)

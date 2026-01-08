@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Armor_Data
   m_EditorClassIdentifier: 
   id: armor_01
-  displayName: Armor
+  displayName: armor_01
   itemType: 2
   icon: {fileID: 21300000, guid: b82bc727059498b4daac6ccbf38de5da, type: 3}
   prefab: {fileID: 6696035008978661619, guid: 1a2d74bbe9c5e634685b0fbb0bed5cbf, type: 3}
@@ -41,3 +41,5 @@ MonoBehaviour:
   bonusDEF: 50
   bonusMaxHP: 145
   bonusEnergy: 0
+  description: 
+  upgradePercentPerLevel: 5

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1fe1b2a578fcf64aaf7c7f381daf541, type: 3}
   m_Name: Sword2_Data
   m_EditorClassIdentifier: 
-  id: sword_02
-  displayName: Sword
+  id: sword2
+  displayName: sword2
   itemType: 0
   icon: {fileID: 21300000, guid: 73de6b75584e1a64983ca5c6699ca0cd, type: 3}
   prefab: {fileID: 3925854204165331886, guid: e7d469b3877ad6545bc64a703aeb46ae, type: 3}
@@ -41,3 +41,5 @@ MonoBehaviour:
   bonusDEF: 0
   bonusMaxHP: 0
   bonusEnergy: 10
+  description: 
+  upgradePercentPerLevel: 5

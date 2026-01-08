@@ -7,10 +7,13 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
     [Header("UI")]
     public Image iconImage;          // child: Icon
     public GameObject plusIcon;      // child: Plus hoặc Text (TMP) dấu +
-    public GameObject inventoryPanel; // Panel túi đồ (kéo Panel_Right vào)
+    public GameObject inventoryPanel; // Panel túi đồ 
 
     [Header("Runtime")]
     public InventoryItem originalItem; // item gốc trong túi
+
+    // Biến để tham chiếu tới script InventoryItem hiển thị visual
+    private InventoryItem visualItem;
 
     private float lastClickTime;
     const float DoubleClickDelay = 0.25f;
@@ -32,6 +35,9 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
             if (t == null) t = transform.Find("Text (TMP)");
             if (t != null) plusIcon = t.gameObject;
         }
+
+        // Tìm component InventoryItem trên chính object này hoặc con của nó. Để dùng cho việc hiển thị Tooltip
+        visualItem = GetComponentInChildren<InventoryItem>();
     }
 
     private void Start()
@@ -40,7 +46,7 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
         {
             iconImage.sprite = null;
             iconImage.enabled = false;
-            iconImage.gameObject.SetActive(true); // luôn bật, chỉ ẩn bằng enabled
+            iconImage.gameObject.SetActive(true);
         }
 
         if (plusIcon != null)
@@ -52,31 +58,26 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log($"[UpgradeSlot] SetItem from {item.name}");
 
+        // 1. LƯU MÓN ĐỒ GỐC 
         originalItem = item;
 
-        // 1) Ẩn item trong túi
+        // 2. Ẩn item trong túi đi 
         originalItem.gameObject.SetActive(false);
 
-        // 2) Lấy Image của item gốc
+        // 3. Xử lý hiển thị (Visual)
         Image sourceImg = originalItem.GetComponent<Image>();
-        if (sourceImg == null)
-            sourceImg = originalItem.GetComponentInChildren<Image>(true);
+        if (sourceImg == null) sourceImg = originalItem.GetComponentInChildren<Image>(true);
 
-        if (iconImage == null)
-        {
-            Debug.LogWarning("[UpgradeSlot] iconImage = NULL");
-            return;
-        }
+        if (iconImage == null) return;
 
         if (sourceImg == null || sourceImg.sprite == null)
         {
-            Debug.LogWarning("[UpgradeSlot] sourceImg hoặc sprite NULL");
             iconImage.sprite = null;
             iconImage.enabled = false;
         }
         else
         {
-            // Copy sprite & ép hiển thị full ô
+            // Copy sprite
             iconImage.sprite = sourceImg.sprite;
             iconImage.type = Image.Type.Simple;
             iconImage.preserveAspect = true;
@@ -84,16 +85,26 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
             iconImage.enabled = true;
             iconImage.gameObject.SetActive(true);
 
-            RectTransform rt = iconImage.rectTransform;
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
+            
+            // NẾU Ô NÀY CÓ SCRIPT INVENTORY ITEM -> PHẢI COPY DATA SANG ĐỂ TOOLTIP HIỆN ĐÚNG
+            if (visualItem != null)
+            {
+                // Copy Data từ món đồ gốc sang món đồ hiển thị
+                visualItem.SetItem(
+                    sourceImg.sprite,
+                    item.itemType,
+                    null,
+                    item.GetCurrentData() // Lấy WeaponData
+                );
 
-            Debug.Log($"[UpgradeSlot] Copied sprite = {sourceImg.sprite.name}, rt={rt.rect}");
+                // Copy Level
+                visualItem.SetUpgradeLevel(item.GetUpgradeLevel());
+
+                Debug.Log($"[UpgradeSlot] Đã copy Data sang VisualItem: Lv {item.GetUpgradeLevel()}");
+            }
         }
 
-        // 4) Tắt dấu +
+        // 4. Tắt dấu +
         if (plusIcon != null) plusIcon.SetActive(false);
     }
 
@@ -102,16 +113,24 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log("[UpgradeSlot] ClearSlot");
 
+        // Hiện lại món đồ gốc trong túi
         if (originalItem != null)
         {
             originalItem.gameObject.SetActive(true);
             originalItem = null;
         }
 
+        // Xóa hiển thị
         if (iconImage != null)
         {
             iconImage.sprite = null;
             iconImage.enabled = false;
+        }
+
+        // Xóa data trong visual item (nếu có)
+        if (visualItem != null)
+        {
+            visualItem.ClearItem();
         }
 
         if (plusIcon != null)
@@ -137,7 +156,6 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
         {
             bool newActive = !inventoryPanel.activeSelf;
             inventoryPanel.SetActive(newActive);
-            Debug.Log($"[UpgradeSlot] Toggle inventoryPanel -> {newActive}");
         }
     }
 
@@ -145,12 +163,9 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
     {
         if (IsEmpty) return;
 
-        if (EnhancementPanel.Instance == null)
+        if (EnhancementPanel.Instance != null)
         {
-            Debug.LogWarning("[UpgradeSlot] EnhancementPanel.Instance NULL");
-            return;
+            EnhancementPanel.Instance.ReturnItemFromSlot(this);
         }
-
-        EnhancementPanel.Instance.ReturnItemFromSlot(this);
     }
 }

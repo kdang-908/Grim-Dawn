@@ -44,13 +44,12 @@ public class WeaponData : ScriptableObject
     public int bonusDEF;
     public int bonusMaxHP;
     public int bonusEnergy;
-
+    [TextArea] public string description; // Mô tả vật phẩm
     [Header("Nâng cấp")]
     [Tooltip("Mỗi cấp tăng thêm bao nhiêu % so với stat gốc (0.05 = 5%)")]
     public float upgradePercentPerLevel = 5f;
 
     // ========== HÀM TÍNH STAT THEO LEVEL ==========
-
     float GetMultiplier(int level)
     {
         // Lv1 = 100%, Lv2 = 105%, Lv3 = 110% ...

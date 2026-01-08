@@ -19,7 +19,7 @@ public class EquipmentManager : MonoBehaviour
     public Vector3 helmetScaleRuntime = new Vector3(0.23f, 0.2f, 0.22f);
     public Vector3 helmetScaleUI = new Vector3(0.254415f, 0.18957f, 0.21072f);
 
-    private InventoryGridManager gridManager;
+    private InventoryGridManager gridManager; // Quản lý túi đồ để trả lại vật phẩm khi tháo
 
     [Header("Lưu trữ đồ đang mặc")]
     public WeaponData currentWeapon;
@@ -50,7 +50,7 @@ public class EquipmentManager : MonoBehaviour
     [Tooltip("Giá trị WeaponType khi KHÔNG cầm vũ khí")]
     public int unarmedWeaponType = 0;            // <<< THÊM DÒNG NÀY
 
-    public bool isFemale = false;
+    public bool isFemale = false; // Biến xác định giới tính 
 
     [System.Serializable]
     public class WeaponIconMap
@@ -92,9 +92,10 @@ public class EquipmentManager : MonoBehaviour
     void Start()
     {
         gridManager = FindFirstObjectByType<InventoryGridManager>();
-        isFemale = GenderSelector.SelectedIsFemale;
+        isFemale = GenderSelector.SelectedIsFemale; // Lấy giới tính từ hệ thống chọn nhân vật
         Debug.Log($"[EquipmentManager] Khởi tạo với giới tính: {(isFemale ? "NỮ" : "NAM")}");
 
+        // Tự động tìm gốc nhân vật UI nếu chưa kéo vào
         if (previewRoot == null)
         {
             var go = GameObject.Find("UI_PreviewRoot");
@@ -107,6 +108,7 @@ public class EquipmentManager : MonoBehaviour
 
     void UpdateButtons()
     {
+        // Chỉ hiện nút tháo đồ (X) khi ô đó đang có đồ (enabled và có sprite)
         if (btnRemoveHead != null) btnRemoveHead.SetActive(slotHead && slotHead.enabled && slotHead.sprite);
         if (btnRemoveChest != null) btnRemoveChest.SetActive(slotChest && slotChest.enabled && slotChest.sprite);
         if (btnRemoveLegs != null) btnRemoveLegs.SetActive(slotLegs && slotLegs.enabled && slotLegs.sprite);
@@ -117,8 +119,12 @@ public class EquipmentManager : MonoBehaviour
     public Sprite EquipItem(InventoryItem.ItemType type,
                             Sprite newItemSprite,
                             GameObject prefab3D,
-                            int upgradeLevel = 1)
+                            int upgradeLevel,
+                            out WeaponData oldData,
+                            out int oldLevel)
     {
+        oldData = null;
+        oldLevel = 1;
         if (newItemSprite == null || newItemSprite.name == "Icon" || newItemSprite.name == "EmptySlot")
         {
             Debug.Log("[EquipItem] Click vào ô trống, bỏ qua xử lý.");
@@ -127,11 +133,35 @@ public class EquipmentManager : MonoBehaviour
 
         Image targetSlot = GetTargetSlot(type);
         if (targetSlot == null) return null;
+        // Lưu lại hình ảnh món đồ cũ để trả về túi đồ
+        Sprite oldSprite = (targetSlot.enabled && targetSlot.sprite != null) ? targetSlot.sprite : null;
 
-        Sprite old = (targetSlot.enabled && targetSlot.sprite != null) ? targetSlot.sprite : null;
-
+        // 2. QUAN TRỌNG: Lưu lại DATA cũ trước khi bị ghi đè!
+        if (oldSprite != null)
+        {
+            if (type == InventoryItem.ItemType.Weapon)
+            {
+                oldData = currentWeapon;
+                oldLevel = weaponUpgradeLevel;
+                // [CƠ CHẾ AN TOÀN] Nếu currentWeapon bị null (do mặc sẵn từ scene), hãy tìm lại trong database
+                if (oldData == null) oldData = FindWeaponDataByIcon(oldSprite);
+            }
+            else if (type == InventoryItem.ItemType.Head)
+            {
+                oldData = currentHelmet;
+                oldLevel = helmetUpgradeLevel;
+                if (oldData == null) oldData = FindHelmetDataByIcon(oldSprite);
+            }
+            else if (type == InventoryItem.ItemType.Chest)
+            {
+                oldData = currentChest;
+                oldLevel = chestUpgradeLevel;
+                if (oldData == null) oldData = FindChestDataByIcon(oldSprite);
+            }
+        }
         targetSlot.sprite = newItemSprite;
         targetSlot.enabled = true;
+        EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
 
         Debug.Log($"[EquipItem] type={type} icon={newItemSprite.name}, lv={upgradeLevel}");
 
@@ -145,11 +175,12 @@ public class EquipmentManager : MonoBehaviour
             wd = FindWeaponDataByIcon(newItemSprite);
             if (wd != null)
             {
-                currentWeapon = wd;
+                currentWeapon = wd; // Gán dữ liệu để Stats đọc
                 currentWeaponData = wd;
                 weaponUpgradeLevel = Mathf.Max(1, upgradeLevel);
 
-                EquipWeapon3D(wd);
+                EquipWeapon3D(wd); // Hiện model 3D
+                if (uiSlot != null) uiSlot.Setup(wd, weaponUpgradeLevel);// Cập nhật Tooltip Data
             }
             else
             {
@@ -166,6 +197,7 @@ public class EquipmentManager : MonoBehaviour
                 helmetUpgradeLevel = Mathf.Max(1, upgradeLevel);
 
                 EquipHelmet3D(hd);
+                if (uiSlot != null) uiSlot.Setup(hd, helmetUpgradeLevel);
             }
             else
             {
@@ -185,6 +217,7 @@ public class EquipmentManager : MonoBehaviour
                 slotChest.enabled = true;
 
                 EquipChest3D(cd);
+                if (uiSlot != null) uiSlot.Setup(cd, chestUpgradeLevel);
             }
             else
             {
@@ -207,7 +240,7 @@ public class EquipmentManager : MonoBehaviour
         }
 
         UpdateButtons();
-        return old;
+        return oldSprite; // Trả về món đồ cũ để túi đồ xử lý tiếp
     }
 
     // Cho EnhancementPanel/ngoài dùng
@@ -236,6 +269,8 @@ public class EquipmentManager : MonoBehaviour
         return null;
     }
 
+
+    // Các hàm này dùng để tra cứu từ Icon ra Data
     public WeaponData FindChestDataByIcon(Sprite icon)
     {
         if (icon == null || chestMaps == null) return null;
@@ -253,11 +288,32 @@ public class EquipmentManager : MonoBehaviour
         if (targetSlot == null) return;
         if (!targetSlot.enabled || targetSlot.sprite == null) return;
 
-        if (gridManager != null && gridManager.AddItemBackToInventory(targetSlot.sprite, type, null))
+        WeaponData dataToReturn = null;
+        int levelToReturn = 1;
+        if (type == InventoryItem.ItemType.Weapon)
+        {
+            dataToReturn = currentWeapon;
+            levelToReturn = weaponUpgradeLevel;
+        }
+        else if (type == InventoryItem.ItemType.Head)
+        {
+            dataToReturn = currentHelmet;
+            levelToReturn = helmetUpgradeLevel;
+        }
+        else if (type == InventoryItem.ItemType.Chest)
+        {
+            dataToReturn = currentChest;
+            levelToReturn = chestUpgradeLevel;
+        }
+        // Trả món đồ về túi đồ, nếu thành công thì xóa trên người
+        if (gridManager != null && gridManager.AddItemBackToInventory(targetSlot.sprite, type, null, dataToReturn, levelToReturn))
         {
             targetSlot.sprite = null;
             targetSlot.enabled = false;
-
+            // Xóa dữ liệu tooltip khỏi ô trang bị
+            EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
+            if (uiSlot != null) uiSlot.Clear();
+            // Xóa model 3D tương ứng
             if (type == InventoryItem.ItemType.Weapon)
                 UnequipWeapon3D();
 
@@ -406,7 +462,7 @@ public class EquipmentManager : MonoBehaviour
 
     public void UnequipWeapon3D()
     {
-        // <<< SỬA HÀM NÀY
+
         if (playerWeaponEquipper != null)
         {
             var anim = playerWeaponEquipper.GetComponentInChildren<Animator>(true);
@@ -562,6 +618,7 @@ public class EquipmentManager : MonoBehaviour
         b.onClick.AddListener(() => UnequipItem(type));
     }
 
+    // Hàm đệ quy để đổi Layer cho Object (Dùng cho Preview Camera)
     void SetLayerRecursively(GameObject obj, int newLayer)
     {
         if (obj == null) return;
@@ -569,6 +626,58 @@ public class EquipmentManager : MonoBehaviour
         foreach (Transform child in obj.transform)
         {
             SetLayerRecursively(child.gameObject, newLayer);
+        }
+    }
+    public void RefreshEquippedItem(InventoryItem.ItemType type, int newLevel)
+    {
+        EquipmentSlotUI uiSlot = null;
+        WeaponData targetData = null;
+
+        // 1. Cập nhật biến Level và xác định Data
+        if (type == InventoryItem.ItemType.Weapon && currentWeapon != null)
+        {
+            weaponUpgradeLevel = newLevel;
+            targetData = currentWeapon;
+            if (slotWeapon != null) uiSlot = slotWeapon.GetComponent<EquipmentSlotUI>();
+        }
+        else if (type == InventoryItem.ItemType.Head && currentHelmet != null)
+        {
+            helmetUpgradeLevel = newLevel;
+            targetData = currentHelmet;
+            if (slotHead != null) uiSlot = slotHead.GetComponent<EquipmentSlotUI>();
+        }
+        else if (type == InventoryItem.ItemType.Chest && currentChest != null)
+        {
+            chestUpgradeLevel = newLevel;
+            targetData = currentChest;
+            if (slotChest != null) uiSlot = slotChest.GetComponent<EquipmentSlotUI>();
+        }
+
+        // 2. Cập nhật UI Slot (để lần sau di chuột vào nó hiện đúng)
+        if (uiSlot != null && targetData != null)
+        {
+            uiSlot.Setup(targetData, newLevel);
+        }
+
+        // ÉP TOOLTIP VẼ LẠI NGAY LẬP TỨC (NẾU ĐANG HIỆN)
+        if (InventoryTooltip.Instance != null && InventoryTooltip.Instance.gameObject.activeSelf)
+        {
+            // Chỉ refresh nếu chuột đang trỏ đúng vào ô đồ vừa đập
+            InventoryTooltip.Instance.ShowTooltip(targetData, newLevel);
+        }
+
+        // 3. Tính lại chỉ số nhân vật
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) player = GameObject.Find("PlayerRuntime");
+
+        if (player != null)
+        {
+            CharacterStats stats = player.GetComponent<CharacterStats>();
+            if (stats != null)
+            {
+                stats.UpdateFinalStats();
+                Debug.Log($"[Refresh] Đã cập nhật Stats: {type} lên Lv {newLevel}");
+            }
         }
     }
 }
