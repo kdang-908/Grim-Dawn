@@ -9,6 +9,10 @@ public class PotionManager : MonoBehaviour
 
     public static PotionManager Instance;
 
+    // Save amount of potions
+    public static int SavedPotions = -1;
+
+
     [Header("UI")]
     [SerializeField] private Image potionIcon;
     [SerializeField] private TMP_Text potionCountText;
@@ -49,8 +53,16 @@ public class PotionManager : MonoBehaviour
         else
             Destroy(gameObject);
 
+        // 🔹 LOAD POTION ĐÃ SAVE (NẾU CÓ)
+        if (SavedPotions >= 0)
+        {
+            potions = SavedPotions;
+            Debug.Log($"[PotionManager] Loaded potions = {potions}");
+        }
+
         UpdateUI();
     }
+
 
     void Update()
     {
@@ -82,7 +94,7 @@ public class PotionManager : MonoBehaviour
         if (activeCharacter == null) return;
         if (isOnCooldown) return;
         if (potions <= 0) return;
-        if (activeCharacter.currentHP >= activeCharacter.maxHP) return;
+        if (activeCharacter.currentHP >= activeCharacter.maxHP_Total) return;
 
         potions--;
         activeCharacter.Heal(healAmount);
