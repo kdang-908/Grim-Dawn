@@ -142,6 +142,13 @@ public class GameEndUIController : MonoBehaviour
                     Debug.LogWarning("[GameEndUI] Không tìm thấy CharacterStats trên Player để Save");
                 }
             }
+            // SAVE POTION TRƯỚC KHI QUA SCENE MỚI
+            if (PotionManager.Instance != null)
+            {
+                PotionManager.SavedPotions = PotionManager.Instance.GetPotionCount();
+                Debug.Log($"[GameEndUI] Saved potions = {PotionManager.SavedPotions}");
+            }
+
             else
             {
                 Debug.LogWarning("[GameEndUI] Không tìm thấy Player (tag Player) để Save trước khi qua map mới");
