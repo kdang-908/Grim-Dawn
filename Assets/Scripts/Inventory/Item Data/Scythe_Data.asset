@@ -41,3 +41,5 @@ MonoBehaviour:
   bonusDEF: 0
   bonusMaxHP: 0
   bonusEnergy: 20
+  description: 
+  upgradePercentPerLevel: 5

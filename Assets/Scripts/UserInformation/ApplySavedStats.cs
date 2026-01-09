@@ -5,16 +5,10 @@ public class ApplySavedStats : MonoBehaviour
 {
     IEnumerator Start()
     {
-        // Đợi 1 frame cho CharacterStats.Start() chạy xong
+        // GameManager đã tự apply trong ApplyAfterSceneLoaded()
         yield return null;
 
-        var gm = GameManager.Instance;
-        if (gm == null) yield break;
-
-        var stats = GetComponent<CharacterStats>();
-        if (stats != null)
-        {
-            gm.LoadPlayer(stats);
-        }
+        if (GameManager.Instance != null)
+            Debug.Log("[ApplySavedStats] Skip (handled by GameManager.ApplyAfterSceneLoaded)");
     }
 }

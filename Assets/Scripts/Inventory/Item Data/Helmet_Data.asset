@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Helmet_Data
   m_EditorClassIdentifier: 
   id: helmet_01
-  displayName: Helmet1
+  displayName: helmet_01
   itemType: 1
   icon: {fileID: 21300000, guid: 341aa97f7c3976a4bbdd29efb85f7f9a, type: 3}
   prefab: {fileID: 1541161333788920938, guid: a4bed8b061ca7c84ba00bc4d54ac3066, type: 3}
@@ -41,3 +41,5 @@ MonoBehaviour:
   bonusDEF: 30
   bonusMaxHP: 120
   bonusEnergy: 0
+  description: 
+  upgradePercentPerLevel: 5
