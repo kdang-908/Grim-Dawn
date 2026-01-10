@@ -28,8 +28,6 @@ public class InventoryTooltip : MonoBehaviour
 
         // Lưu lại Canvas hiện tại (ở Scene 1) trước khi tách ra
         Canvas initialCanvas = GetComponentInParent<Canvas>();
-
-        // Tách ra để set DontDestroyOnLoad (Bắt buộc phải là object gốc mới dùng được hàm này)
         transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
 
@@ -55,7 +53,7 @@ public class InventoryTooltip : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            // Nếu mất Canvas (do chuyển scene), tìm lại ngay
+            // Nếu mất Canvas (do chuyển scene), tìm lại 
             if (canvas == null)
             {
                 EnsureCanvas();
@@ -121,7 +119,7 @@ public class InventoryTooltip : MonoBehaviour
             {
                 canvas = foundCanvas;
                 transform.SetParent(canvas.transform, false); // false để giữ nguyên scale
-                transform.localScale = Vector3.one; // Reset scale về 1 cho chắc chắn
+                transform.localScale = Vector3.one; // Reset scale về 1 
                 transform.SetAsLastSibling(); // Đẩy lên trên cùng
             }
         }

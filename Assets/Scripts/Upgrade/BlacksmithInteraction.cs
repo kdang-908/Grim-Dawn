@@ -1,61 +1,92 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class BlacksmithInteraction : MonoBehaviour
 {
     [Header("UI to open")]
-    [Tooltip("Canvas Forge: Canvas_Enhancement")]
-    public GameObject enhancementCanvas;          // kéo Canvas_Enhancement vào đây
+    [Tooltip("Kéo Canvas_Enhancement vào đây")]
+    public GameObject enhancementCanvas;
+
+    [Header("Conflict Handling")]
+    public InventoryToggle inventoryToggle; // Kéo script InventoryToggle vào đây
 
     [Header("Key")]
     public KeyCode interactKey = KeyCode.F;
 
     private bool playerInRange = false;
-    private HumanController playerController;     // tham chiếu tới script điều khiển nhân vật
+    private HumanController playerController;
 
     void Start()
     {
-        // tìm player theo Tag
+        // 1. Tìm Player
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             playerController = player.GetComponent<HumanController>();
         }
-        else
-        {
-            Debug.LogWarning("[BlacksmithInteraction] Không tìm thấy Player với tag 'Player'");
-        }
 
-        // lúc đầu tắt Forge UI
+        // 2. Tự tìm InventoryToggle nếu quên kéo
+        if (inventoryToggle == null)
+            inventoryToggle = FindFirstObjectByType<InventoryToggle>();
+
+        // 3. Đảm bảo UI tắt khi bắt đầu
         if (enhancementCanvas != null)
             enhancementCanvas.SetActive(false);
     }
 
     void Update()
     {
-        // chỉ khi đứng trong vùng & bấm F
+        // Chỉ xử lý khi đứng trong vùng trigger
         if (playerInRange && Input.GetKeyDown(interactKey))
         {
-            bool open = enhancementCanvas != null && !enhancementCanvas.activeSelf;
-            SetUIOpen(open);
+            ToggleForge();
         }
     }
 
-    /// <summary>
-    /// Bật/tắt Forge + set trạng thái chuột + chặn điều khiển nhân vật
-    /// </summary>
-    void SetUIOpen(bool open)
+    void ToggleForge()
     {
-        if (enhancementCanvas != null)
-            enhancementCanvas.SetActive(open);
+        if (enhancementCanvas == null) return;
 
-        // Chuột: Forge mở -> unlock + hiện, tắt -> lock + ẩn
-        Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = open;
+        bool isOpening = !enhancementCanvas.activeSelf; // Nếu đang tắt thì sẽ mở, và ngược lại
 
-        // Chặn input nhân vật
+        if (isOpening)
+        {
+            // Trước khi mở Lò rèn, phải đóng Túi đồ (nếu đang mở)
+            // Gọi hàm Close() để script kia tự reset TimeScale, Cursor, v.v.
+            if (inventoryToggle != null)
+            {
+                inventoryToggle.Close();
+            }
+
+            OpenUI();
+        }
+        else
+        {
+            CloseUI();
+        }
+    }
+
+    void OpenUI()
+    {
+        enhancementCanvas.SetActive(true);
+
+        // Mở chuột + Chặn điều khiển nhân vật
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         if (playerController != null)
-            playerController.isUIOpen = open;
+            playerController.isUIOpen = true;
+    }
+
+    void CloseUI()
+    {
+        enhancementCanvas.SetActive(false);
+
+        // Khóa chuột + Trả lại điều khiển
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (playerController != null)
+            playerController.isUIOpen = false;
     }
 
     void OnTriggerEnter(Collider other)
@@ -63,7 +94,7 @@ public class BlacksmithInteraction : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-            // TODO: hiện chữ "Nhấn F để nâng cấp" nếu muốn
+            //Có thể hiện dòng text "Press F" ở đây
         }
     }
 
@@ -72,8 +103,8 @@ public class BlacksmithInteraction : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            // ra khỏi vùng -> chắc chắn tắt Forge
-            SetUIOpen(false);
+            // Đi ra xa thì tự động đóng UI
+            CloseUI();
         }
     }
 }

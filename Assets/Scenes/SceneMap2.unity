@@ -930,6 +930,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &28043445
 PrefabInstance:
@@ -1380,6 +1381,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &33413129
 GameObject:
@@ -2523,6 +2525,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &88873758
 PrefabInstance:
@@ -3046,6 +3049,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &118205911
 PrefabInstance:
@@ -3297,6 +3301,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &129839809
 PrefabInstance:
@@ -4136,6 +4141,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &184260154
 PrefabInstance:
@@ -4283,6 +4289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enhancementCanvas: {fileID: 853644356}
+  inventoryToggle: {fileID: 0}
   interactKey: 102
 --- !u!136 &185428866
 CapsuleCollider:
@@ -4554,6 +4561,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &208368068
 PrefabInstance:
@@ -4890,6 +4898,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &224208918
 PrefabInstance:
@@ -10181,6 +10190,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &274460007
 PrefabInstance:
@@ -10983,6 +10993,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &294175360
 PrefabInstance:
@@ -11164,6 +11175,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &294802791
 GameObject:
@@ -12071,6 +12083,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &349139946
 PrefabInstance:
@@ -12550,6 +12563,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -12702,6 +12719,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 375056095}
     - targetCorrespondingSourceObject: {fileID: 2562775941875836062, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       insertIndex: -1
       addedObject: {fileID: 375056099}
@@ -12721,10 +12741,27 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
   m_PrefabInstance: {fileID: 375056090}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 375056094}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &375056094 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+  m_PrefabInstance: {fileID: 375056090}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &375056095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375056094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 533ce83e7ff0f654089b1b403e363c20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &375056099
@@ -13264,6 +13301,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &400737203
 PrefabInstance:
@@ -13753,6 +13791,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &428336790
 GameObject:
@@ -14480,6 +14519,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &464830582
 MonoBehaviour:
@@ -14496,6 +14536,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &482213457
 PrefabInstance:
@@ -15560,6 +15601,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &521403023
 PrefabInstance:
@@ -15889,6 +15931,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &533565878
 PrefabInstance:
@@ -17381,6 +17424,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 2
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &606287311
 PrefabInstance:
@@ -19232,6 +19276,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &698644418
 PrefabInstance:
@@ -19479,6 +19524,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &703322168
 PrefabInstance:
@@ -20168,6 +20214,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &719432841
 PrefabInstance:
@@ -20353,6 +20400,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &733068337
 GameObject:
@@ -20476,6 +20524,10 @@ MonoBehaviour:
   - {fileID: 1886451837}
   - {fileID: 719432845}
   - {fileID: 1919630675}
+  headSlotUI: {fileID: 0}
+  chestSlotUI: {fileID: 0}
+  legSlotUI: {fileID: 0}
+  weaponSlotUI: {fileID: 0}
   startItems:
   - {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
   - {fileID: 11400000, guid: ec14bcbea9b390343bf66fe088035b8c, type: 2}
@@ -20850,6 +20902,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &747807268
 PrefabInstance:
@@ -22003,6 +22056,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &818521205
 GameObject:
@@ -22836,7 +22890,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectSlot: {fileID: 1130026574}
-  mainInventoryPanel: {fileID: 1153960779}
+  inventoryToggle: {fileID: 0}
   mainInventoryManager: {fileID: 1336979271}
   txtLevelFrom: {fileID: 1244664235}
   txtLevelTo: {fileID: 579666612}
@@ -24374,6 +24428,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &938397420
 GameObject:
@@ -25305,6 +25360,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &964844708
 GameObject:
@@ -25997,6 +26053,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &995585398
 PrefabInstance:
@@ -26178,6 +26235,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &998176747
 PrefabInstance:
@@ -26359,6 +26417,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &998571431
 PrefabInstance:
@@ -27222,6 +27281,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1057007896
 GameObject:
@@ -27541,6 +27601,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1064551842
 GameObject:
@@ -28017,6 +28078,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &1075215319
 MonoBehaviour:
@@ -28033,6 +28095,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1086235214
 PrefabInstance:
@@ -28485,6 +28548,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1107604466
 PrefabInstance:
@@ -28666,6 +28730,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1110343738
 GameObject:
@@ -29061,6 +29126,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1116623510
 PrefabInstance:
@@ -29242,6 +29308,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1119778914
 PrefabInstance:
@@ -29571,6 +29638,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &1126792436
 MonoBehaviour:
@@ -29587,6 +29655,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1130026569
 GameObject:
@@ -30025,6 +30094,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1139122223}
     - targetCorrespondingSourceObject: {fileID: 2562775941875836062, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1139122221}
@@ -30044,7 +30116,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
   m_PrefabInstance: {fileID: 1139122217}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1139122222}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -30063,6 +30135,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slotTypeToUnequip: 3
+--- !u!1 &1139122222 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+  m_PrefabInstance: {fileID: 1139122217}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1139122223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1139122222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 533ce83e7ff0f654089b1b403e363c20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1146172213
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30309,6 +30398,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1153960779
 GameObject:
@@ -31084,6 +31174,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1189554608
 PrefabInstance:
@@ -31655,6 +31746,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1216087697
 GameObject:
@@ -32206,6 +32298,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1228164551
 GameObject:
@@ -34073,6 +34166,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &1312709579
 MonoBehaviour:
@@ -34089,6 +34183,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1314539418
 PrefabInstance:
@@ -34607,6 +34702,10 @@ MonoBehaviour:
   - {fileID: 1877827973}
   - {fileID: 1512601218}
   - {fileID: 1738697449}
+  headSlotUI: {fileID: 0}
+  chestSlotUI: {fileID: 0}
+  legSlotUI: {fileID: 0}
+  weaponSlotUI: {fileID: 0}
   startItems:
   - {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
   - {fileID: 11400000, guid: ec14bcbea9b390343bf66fe088035b8c, type: 2}
@@ -35671,6 +35770,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1397864564
 PrefabInstance:
@@ -35941,6 +36041,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1407426320
 GameObject:
@@ -36478,6 +36579,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1425800665
 GameObject:
@@ -37270,6 +37372,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1459059851
 PrefabInstance:
@@ -37529,6 +37632,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1463863797
 PrefabInstance:
@@ -37890,6 +37994,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1478618835
 GameObject:
@@ -38087,6 +38192,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1479098618}
     - targetCorrespondingSourceObject: {fileID: 2562775941875836062, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1479098622}
@@ -38106,10 +38214,27 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
   m_PrefabInstance: {fileID: 1479098613}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1479098617}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1479098617 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+  m_PrefabInstance: {fileID: 1479098613}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1479098618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479098617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 533ce83e7ff0f654089b1b403e363c20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1479098622
@@ -38507,6 +38632,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1491291607
 GameObject:
@@ -39295,6 +39421,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1518770305
 PrefabInstance:
@@ -39935,6 +40062,7 @@ GameObject:
   - component: {fileID: 1537617743}
   - component: {fileID: 1537617742}
   - component: {fileID: 1537617741}
+  - component: {fileID: 1537617744}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -40003,6 +40131,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1537617744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537617740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f89ecdcf4075c4c94736e8a64f3220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1542468441
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40237,6 +40377,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1548199098
 PrefabInstance:
@@ -40472,6 +40613,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1559103503
 PrefabInstance:
@@ -43475,6 +43617,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1743529008
 PrefabInstance:
@@ -43903,6 +44046,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1756234071
 GameObject:
@@ -44122,6 +44266,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1765246060
 PrefabInstance:
@@ -45199,6 +45344,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1795377563
 GameObject:
@@ -45692,6 +45838,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &1801581213
 MonoBehaviour:
@@ -46645,6 +46792,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1830712643
 GameObject:
@@ -46962,6 +47110,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1834501652
 PrefabInstance:
@@ -47368,6 +47517,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1858257789
 PrefabInstance:
@@ -47933,6 +48083,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &1873908538
 MonoBehaviour:
@@ -47949,6 +48100,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1875734378
 GameObject:
@@ -48162,6 +48314,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &1885075644
 GameObject:
@@ -48514,6 +48667,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1886921360
 PrefabInstance:
@@ -49380,6 +49534,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 1
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1920587016
 PrefabInstance:
@@ -50129,6 +50284,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1990301271
 PrefabInstance:
@@ -50310,6 +50466,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &1993685682
 PrefabInstance:
@@ -50911,6 +51068,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &2026470799
 PrefabInstance:
@@ -50997,6 +51155,10 @@ PrefabInstance:
     - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2529639193486661992, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       propertyPath: m_SizeDelta.x
@@ -51114,6 +51276,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2028816964}
     - targetCorrespondingSourceObject: {fileID: 2562775941875836062, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2028816962}
@@ -51133,7 +51298,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2217284849668365398, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
   m_PrefabInstance: {fileID: 2028816958}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2028816963}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -51152,6 +51317,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slotTypeToUnequip: 2
+--- !u!1 &2028816963 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8400435835775129048, guid: 0af722669d3234a4ea41e1249a1c3c75, type: 3}
+  m_PrefabInstance: {fileID: 2028816958}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2028816964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028816963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 533ce83e7ff0f654089b1b403e363c20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2030587339
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52043,6 +52225,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &2050479452
 GameObject:
@@ -53486,6 +53669,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 3
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!114 &2112136932
 MonoBehaviour:
@@ -53502,6 +53686,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 0
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1 &2115474262 stripped
 GameObject:
@@ -54109,6 +54294,7 @@ MonoBehaviour:
   headMaps: []
   itemType: 2
   itemImage: {fileID: 0}
+  currentData: {fileID: 0}
   upgradeLevel: 1
 --- !u!1001 &3561974047355799917
 PrefabInstance:

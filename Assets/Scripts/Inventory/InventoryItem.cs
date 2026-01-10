@@ -21,13 +21,13 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     private GameObject removeButtonObj;
 
     // Data hiện tại của món đồ
-    private WeaponData currentData;
+    [Header("Debug Info")]
+    [SerializeField] private WeaponData currentData; // Để Serialized để bạn soi được trên Inspector
 
     [Header("Upgrade")]
-    public int upgradeLevel = 1;             // cấp hiện tại
+    public int upgradeLevel = 1;
     public const int MaxUpgradeLevel = 4;
 
-    // --- HÀM ĐỂ ENHANCEMENT PANEL LẤY DATA ---
     public WeaponData GetCurrentData()
     {
         return currentData;
@@ -50,13 +50,18 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
 
     private void Awake()
     {
+        // Tự động tìm Image nếu chưa gán
         if (itemImage == null) itemImage = GetComponent<Image>();
         if (itemImage == null) itemImage = GetComponentInChildren<Image>(true);
 
-        // ✅ include inactive để vẫn tìm được EquipmentManager dù inventoryPanel đang tắt
+        if (itemImage != null && itemImage.gameObject != this.gameObject)
+        {
+            itemImage.raycastTarget = false;
+        }
+
         equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
-        // Icon -> ItemButton -> InventorySlot -> RemoveButton
+        // Tìm nút xóa (RemoveButton)
         if (transform.parent != null && transform.parent.parent != null)
         {
             Transform slotTransform = transform.parent.parent;
@@ -67,9 +72,6 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         RefreshRemoveButton();
     }
 
-    // ================= XỬ LÝ SỰ KIỆN UI (FIX LỖI TOOLTIP) =================
-
-    // 1. Khi tắt object (đóng túi đồ) -> Tắt Tooltip ngay lập tức
     private void OnDisable()
     {
         if (InventoryTooltip.Instance != null)
@@ -78,16 +80,30 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         }
     }
 
-    // 2. Khi di chuột vào -> Hiện Tooltip
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (itemImage.enabled && currentData != null && InventoryTooltip.Instance != null)
+        // Kiểm tra xem InventoryTooltip có tồn tại không
+        if (InventoryTooltip.Instance == null)
         {
-            InventoryTooltip.Instance.ShowTooltip(currentData, upgradeLevel);
+            return;
         }
+
+        // 2. Kiểm tra Data
+        if (currentData == null)
+        {
+            return;
+        }
+
+        // 3. Kiểm tra Image
+        if (itemImage == null || !itemImage.enabled)
+        {
+            return;
+        }
+
+        // MỌI THỨ OK -> HIỆN TOOLTIP
+        InventoryTooltip.Instance.ShowTooltip(currentData, upgradeLevel);
     }
 
-    // 3. Khi di chuột ra -> Tắt Tooltip
     public void OnPointerExit(PointerEventData eventData)
     {
         if (InventoryTooltip.Instance != null)
@@ -96,23 +112,27 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         }
     }
 
-    // ======================================================================
-
     public void SetItem(Sprite sprite, ItemType type, GameObject prefab, WeaponData data)
     {
         itemType = type;
         myPrefab = prefab;
-        currentData = data; // Lưu lại data
+        currentData = data;
+
         if (itemImage != null)
         {
             itemImage.sprite = sprite;
             itemImage.enabled = (sprite != null);
+
+            // BẮT BUỘC BẬT RAYCAST TARGET
+            // Nếu cái này bị tắt ở Scene 2, chuột sẽ không nhận diện được
+            itemImage.raycastTarget = true;
         }
         RefreshRemoveButton();
     }
 
     public void ClearItem()
     {
+        currentData = null; // Xóa data khi clear
         if (itemImage != null)
         {
             itemImage.sprite = null;
@@ -130,38 +150,25 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // chỉ nhận chuột trái
-        if (eventData.button != PointerEventData.InputButton.Left)
-            return;
+        if (eventData.button != PointerEventData.InputButton.Left) return;
 
-        if (itemImage == null || !itemImage.enabled || itemImage.sprite == null ||
-            itemImage.sprite.name == "Icon" || itemImage.sprite.name == "EmptySlot")
-        {
-            Debug.Log("Đây là ô trống, không gửi lệnh trang bị.");
-            return;
-        }
+        if (itemImage == null || !itemImage.enabled || itemImage.sprite == null) return;
 
-        bool enhanceMode =
-            EnhancementPanel.Instance != null &&
-            EnhancementPanel.Instance.IsOpen();
+        bool enhanceMode = EnhancementPanel.Instance != null && EnhancementPanel.Instance.IsOpen();
 
-        Debug.Log($"[InventoryItem] Click on {name} | enhanceMode={enhanceMode}");
-
-        // 🔸 1) Đang ở màn NÂNG CẤP → đưa item sang ô dấu +
         if (enhanceMode)
         {
             EnhancementPanel.Instance.TryInsert(this);
-            return; // ⛔ không equip
+            return;
         }
 
-        // 🔸 2) Bình thường → EQUIP / tháo trang bị như cũ
         if (equipmentManager == null)
             equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
         if (equipmentManager == null) return;
 
         WeaponData returnedData;
-        int returnedLevel; // Biến hứng level trả về
+        int returnedLevel;
 
         Sprite returnedSprite = equipmentManager.EquipItem(
             itemType,
@@ -169,22 +176,19 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
             myPrefab,
             upgradeLevel,
             out returnedData,
-            out returnedLevel); // Nhận level từ EquipmentManager
+            out returnedLevel);
 
         if (returnedSprite != null)
         {
             if (returnedData != null)
             {
-                // Nếu có đầy đủ dữ liệu -> Hoán đổi hoàn hảo
                 this.SetItem(returnedSprite, itemType, returnedData.prefab, returnedData);
-                this.SetUpgradeLevel(returnedLevel); // Gán lại level cũ cho món đồ vừa về
-                Debug.Log($"Đã hoán đổi: {returnedData.displayName} về vị trí cũ với Lv {returnedLevel}.");
+                this.SetUpgradeLevel(returnedLevel);
             }
             else
             {
                 this.SetItem(returnedSprite, itemType, myPrefab, null);
                 this.SetUpgradeLevel(returnedLevel);
-                Debug.LogWarning("Hoán đổi item: Có hình ảnh trả về nhưng không tìm thấy Data.");
             }
         }
         else
