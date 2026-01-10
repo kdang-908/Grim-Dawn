@@ -27,6 +27,13 @@ public class GameEndUIController : MonoBehaviour
     [Tooltip("Map kế tiếp thứ 2 (sau SceneMap2)")]
     public string nextSceneName2 = "SceneMap3";
 
+    [Header("End Game")]
+    public GameObject endScreen;
+
+    [Header("End Game Audio")]
+    [SerializeField] private AudioSource endAudioSource;
+    [SerializeField] private AudioClip endMusic;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -106,6 +113,33 @@ public class GameEndUIController : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    // ===================== End Game =====================
+    public void ShowEndGame()
+    {
+        Debug.Log("[GameEndUI] GAME COMPLETED - SHOW THE END");
+
+        gameObject.SetActive(true);
+
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (endScreen != null) endScreen.SetActive(true);
+
+        // Unlock chuột
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Dừng game
+        Time.timeScale = 0f;
+
+        // Play end music
+        if (endAudioSource != null && endMusic != null)
+        {
+            endAudioSource.clip = endMusic;
+            endAudioSource.loop = false;
+            endAudioSource.Play();
+        }
+    }
+
     /// <summary>
     /// Gán hàm này cho nút "Next" / "Continue" ở màn hình Victory
     /// - Nếu đang ở Map => qua SceneMap2 (và unlock Map2)
@@ -151,10 +185,16 @@ public class GameEndUIController : MonoBehaviour
                 // thắng Map1 -> mở Map2
                 gm.UnlockMap(1);
             }
-            else if (current == nextSceneName) // SceneMap2
+            if (current == nextSceneName) // SceneMap2
             {
                 // thắng Map2 -> mở Map3
                 gm.UnlockMap(2);
+            }
+            else if (current == nextSceneName2) // SceneMap3
+            {
+                // ✅ ĐÃ THẮNG MAP CUỐI
+                ShowEndGame();
+                return;
             }
         }
 
