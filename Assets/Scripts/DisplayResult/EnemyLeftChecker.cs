@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+
 
 public class EnemyLeftChecker : MonoBehaviour
 {
@@ -45,13 +47,26 @@ public class EnemyLeftChecker : MonoBehaviour
 
     void TriggerVictoryUI()
     {
-        if (GameEndUIController.Instance != null)
+        if (GameEndUIController.Instance == null)
         {
-            GameEndUIController.Instance.ShowVictory();
+            Debug.LogError("[EnemyLeftChecker] GameEndUIController.Instance = NULL");
+            return;
+        }
+
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        //  MAP CUỐI → THE END (KHÔNG HIỆN VICTORY)
+        if (currentScene == "SceneMap3")
+        {
+            Debug.Log("[EnemyLeftChecker] Final Map cleared → SHOW THE END");
+            GameEndUIController.Instance.ShowEndGame();
         }
         else
         {
-            Debug.LogError("[EnemyLeftChecker] GameEndUIController.Instance = NULL");
+            // MAP THƯỜNG → VICTORY
+            Debug.Log("[EnemyLeftChecker] Map cleared → SHOW VICTORY");
+            GameEndUIController.Instance.ShowVictory();
         }
     }
+
 }
