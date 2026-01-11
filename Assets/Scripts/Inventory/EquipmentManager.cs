@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class EquipmentManager : MonoBehaviour
 {
@@ -72,6 +73,21 @@ public class EquipmentManager : MonoBehaviour
         public Sprite icon;
         public WeaponData data;
     }
+    [System.Serializable]
+    public class EquippedSaveData
+    {
+        public WeaponData weapon;
+        public int weaponLv;
+
+        public WeaponData helmet;
+        public int helmetLv;
+
+        public WeaponData chest;
+        public int chestLv;
+    }
+
+    public static EquippedSaveData GlobalEquippedSave = new EquippedSaveData();
+    public static bool HasEquippedSave = false;
 
     [Header("Map icon -> Helmet Data")]
     public HelmetIconMap[] helmetMaps;
@@ -104,8 +120,14 @@ public class EquipmentManager : MonoBehaviour
 
         AutoBindRemoveButtons();
         UpdateButtons();
+        // Restore equip sau khi scene mới load xong UI
+        StartCoroutine(RestoreEquippedNextFrame());
     }
-
+    private IEnumerator RestoreEquippedNextFrame()
+    {
+        yield return null; // đợi 1 frame cho UI slot bind xong
+        //RestoreEquippedState();
+    }
     void UpdateButtons()
     {
         // Chỉ hiện nút tháo đồ (X) khi ô đó đang có đồ (enabled và có sprite)
@@ -309,7 +331,7 @@ public class EquipmentManager : MonoBehaviour
         if (gridManager != null && gridManager.AddItemBackToInventory(targetSlot.sprite, type, null, dataToReturn, levelToReturn))
         {
             targetSlot.sprite = null;
-            targetSlot.enabled = false;
+            targetSlot.enabled = true;
             // Xóa dữ liệu tooltip khỏi ô trang bị
             EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
             if (uiSlot != null) uiSlot.Clear();
@@ -679,5 +701,40 @@ public class EquipmentManager : MonoBehaviour
                 Debug.Log($"[Refresh] Đã cập nhật Stats: {type} lên Lv {newLevel}");
             }
         }
+    }
+    public void SaveEquippedState()
+    {
+        GlobalEquippedSave.weapon = currentWeapon;
+        GlobalEquippedSave.weaponLv = weaponUpgradeLevel;
+
+        GlobalEquippedSave.helmet = currentHelmet;
+        GlobalEquippedSave.helmetLv = helmetUpgradeLevel;
+
+        GlobalEquippedSave.chest = currentChest;
+        GlobalEquippedSave.chestLv = chestUpgradeLevel;
+
+        HasEquippedSave = (currentWeapon != null || currentHelmet != null || currentChest != null);
+
+        Debug.Log($"✅ [EquipSave] weapon={(currentWeapon ? currentWeapon.name : "null")} lv={weaponUpgradeLevel} | " +
+                  $"helmet={(currentHelmet ? currentHelmet.name : "null")} lv={helmetUpgradeLevel} | " +
+                  $"chest={(currentChest ? currentChest.name : "null")} lv={chestUpgradeLevel}");
+    }
+
+    public void UnequipAllToInventory()
+    {
+        if (gridManager == null)
+            gridManager = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
+
+        // ⚠️ CHỈ unequip khi slot đang thực sự có đồ
+        if (currentWeapon != null && slotWeapon != null && slotWeapon.sprite != null)
+            UnequipItem(InventoryItem.ItemType.Weapon);
+
+        if (currentHelmet != null && slotHead != null && slotHead.sprite != null)
+            UnequipItem(InventoryItem.ItemType.Head);
+
+        if (currentChest != null && slotChest != null && slotChest.sprite != null)
+            UnequipItem(InventoryItem.ItemType.Chest);
+
+        Debug.Log("✅ [EquipmentManager] UnequipAllToInventory done (SAFE).");
     }
 }
