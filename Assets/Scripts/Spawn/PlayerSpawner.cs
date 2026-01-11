@@ -1,92 +1,211 @@
-﻿    using UnityEngine;
+﻿// ===============================
+// 4) PlayerSpawner.cs ✅ FULL (SAFE)
+// ===============================
+using System.Collections;
+using UnityEngine;
 
-    public class PlayerSpawner : MonoBehaviour
+public class PlayerSpawner : MonoBehaviour
+{
+    [Header("Spawn Settings")]
+    [Tooltip("Điểm hồi sinh của Player. Nếu để trống sẽ dùng chính Transform của object này.")]
+    public Transform playerSpawn;
+
+    [Tooltip("Tag dùng để nhận diện Player trong scene.")]
+    public string playerTag = "Player";
+
+    [Header("Minimap")]
+    [Tooltip("Kéo object có script MinimapBinder vào đây (khuyến nghị). Nếu để trống sẽ auto-find.")]
+    public MinimapBinder minimapBinder;
+
+    [Tooltip("Số lần thử bind minimap (phòng trường hợp minimap load trễ).")]
+    public int bindTryCount = 60; // ~1s nếu 60fps
+
+    [Tooltip("Khoảng cách giữa mỗi lần thử (giây).")]
+    public float bindTryInterval = 0.05f;
+
+    [Header("Spawn FX")]
+    public PlayerSpawnFX spawnFX;
+
+    void Awake()
     {
-        [Header("Spawn Settings")]
-        [Tooltip("Điểm hồi sinh của Player. Nếu để trống sẽ dùng chính Transform của object này.")]
-        public Transform playerSpawn;
+        if (playerSpawn == null) playerSpawn = transform;
+        if (spawnFX == null) spawnFX = GetComponent<PlayerSpawnFX>();
 
-        public string playerTag = "Player";
+        if (minimapBinder == null)
+            minimapBinder = FindObjectOfType<MinimapBinder>(true);
+    }
 
-        [Header("Spawn FX")]
-        public PlayerSpawnFX spawnFX;   // <= thêm dòng này
-
-        void Awake()
+    void Start()
+    {
+        if (playerSpawn == null)
         {
-            if (playerSpawn == null)
-                playerSpawn = transform;
-
-            // auto lấy PlayerSpawnFX nếu chưa gán
-            if (spawnFX == null)
-                spawnFX = GetComponent<PlayerSpawnFX>();
+            Debug.LogError("[PlayerSpawner] playerSpawn NULL!");
+            return;
         }
 
-        void Start()
-        {
-            if (playerSpawn == null)
-            {
-                Debug.LogError("[PlayerSpawner] playerSpawn NULL!");
-                return;
-            }
+        // 1) Tìm tất cả object có tag Player
+        var players = GameObject.FindGameObjectsWithTag(playerTag);
 
-            // Nếu đã có Player => chỉ đưa nó về đúng chỗ spawn
-            var exist = GameObject.FindGameObjectWithTag(playerTag);
+        // 2) Nếu đã có player (hoặc lỡ có nhiều)
+        if (players != null && players.Length > 0)
+        {
+            GameObject exist = PickMainPlayer(players);
+
             if (exist != null)
             {
-                Debug.Log("[PlayerSpawner] Found existing player → move to spawn");
-                exist.transform.SetPositionAndRotation(playerSpawn.position, playerSpawn.rotation);
-                BindPotionManager(exist);
+                // ✅ ép identity cho chắc
+                exist.name = "PlayerRuntime";
+                exist.tag = playerTag;
+            }
 
-                // 🔥 gọi hiệu ứng spawn
-                if (spawnFX != null) spawnFX.PlaySpawnFX();
+            DestroyDuplicates(players, exist);
+
+            if (exist == null)
+            {
+                Debug.LogWarning("[PlayerSpawner] Found players but main player is NULL after cleanup.");
                 return;
             }
 
-            // --- Nếu chưa có Player => spawn mới ---
+            exist.transform.SetPositionAndRotation(playerSpawn.position, playerSpawn.rotation);
 
-            GameObject prefab = null;
-            if (GameManager.Instance != null)
-                prefab = GameManager.Instance.GetSelectedPrefab();
+            BindPotionManager(exist);
 
-            if (prefab == null && GameManager.Instance != null && GameManager.Instance.gameplayPrefabs != null)
-            {
-                int gender = PlayerPrefs.GetInt("SelectedGender", 0);
-                if (gender >= 0 && gender < GameManager.Instance.gameplayPrefabs.Length)
-                    prefab = GameManager.Instance.gameplayPrefabs[gender];
-            }
+            StartCoroutine(BindMinimapWhenReady(exist.transform));
 
-            if (prefab == null)
-            {
-                Debug.LogError("[PlayerSpawner] Selected prefab NULL. Check GameManager.gameplayPrefabs");
-                return;
-            }
-
-            var p = Instantiate(prefab, playerSpawn.position, playerSpawn.rotation);
-            p.tag = playerTag;
-            p.name = "PlayerRuntime";
-
-            BindPotionManager(p);
-
-            // 🔥 gọi hiệu ứng spawn lần đầu
             if (spawnFX != null) spawnFX.PlaySpawnFX();
+            return;
         }
 
-        private void BindPotionManager(GameObject playerObj)
+        // 3) Chưa có player => spawn mới
+        GameObject prefab = GetSelectedPrefab();
+        if (prefab == null)
         {
-            var potion = FindObjectOfType<PotionManager>();
-            if (potion == null)
+            Debug.LogError("[PlayerSpawner] Selected prefab NULL. Check GameManager/gameplayPrefabs.");
+            return;
+        }
+
+        var p = Instantiate(prefab, playerSpawn.position, playerSpawn.rotation);
+        p.name = "PlayerRuntime";
+        p.tag = playerTag;
+
+        BindPotionManager(p);
+
+        StartCoroutine(BindMinimapWhenReady(p.transform));
+
+        if (spawnFX != null) spawnFX.PlaySpawnFX();
+    }
+
+    // ✅ Bind minimap: retry đến khi sẵn sàng + tự recover nếu player bị Destroy
+    IEnumerator BindMinimapWhenReady(Transform player)
+    {
+        yield return null;
+
+        for (int i = 0; i < bindTryCount; i++)
+        {
+            // ✅ nếu player bị destroy -> tìm lại
+            if (player == null)
             {
-                Debug.LogWarning("[PlayerSpawner] PotionManager not found in scene.");
-                return;
+                var go = GameObject.FindGameObjectWithTag(playerTag);
+                player = (go != null) ? go.transform : null;
             }
 
-            var stats = playerObj.GetComponent<CharacterStats>();
-            if (stats == null)
+            if (player == null)
             {
-                Debug.LogWarning("[PlayerSpawner] CharacterStats not found on spawned player.");
-                return;
+                yield return new WaitForSeconds(bindTryInterval);
+                continue;
             }
 
-            potion.RegisterCharacter(stats);
+            if (minimapBinder == null)
+                minimapBinder = FindObjectOfType<MinimapBinder>(true);
+
+            if (minimapBinder != null)
+            {
+                minimapBinder.BindPlayer(player);
+
+                bool okCam = (minimapBinder.minimapCamera != null && minimapBinder.minimapCamera.target == player);
+                bool okArrow = (minimapBinder.minimapArrow != null && minimapBinder.minimapArrow.target == player);
+
+                if (okCam && okArrow)
+                {
+                    Debug.Log("[PlayerSpawner] Minimap bind OK -> " + player.name);
+                    yield break;
+                }
+            }
+
+            yield return new WaitForSeconds(bindTryInterval);
+        }
+
+        Debug.LogWarning("[PlayerSpawner] Minimap bind FAILED (timeout). Check MinimapBinder exists & enabled in scene.");
+    }
+
+    // ===== Helpers =====
+
+    private GameObject PickMainPlayer(GameObject[] players)
+    {
+        // ưu tiên đúng PlayerRuntime
+        foreach (var go in players)
+            if (go != null && go.name == "PlayerRuntime")
+                return go;
+
+        foreach (var go in players)
+            if (go != null && go.name.Contains("PlayerRuntime"))
+                return go;
+
+        // ưu tiên có CharacterStats (player thật)
+        foreach (var go in players)
+            if (go != null && go.GetComponentInChildren<CharacterStats>() != null)
+                return go;
+
+        return (players != null && players.Length > 0) ? players[0] : null;
+    }
+
+    private void DestroyDuplicates(GameObject[] players, GameObject keep)
+    {
+        if (players == null) return;
+
+        foreach (var go in players)
+        {
+            if (go != null && go != keep)
+            {
+                Debug.LogWarning("[PlayerSpawner] Duplicate player -> Destroy: " + go.name);
+                Destroy(go);
+            }
         }
     }
+
+    private GameObject GetSelectedPrefab()
+    {
+        GameObject prefab = null;
+
+        if (GameManager.Instance != null)
+            prefab = GameManager.Instance.GetSelectedPrefab();
+
+        if (prefab == null && GameManager.Instance != null && GameManager.Instance.gameplayPrefabs != null)
+        {
+            int gender = PlayerPrefs.GetInt("SelectedGender", 0);
+            if (gender >= 0 && gender < GameManager.Instance.gameplayPrefabs.Length)
+                prefab = GameManager.Instance.gameplayPrefabs[gender];
+        }
+
+        return prefab;
+    }
+
+    private void BindPotionManager(GameObject playerObj)
+    {
+        var potion = FindObjectOfType<PotionManager>(true);
+        if (potion == null)
+        {
+            Debug.LogWarning("[PlayerSpawner] PotionManager not found in scene.");
+            return;
+        }
+
+        var stats = playerObj.GetComponent<CharacterStats>();
+        if (stats == null)
+        {
+            Debug.LogWarning("[PlayerSpawner] CharacterStats not found on player.");
+            return;
+        }
+
+        potion.RegisterCharacter(stats);
+    }
+}
