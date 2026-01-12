@@ -16463,8 +16463,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -20544,6 +20544,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b78da7e4878c75549b52300b017e705a, type: 2}
   - {fileID: 11400000, guid: 4b5223e7f301546498c4e1428fe6e46f, type: 2}
   - {fileID: 11400000, guid: 6069297a2ca875b418e124bf018dc61d, type: 2}
+  inventoryRoot: {fileID: 0}
 --- !u!114 &733068340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27456,8 +27457,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -27923,8 +27924,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -34842,6 +34843,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b78da7e4878c75549b52300b017e705a, type: 2}
   - {fileID: 11400000, guid: 4b5223e7f301546498c4e1428fe6e46f, type: 2}
   - {fileID: 11400000, guid: 6069297a2ca875b418e124bf018dc61d, type: 2}
+  inventoryRoot: {fileID: 0}
 --- !u!114 &1336979272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35385,8 +35387,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -37052,8 +37054,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -38807,8 +38809,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

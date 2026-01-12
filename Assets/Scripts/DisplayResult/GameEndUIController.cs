@@ -207,6 +207,18 @@ public class GameEndUIController : MonoBehaviour
             // ✅ Save potions
             gm.SavePotions();
 
+            // ✅ Save inventory + equip levels (include inactive objects)
+            // 1) Unequip hết về túi (giữ level)
+            var eq = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+            if (eq != null) eq.UnequipAllToInventory();
+
+            // 2) Save inventory
+            var inv = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
+            if (inv != null) inv.SaveInventoryState();
+
+            // 3) Không restore equip ở scene sau nữa
+            EquipmentManager.HasEquippedSave = false;
+
             // ✅ UNLOCK theo scene hiện tại
             // Quy ước của bạn: 0=Map1, 1=Map2, 2=Map3
             if (current == retrySceneName || current == "Map")
@@ -239,6 +251,9 @@ public class GameEndUIController : MonoBehaviour
 
         Debug.Log($"[GameEndUI] LoadScene => {targetScene}");
         SceneManager.LoadScene(targetScene);
+
+        Debug.Log($"[DEBUG] Saved Inventory Count = {InventoryGridManager.GlobalInventorySave.Count}");
+        Debug.Log($"[DEBUG] HasEquippedSave = {EquipmentManager.HasEquippedSave}");
     }
 
     // ===================== CONTINUE (ẩn UI, không đổi scene) =====================

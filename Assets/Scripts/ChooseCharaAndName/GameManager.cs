@@ -20,31 +20,28 @@ public class GameManager : MonoBehaviour
     public string playerTag = "Player";
     public string spawnPointName = "PlayerSpawn";
 
-    // =========================
-    // UNLOCK MAP PROGRESS (RAM ONLY - NOT SAVED)
-    // =========================
     [Header("Chapter Progress (Runtime only)")]
-    [Tooltip("0=Map1, 1=Map2, 2=Map3 (map cao nhất đã mở)")]
     public int maxUnlockedMap = 0;
-
-    [Tooltip("Nếu true thì mỗi lần bấm Play sẽ reset về chỉ mở Map1")]
     public bool resetUnlockOnStart = true;
 
     [System.Serializable]
     public class PlayerSaveData
     {
         public int level;
-        public int maxHP;
+
+        // ✅ SAVE BASE (để equip/unequip không bị reset về 1000)
+        public int baseMaxHP;
+        public int baseAtk;
+        public int baseDef;
+        public int baseEnergy;
+
         public int currentHP;
-        public int atk;
-        public int def;
     }
 
     [Header("Saved Stats (debug)")]
     public PlayerSaveData playerData = new PlayerSaveData();
     public bool hasSavedData = false;
 
-    // ✅ SAVE/LOAD POTION (runtime only - currently not persisted)
     [Header("Saved Potions")]
     public int savedPotions = 0;
     public bool hasSavedPotions = false;
@@ -56,9 +53,8 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // ✅ Runtime only: mỗi lần Play reset unlock nếu bạn muốn
             if (resetUnlockOnStart)
-                maxUnlockedMap = 0; // chỉ mở Map1
+                maxUnlockedMap = 0;
         }
         else
         {
@@ -103,26 +99,22 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        // ✅ NAME
+        // NAME
         if (!string.IsNullOrEmpty(playerName))
             stats.characterName = playerName;
 
-        // ✅ STATS
-        if (hasSavedData && playerData != null && playerData.maxHP > 0)
+        // ✅ LOAD BASE + recalc TOTAL
+        if (hasSavedData)
             LoadPlayer(stats);
 
-        // ✅ POTION
+        // POTION
         LoadPotions();
 
-        // ✅ refresh UI nếu có
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
 
-        Debug.Log($"[GM] Applied | Scene={SceneManager.GetActiveScene().name} | HP={stats.currentHP}/{stats.maxHP_Total} | Potions={(PotionManager.Instance ? PotionManager.Instance.GetPotionCount() : -1)} | UnlockedMax={maxUnlockedMap}");
+        Debug.Log($"[GM] Applied | Scene={SceneManager.GetActiveScene().name} | HP={stats.currentHP}/{stats.maxHP_Total} | LV={stats.level} | UnlockedMax={maxUnlockedMap}");
     }
 
-    // =========================
-    // SETUP
-    // =========================
     public void SetPlayerData(int index, string name)
     {
         selectedCharacter = index;
@@ -175,7 +167,7 @@ public class GameManager : MonoBehaviour
                 if (!string.IsNullOrEmpty(playerName))
                     statsExist.characterName = playerName;
 
-                if (hasSavedData && playerData != null && playerData.maxHP > 0)
+                if (hasSavedData)
                     LoadPlayer(statsExist);
             }
 
@@ -211,7 +203,7 @@ public class GameManager : MonoBehaviour
             if (!string.IsNullOrEmpty(playerName))
                 stats.characterName = playerName;
 
-            if (hasSavedData && playerData != null && playerData.maxHP > 0)
+            if (hasSavedData)
                 LoadPlayer(stats);
         }
 
@@ -219,9 +211,7 @@ public class GameManager : MonoBehaviour
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
     }
 
-    // =========================
     // GOLD
-    // =========================
     public void AddGold(int amount)
     {
         if (amount <= 0) return;
@@ -236,9 +226,7 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    // =========================
-    // SAVE/LOAD STATS (runtime only)
-    // =========================
+    // ✅ SAVE BASE (đúng)
     public void SavePlayer(CharacterStats stats)
     {
         if (stats == null)
@@ -248,33 +236,42 @@ public class GameManager : MonoBehaviour
         }
 
         playerData.level = stats.level;
-        playerData.maxHP = stats.maxHP_Total;
+
+        playerData.baseMaxHP = stats.maxHP;
+        playerData.baseAtk = stats.atk;
+        playerData.baseDef = stats.def;
+        playerData.baseEnergy = stats.energy;
+
         playerData.currentHP = stats.currentHP;
-        playerData.atk = stats.atk_Total;
-        playerData.def = stats.def_Total;
 
         hasSavedData = true;
 
-        Debug.Log($"[GM] SavePlayer: LV {playerData.level}, HP {playerData.currentHP}/{playerData.maxHP}");
+        Debug.Log($"[GM] SavePlayer: LV {playerData.level} | BASE HP={playerData.baseMaxHP} | CurHP={playerData.currentHP}");
     }
 
+    // ✅ LOAD BASE -> recalc TOTAL -> restore HP
     public void LoadPlayer(CharacterStats stats)
     {
         if (stats == null) return;
-        if (!hasSavedData || playerData == null || playerData.maxHP <= 0) return;
+        if (!hasSavedData) return;
 
         stats.level = playerData.level;
-        stats.maxHP_Total = playerData.maxHP;
-        stats.currentHP = Mathf.Clamp(playerData.currentHP, 1, playerData.maxHP);
-        stats.atk_Total = playerData.atk;
-        stats.def_Total = playerData.def;
 
-        Debug.Log($"[GM] LoadPlayer: LV {playerData.level}, HP {stats.currentHP}/{playerData.maxHP}");
+        stats.maxHP = Mathf.Max(1, playerData.baseMaxHP);
+        stats.atk = playerData.baseAtk;
+        stats.def = playerData.baseDef;
+        stats.energy = playerData.baseEnergy;
+
+        // tính lại TOTAL (cộng trang bị) và GIỮ % HP
+        stats.UpdateFinalStats(keepCurrentHP: true, keepHPPercent: true);
+
+        // đảm bảo HP không bị 0
+        stats.currentHP = Mathf.Clamp(playerData.currentHP, 1, stats.maxHP_Total);
+
+        Debug.Log($"[GM] LoadPlayer: LV {stats.level} | BASE HP={stats.maxHP} | TOTAL HP={stats.maxHP_Total} | CurHP={stats.currentHP}");
     }
 
-    // =========================
-    // SAVE/LOAD POTIONS (runtime only)
-    // =========================
+    // POTIONS
     public void SavePotions()
     {
         if (PotionManager.Instance == null)
@@ -302,18 +299,12 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GM] LoadPotions = {savedPotions}");
     }
 
-    // =========================
-    // UNLOCK MAP API (runtime only)
-    // =========================
-    public bool IsMapUnlocked(int mapIndex)
-    {
-        return mapIndex <= maxUnlockedMap;
-    }
+    // UNLOCK MAP
+    public bool IsMapUnlocked(int mapIndex) => mapIndex <= maxUnlockedMap;
 
     public void UnlockMap(int mapIndex)
     {
         if (mapIndex <= maxUnlockedMap) return;
-
         maxUnlockedMap = mapIndex;
         Debug.Log($"[GM] UnlockMap (runtime) -> maxUnlockedMap = {maxUnlockedMap}");
     }
