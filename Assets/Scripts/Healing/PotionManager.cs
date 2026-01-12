@@ -42,12 +42,12 @@ public class PotionManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // ✅ GIỮ LẠI QUA SCENE
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
-            return; // ✅ QUAN TRỌNG: tránh chạy tiếp
+            return;
         }
 
         UpdateUI();
@@ -55,7 +55,6 @@ public class PotionManager : MonoBehaviour
 
     void Update()
     {
-        // auto bind lại player khi qua scene mới
         if (activeCharacter == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -76,7 +75,6 @@ public class PotionManager : MonoBehaviour
 
     public int GetPotionCount() => potions;
 
-    // ✅ Cho GameManager set lại potion sau khi load scene
     public void SetPotionCount(int value)
     {
         potions = Mathf.Max(0, value);
@@ -89,12 +87,18 @@ public class PotionManager : MonoBehaviour
         if (isOnCooldown) return;
         if (potions <= 0) return;
 
-        // bạn đang dùng maxHP hay maxHP_Total tùy CharacterStats của bạn
         int maxHp = (activeCharacter.maxHP_Total > 0) ? activeCharacter.maxHP_Total : activeCharacter.maxHP;
         if (activeCharacter.currentHP >= maxHp) return;
 
         potions--;
         activeCharacter.Heal(healAmount);
+
+        // ✅ FIX: sau khi heal, cập nhật lại HP/potion vào GameManager
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SyncCurrentHP(activeCharacter);
+            GameManager.Instance.SavePotions();
+        }
 
         if (audioSource != null && healClip != null)
             audioSource.PlayOneShot(healClip, healVolume);
@@ -150,6 +154,11 @@ public class PotionManager : MonoBehaviour
     {
         if (amount <= 0) return;
         potions += amount;
+
+        // nếu bạn muốn nhặt potion cũng persist luôn:
+        if (GameManager.Instance != null)
+            GameManager.Instance.SavePotions();
+
         UpdateUI();
     }
 

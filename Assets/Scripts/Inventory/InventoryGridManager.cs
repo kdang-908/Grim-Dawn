@@ -20,19 +20,20 @@ public class InventoryGridManager : MonoBehaviour
     [Header("Data Khởi Đầu")]
     public List<WeaponData> startItems = new List<WeaponData>();
 
-    private bool hasInitialized = false;
-
     [SerializeField] private Transform inventoryRoot;
+
+    private bool hasInitialized = false;
 
     void Start()
     {
         InitData();
     }
 
+    // =========================
+    // INIT / LOAD
+    // =========================
     public void InitData()
     {
-        Debug.Log($"[DEBUG] GlobalInventorySave at InitData = {(GlobalInventorySave == null ? -1 : GlobalInventorySave.Count)}");
-
         if (hasInitialized) return;
 
         RefreshInventorySlots();
@@ -41,27 +42,14 @@ public class InventoryGridManager : MonoBehaviour
         // ✅ 1) Ưu tiên nạp dữ liệu đã save (nếu có)
         if (GlobalInventorySave != null && GlobalInventorySave.Count > 0)
         {
-            Debug.Log($"📦 [InitData] Load from GlobalInventorySave: {GlobalInventorySave.Count} items");
-
-            foreach (var s in GlobalInventorySave)
-            {
-                if (s == null || s.data == null || s.data.icon == null) continue;
-
-                AddItemBackToInventory(
-                    s.data.icon,
-                    s.data.itemType,
-                    s.data.prefab,
-                    s.data,
-                    Mathf.Max(1, s.level)
-                );
-            }
-
+            Debug.Log($"📦 [InitData] Load from GlobalInventorySave: {GlobalInventorySave.Count} items | manager={name}");
+            LoadFromGlobalSaveToUI();
             hasInitialized = true;
-            return; // QUAN TRỌNG: không nạp startItems nữa
+            return;
         }
 
         // ✅ 2) Nếu chưa có save thì mới nạp StartItems (level 1)
-        Debug.Log($"🚀 [InitData] Không có save, nạp startItems: {startItems.Count} món...");
+        Debug.Log($"🚀 [InitData] No save, load startItems: {startItems.Count} items | manager={name}");
 
         if (startItems != null && startItems.Count > 0)
         {
@@ -74,39 +62,45 @@ public class InventoryGridManager : MonoBehaviour
             }
         }
 
+        // ❌ TUYỆT ĐỐI KHÔNG Save ở đây (vì UI có thể chưa fill sprite -> temp=0 -> wipe global)
+        // SaveInventoryState();
+
         hasInitialized = true;
     }
 
     // ✅ NEW: Cho phép UI khác (Forge/Enhance) reload lại từ GlobalInventorySave
-    // dùng khi Shop mua xong / nâng cấp xong / đổi scene...
     public void ReloadFromGlobalSave()
     {
         RefreshInventorySlots();
         ClearInventory();
 
-        if (GlobalInventorySave != null && GlobalInventorySave.Count > 0)
-        {
-            Debug.Log($"🔁 [ReloadFromGlobalSave] Reload: {GlobalInventorySave.Count} items");
-
-            foreach (var s in GlobalInventorySave)
-            {
-                if (s == null || s.data == null || s.data.icon == null) continue;
-
-                AddItemBackToInventory(
-                    s.data.icon,
-                    s.data.itemType,
-                    s.data.prefab,
-                    s.data,
-                    Mathf.Max(1, s.level)
-                );
-            }
-        }
+        LoadFromGlobalSaveToUI();
 
         // Cho phép gọi nhiều lần
         hasInitialized = true;
     }
 
-    // Hàm dọn dẹp
+    private void LoadFromGlobalSaveToUI()
+    {
+        if (GlobalInventorySave == null || GlobalInventorySave.Count == 0) return;
+
+        foreach (var s in GlobalInventorySave)
+        {
+            if (s == null || s.data == null || s.data.icon == null) continue;
+
+            AddItemBackToInventory(
+                s.data.icon,
+                s.data.itemType,
+                s.data.prefab,
+                s.data,
+                Mathf.Max(1, s.level)
+            );
+        }
+    }
+
+    // =========================
+    // UI HELPERS
+    // =========================
     void ClearInventory()
     {
         foreach (Image slot in inventorySlots)
@@ -117,7 +111,6 @@ public class InventoryGridManager : MonoBehaviour
         }
     }
 
-    // HÀM REFRESH
     void RefreshInventorySlots()
     {
         inventorySlots.Clear();
@@ -174,40 +167,9 @@ public class InventoryGridManager : MonoBehaviour
         return false;
     }
 
-    public void SyncItemLevel(WeaponData targetData, int oldLevel, int newLevel)
-    {
-        if (targetData == null) return;
-        InitData();
-
-        string targetIconName = (targetData.icon != null) ? targetData.icon.name : "NULL";
-        string cleanTarget = targetIconName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
-
-        Debug.Log($"🔍 [DEBUG] Đang đi tìm: '{targetIconName}' (Clean: {cleanTarget})");
-
-        foreach (Image slot in inventorySlots)
-        {
-            if (slot == null) continue;
-            InventoryItem item = slot.GetComponentInParent<InventoryItem>(true);
-            if (item == null || item.GetItemSprite() == null) continue;
-
-            string itemSpriteName = item.GetItemSprite().name;
-            string cleanItem = itemSpriteName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
-
-            bool isMatch = (cleanItem == cleanTarget);
-
-            if (isMatch)
-            {
-                if (item.GetUpgradeLevel() != newLevel)
-                    item.SetUpgradeLevel(newLevel);
-
-                item.SetItem(item.GetItemSprite(), item.itemType, null, targetData);
-                item.SetUpgradeLevel(newLevel);
-
-                Debug.Log($"✅ [SYNC SUCCESS] Update: {itemSpriteName} -> Lv{newLevel}");
-            }
-        }
-    }
-
+    // =========================
+    // SAVE / SYNC
+    // =========================
     public void SaveInventoryState()
     {
         RefreshInventorySlots();
@@ -233,16 +195,20 @@ public class InventoryGridManager : MonoBehaviour
             });
         }
 
+        // ✅ QUAN TRỌNG: temp rỗng thì KHÔNG được wipe Global
         if (temp.Count == 0)
         {
-            Debug.LogWarning("[Inventory] Skip SaveInventoryState vì không có item nào.");
+            Debug.LogWarning($"[Inventory] Skip SaveInventoryState (temp=0) to avoid wiping Global | manager={name}");
             return;
         }
 
         GlobalInventorySave.Clear();
         GlobalInventorySave.AddRange(temp);
 
-        Debug.Log($"✅ [Inventory] Saved {GlobalInventorySave.Count} items");
+        Debug.Log($"✅ [Inventory] Saved Global = {GlobalInventorySave.Count} items | by manager={name}");
+
+        // ✅ Sau khi save -> reload toàn bộ túi khác (Inventory thường + Forge/Enhance)
+        ReloadAllManagers();
     }
 
     // ✅ SHOP sẽ gọi hàm này
@@ -250,9 +216,55 @@ public class InventoryGridManager : MonoBehaviour
     {
         if (data == null || data.icon == null) return false;
 
-        bool ok = AddItemBackToInventory(data.icon, data.itemType, data.prefab, data, Mathf.Max(1, level));
-        if (ok) SaveInventoryState(); // đồng bộ qua scene (GlobalInventorySave)
+        InitData(); // đảm bảo slots đã scan
 
+        bool ok = AddItemBackToInventory(data.icon, data.itemType, data.prefab, data, Mathf.Max(1, level));
+        if (ok)
+        {
+            SaveInventoryState();
+        }
         return ok;
+    }
+
+    // ✅ Nâng cấp xong gọi để sync level
+    public void SyncItemLevel(WeaponData targetData, int oldLevel, int newLevel)
+    {
+        if (targetData == null) return;
+
+        InitData();
+
+        string targetIconName = (targetData.icon != null) ? targetData.icon.name : "NULL";
+        string cleanTarget = targetIconName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
+
+        foreach (Image slot in inventorySlots)
+        {
+            if (slot == null) continue;
+            InventoryItem item = slot.GetComponentInParent<InventoryItem>(true);
+            if (item == null || item.GetItemSprite() == null) continue;
+
+            string itemSpriteName = item.GetItemSprite().name;
+            string cleanItem = itemSpriteName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
+
+            if (cleanItem == cleanTarget)
+            {
+                item.SetUpgradeLevel(newLevel);
+                item.SetItem(item.GetItemSprite(), item.itemType, null, targetData);
+            }
+        }
+
+        SaveInventoryState();
+    }
+
+    // =========================
+    // GLOBAL RELOAD FOR ALL UI
+    // =========================
+    private static void ReloadAllManagers()
+    {
+        var managers = Object.FindObjectsOfType<InventoryGridManager>(true);
+        foreach (var m in managers)
+        {
+            if (m == null) continue;
+            m.ReloadFromGlobalSave();
+        }
     }
 }

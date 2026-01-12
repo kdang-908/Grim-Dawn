@@ -20398,6 +20398,7 @@ MonoBehaviour:
   txtGold: {fileID: 0}
   btnBuy: {fileID: 1170104593}
   inventory: {fileID: 1336979271}
+  extraInventoriesToRefresh: []
   fallbackPrice: 999
 --- !u!114 &637338333
 MonoBehaviour:
@@ -23791,20 +23792,7 @@ MonoBehaviour:
   - {fileID: 1886451837}
   - {fileID: 719432845}
   - {fileID: 1919630675}
-  startItems:
-  - {fileID: 11400000, guid: f749569d0667e5648b100c17911aafb4, type: 2}
-  - {fileID: 11400000, guid: ec14bcbea9b390343bf66fe088035b8c, type: 2}
-  - {fileID: 11400000, guid: 739010fbb6c7b35458c4d410734f3b06, type: 2}
-  - {fileID: 11400000, guid: a01b71da38b85774cbe3ae773c206e7d, type: 2}
-  - {fileID: 11400000, guid: 38c2dd7ddb045464bbd8cf380ef1a61a, type: 2}
-  - {fileID: 11400000, guid: 8477ab5c476df2d4d918356445b84817, type: 2}
-  - {fileID: 11400000, guid: 77c6b263f34723b45b691a37bb7c5156, type: 2}
-  - {fileID: 11400000, guid: 470499d924ef3b34389bb6ce1269e340, type: 2}
-  - {fileID: 11400000, guid: db05373e0f5881446b0c0bbdc89509fc, type: 2}
-  - {fileID: 11400000, guid: 4e6ce0a51552b2846a73486c28255034, type: 2}
-  - {fileID: 11400000, guid: b78da7e4878c75549b52300b017e705a, type: 2}
-  - {fileID: 11400000, guid: 4b5223e7f301546498c4e1428fe6e46f, type: 2}
-  - {fileID: 11400000, guid: 6069297a2ca875b418e124bf018dc61d, type: 2}
+  startItems: []
   inventoryRoot: {fileID: 0}
 --- !u!114 &733068340
 MonoBehaviour:
