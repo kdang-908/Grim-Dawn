@@ -77,6 +77,10 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // ✅ QUAN TRỌNG: SelectChapter chỉ là UI (Additive khi ấn M) -> không apply/load lại stats
+        if (scene.name == "SelectChapter")
+            return;
+
         StartCoroutine(ApplyAfterSceneLoaded());
     }
 
@@ -226,7 +230,7 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    // ✅ SAVE BASE (đúng)
+    // ✅ SAVE BASE
     public void SavePlayer(CharacterStats stats)
     {
         if (stats == null)
@@ -249,6 +253,14 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GM] SavePlayer: LV {playerData.level} | BASE HP={playerData.baseMaxHP} | CurHP={playerData.currentHP}");
     }
 
+    // ✅ Nhẹ hơn SavePlayer: chỉ sync HP (fix H heal bị rollback khi load scene)
+    public void SyncCurrentHP(CharacterStats stats)
+    {
+        if (stats == null) return;
+        playerData.currentHP = stats.currentHP;
+        hasSavedData = true;
+    }
+
     // ✅ LOAD BASE -> recalc TOTAL -> restore HP
     public void LoadPlayer(CharacterStats stats)
     {
@@ -262,10 +274,8 @@ public class GameManager : MonoBehaviour
         stats.def = playerData.baseDef;
         stats.energy = playerData.baseEnergy;
 
-        // tính lại TOTAL (cộng trang bị) và GIỮ % HP
         stats.UpdateFinalStats(keepCurrentHP: true, keepHPPercent: true);
 
-        // đảm bảo HP không bị 0
         stats.currentHP = Mathf.Clamp(playerData.currentHP, 1, stats.maxHP_Total);
 
         Debug.Log($"[GM] LoadPlayer: LV {stats.level} | BASE HP={stats.maxHP} | TOTAL HP={stats.maxHP_Total} | CurHP={stats.currentHP}");
