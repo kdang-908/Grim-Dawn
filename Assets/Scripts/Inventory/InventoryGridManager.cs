@@ -7,11 +7,18 @@ public class InventoryGridManager : MonoBehaviour
     [Header("UI References")]
     public List<Image> inventorySlots = new List<Image>();
 
+    public static List<SavedInvItem> GlobalInventorySave = new List<SavedInvItem>();
+    [System.Serializable]
+    public class SavedInvItem
+    {
+        public WeaponData data;
+        public int level;
+    }
     [Header("Data Khởi Đầu")]
     public List<WeaponData> startItems = new List<WeaponData>();
 
     private bool hasInitialized = false;
-
+    [SerializeField] private Transform inventoryRoot;
     void Start()
     {
         InitData();
@@ -19,48 +26,47 @@ public class InventoryGridManager : MonoBehaviour
 
     public void InitData()
     {
-        // debug
+        Debug.Log($"[DEBUG] GlobalInventorySave at InitData = {(GlobalInventorySave == null ? -1 : GlobalInventorySave.Count)}");
+
         if (hasInitialized) return;
 
         RefreshInventorySlots();
-        ClearInventory(); // Xóa sạch để nạp lại từ đầu 
+        ClearInventory();
 
-        Debug.Log($"🚀 [InitData] Bắt đầu nạp {startItems.Count} món...");
+        // ✅ 1) Ưu tiên nạp dữ liệu đã save (nếu có)
+        if (GlobalInventorySave != null && GlobalInventorySave.Count > 0)
+        {
+            Debug.Log($"📦 [InitData] Load from GlobalInventorySave: {GlobalInventorySave.Count} items");
+
+            foreach (var s in GlobalInventorySave)
+            {
+                if (s == null || s.data == null || s.data.icon == null) continue;
+
+                AddItemBackToInventory(
+                    s.data.icon,
+                    s.data.itemType,
+                    s.data.prefab,
+                    s.data,
+                    Mathf.Max(1, s.level)
+                );
+            }
+
+            hasInitialized = true;
+            return; // QUAN TRỌNG: không nạp startItems nữa
+        }
+
+        // ✅ 2) Nếu chưa có save thì mới nạp StartItems (level 1)
+        Debug.Log($"🚀 [InitData] Không có save, nạp startItems: {startItems.Count} món...");
 
         if (startItems != null && startItems.Count > 0)
         {
             for (int i = 0; i < startItems.Count; i++)
             {
                 WeaponData itemData = startItems[i];
+                if (itemData == null || itemData.icon == null) continue;
 
-                
-                string itemName = (itemData != null) ? itemData.name : "NULL";
-                Debug.Log($"   👉 Đang xử lý Element {i}: {itemName}");
-
-                if (itemData == null)
-                {
-                    Debug.LogError($"   ❌ Element {i} bị NULL (Chưa kéo file vào Inspector)!");
-                    continue;
-                }
-
-                if (itemData.icon == null)
-                {
-                    Debug.LogError($"   ❌ Món '{itemName}' có Icon bị NULL!");
-                    continue;
-                }
-
-                // LOG 2: Thử thêm vào
-                bool added = AddItemBackToInventory(itemData.icon, itemData.itemType, itemData.prefab, itemData, 1);
-
-                if (added)
-                    Debug.Log($"      ✅ Đã thêm '{itemName}' thành công.");
-                else
-                    Debug.LogError($"      ⛔ Thêm '{itemName}' THẤT BẠI (Có thể túi đầy hoặc không tìm thấy slot trống)!");
+                AddItemBackToInventory(itemData.icon, itemData.itemType, itemData.prefab, itemData, 1);
             }
-        }
-        else
-        {
-            Debug.LogError("❌ Danh sách StartItems đang bị RỖNG!");
         }
 
         hasInitialized = true;
@@ -74,7 +80,7 @@ public class InventoryGridManager : MonoBehaviour
             slot.sprite = null;
             slot.enabled = false;
 
-            
+
             InventoryItem itemScript = slot.GetComponentInParent<InventoryItem>(true);
             if (itemScript != null)
             {
@@ -83,37 +89,30 @@ public class InventoryGridManager : MonoBehaviour
         }
     }
 
-    
+
     // HÀM REFRESH 
-    public void RefreshInventorySlots()
+    void RefreshInventorySlots()
     {
         inventorySlots.Clear();
 
-        // tìm TẤT CẢ object có gắn script InventoryItem
-        InventoryItem[] allItems = GetComponentsInChildren<InventoryItem>(true);
+        Transform root = inventoryRoot != null ? inventoryRoot : transform;
 
-        foreach (InventoryItem itemScript in allItems)
+        var allItems = root.GetComponentsInChildren<InventoryItem>(true);
+
+        foreach (var itemScript in allItems)
         {
-            // Với mỗi script tìm thấy, tìm cái ảnh Icon 
+            // CHỈ lấy icon của slot item (đúng object chứa InventoryItem)
             Transform iconTrans = itemScript.transform.Find("Icon");
+            Image iconImg = null;
 
-            if (iconTrans != null)
-            {
-                Image iconImg = iconTrans.GetComponent<Image>();
-                if (iconImg != null)
-                {
-                    inventorySlots.Add(iconImg);
-                }
-            }
-            else
-            {
-                //  Nếu không thấy con "Icon", lấy chính Image ở object đó
-                Image img = itemScript.GetComponent<Image>();
-                if (img != null) inventorySlots.Add(img);
-            }
+            if (iconTrans != null) iconImg = iconTrans.GetComponent<Image>();
+            else iconImg = itemScript.GetComponent<Image>();
+
+            if (iconImg != null)
+                inventorySlots.Add(iconImg);
         }
 
-        Debug.Log($"[Refresh] Đã tìm thấy {inventorySlots.Count} ô chứa đồ (dựa trên InventoryItem script).");
+        Debug.Log($"[Refresh] Inventory slots found = {inventorySlots.Count}");
     }
 
     public bool AddItemBackToInventory(Sprite itemSprite, InventoryItem.ItemType newType, GameObject itemPrefab, WeaponData data, int level)
@@ -173,7 +172,7 @@ public class InventoryGridManager : MonoBehaviour
             string itemSpriteName = item.GetItemSprite().name;
             string cleanItem = itemSpriteName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
 
-            
+
             Debug.Log($"   + Slot {slot.name} đang chứa: '{itemSpriteName}' (Clean: {cleanItem})");
 
             // So sánh
@@ -193,9 +192,39 @@ public class InventoryGridManager : MonoBehaviour
                 }
             }
         }
-        if (!foundAny)
+    }
+    public void SaveInventoryState()
+    {
+        RefreshInventorySlots();
+
+        var temp = new List<SavedInvItem>();
+
+        foreach (var slotImg in inventorySlots)
         {
-            Debug.LogError($"❌ [FAILED] Không tìm thấy món nào khớp với '{targetIconName}'");
+            if (slotImg == null || slotImg.sprite == null) continue;
+
+            var item = slotImg.GetComponentInParent<InventoryItem>(true);
+            if (item == null) continue;
+            if (inventoryRoot != null && !item.transform.IsChildOf(inventoryRoot)) continue;
+            var data = item.GetCurrentData();
+            if (data == null) continue;
+
+            temp.Add(new SavedInvItem
+            {
+                data = data,
+                level = Mathf.Max(1, item.GetUpgradeLevel())
+            });
         }
+
+        if (temp.Count == 0)
+        {
+            Debug.LogWarning("[Inventory] Skip SaveInventoryState vì không có item nào.");
+            return;
+        }
+
+        GlobalInventorySave.Clear();
+        GlobalInventorySave.AddRange(temp);
+
+        Debug.Log($"✅ [Inventory] Saved {GlobalInventorySave.Count} items");
     }
 }

@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 4405654547201596442}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.014, y: 1.102, z: 0.196}
+  m_LocalPosition: {x: 0.014, y: 0.924, z: 0.196}
   m_LocalScale: {x: 0.375, y: 0.375, z: 0.375}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -68,7 +68,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1633522612837138316}
-  m_Layer: 11
+  m_Layer: 9
   m_Name: WeaponSocket_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 8507815828325356026}
   - component: {fileID: 2772363401303845880}
   - component: {fileID: 6034921898592672381}
-  m_Layer: 12
+  m_Layer: 9
   m_Name: 'PlayerHitbox '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +144,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8, y: 1.2, z: 1.2}
+  m_Size: {x: 3, y: 2, z: 1.5}
   m_Center: {x: 0, y: 0, z: 0.5}
 --- !u!114 &6034921898592672381
 MonoBehaviour:
@@ -171,7 +171,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 626579025120622932}
-  m_Layer: 11
+  m_Layer: 9
   m_Name: 'WeaponGrip '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -499,7 +499,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 69e6a6ea8e179f445bd248ba46f2a2e9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 69e6a6ea8e179f445bd248ba46f2a2e9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -611,15 +611,11 @@ MonoBehaviour:
   moveSpeed: 5
   runSpeed: 8
   rotationSpeed: 10
-  jumpForce: 5
+  jumpForce: 3
   groundMask:
     serializedVersion: 2
     m_Bits: 2048
   groundCheckDistance: 0.2
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4097
-  skin: 0.05
   characterSelectScene: CharacterSelection
   disableColliderInSelection: 1
   freezeAllInSelection: 1
@@ -713,8 +709,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Niche
   level: 1
-  maxHP: 500
-  atk: 120
+  maxHP: 1000
+  atk: 200
   def: 75
   energy: 60
   maxHP_Total: 0
@@ -750,8 +746,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41981388cf8e0684fa74ae2cc6195ffe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  socketR: {fileID: 1633522612837138316}
-  weaponGrip: {fileID: 626579025120622932}
+  socketR: {fileID: 0}
+  weaponGrip: {fileID: 0}
 --- !u!114 &429008195846208859
 MonoBehaviour:
   m_ObjectHideFlags: 0
