@@ -99,9 +99,11 @@ public class WeaponEquipper : MonoBehaviour
     private static Transform FindChildContains(Transform root, string contains)
     {
         if (root == null) return null;
+
         foreach (var t in root.GetComponentsInChildren<Transform>(true))
         {
-            if (t.name.Trim().Contains(contains)) return t;
+            if (t.name.Trim().Contains(contains))
+                return t;
         }
         return null;
     }
@@ -109,6 +111,7 @@ public class WeaponEquipper : MonoBehaviour
     private void SetLayerRecursively(GameObject go, int layer)
     {
         if (go == null) return;
+
         go.layer = layer;
         foreach (Transform child in go.transform)
             SetLayerRecursively(child.gameObject, layer);
@@ -117,12 +120,16 @@ public class WeaponEquipper : MonoBehaviour
     private static string GetPath(Transform t)
     {
         string p = t.name;
-        while (t.parent != null) { t = t.parent; p = t.name + "/" + p; }
+        while (t.parent != null)
+        {
+            t = t.parent;
+            p = t.name + "/" + p;
+        }
         return p;
     }
+
     public bool HasWeapon()
     {
         return currentWeapon != null;
     }
 }
-

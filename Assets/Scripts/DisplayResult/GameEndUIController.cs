@@ -34,6 +34,10 @@ public class GameEndUIController : MonoBehaviour
     [SerializeField] private AudioSource endAudioSource;
     [SerializeField] private AudioClip endMusic;
 
+    [Header("Transition")]
+    [SerializeField] private CanvasGroup screenFader;
+    [SerializeField] private float fadeDuration = 0.8f;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -73,51 +77,76 @@ public class GameEndUIController : MonoBehaviour
         Debug.Log("[GameEndUI] Đã hook OnDeath");
     }
 
-    // ===================== DEATH =====================
-    public void OnPlayerDeath()
+    // ===================== FADE TRANSITION =====================
+    IEnumerator Fade(float from, float to)
     {
-        StartCoroutine(ShowDeathScreenDelay());
+        float t = 0f;
+        screenFader.alpha = from;
+
+        while (t < fadeDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            screenFader.alpha = Mathf.Lerp(from, to, t / fadeDuration);
+            yield return null;
+        }
+
+        screenFader.alpha = to;
     }
 
-    IEnumerator ShowDeathScreenDelay()
+    IEnumerator VictoryWithTransition()
     {
+        // Đợi 1 nhịp cho cảm giác quái chết xong
         yield return new WaitForSecondsRealtime(showDelay);
 
-        gameObject.SetActive(true);
-        if (victoryScreen != null) victoryScreen.SetActive(false);
-        if (deathScreen != null) deathScreen.SetActive(true);
+        // Fade to black
+        yield return StartCoroutine(Fade(0f, 1f));
+
+        // Hiện Victory (sau màn đen)
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(true);
+
+        // Fade out
+        yield return StartCoroutine(Fade(1f, 0f));
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         Time.timeScale = 0f;
+    }
+
+    IEnumerator DeadWithTransition()
+    {
+        yield return new WaitForSecondsRealtime(showDelay);
+
+        yield return Fade(0f, 1f); // fade to black
+
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(true);
+
+        yield return Fade(1f, 0f); // fade out
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Time.timeScale = 0f;
+    }
+
+    // ===================== DEATH =====================
+    public void OnPlayerDeath()
+    {
+        StartCoroutine(DeadWithTransition());
     }
 
     // ===================== VICTORY =====================
     public void ShowVictory()
     {
-        StartCoroutine(ShowVictoryDelay());
-    }
-
-    IEnumerator ShowVictoryDelay()
-    {
-        yield return new WaitForSecondsRealtime(showDelay);
-
-        gameObject.SetActive(true);
-        if (deathScreen != null) deathScreen.SetActive(false);
-        if (victoryScreen != null) victoryScreen.SetActive(true);
-
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-
-        Time.timeScale = 0f;
+        StartCoroutine(VictoryWithTransition());
     }
 
     // ===================== End Game =====================
     public void ShowEndGame()
     {
-        Debug.Log("[GameEndUI] GAME COMPLETED - SHOW THE END");
-
+        Debug.Log("[GameEndUI] GAME COMPLETED - SHOW THE END");     
         gameObject.SetActive(true);
 
         if (victoryScreen != null) victoryScreen.SetActive(false);

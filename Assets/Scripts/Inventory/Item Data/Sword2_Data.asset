@@ -43,3 +43,5 @@ MonoBehaviour:
   bonusEnergy: 10
   description: 
   upgradePercentPerLevel: 5
+  price: 2223
+  buyOnce: 1

@@ -7,18 +7,23 @@ public class InventoryGridManager : MonoBehaviour
     [Header("UI References")]
     public List<Image> inventorySlots = new List<Image>();
 
+    // ✅ SAVE CHUNG CHO TOÀN GAME (Inventory thường + Forge/Enhance cùng nhìn chung)
     public static List<SavedInvItem> GlobalInventorySave = new List<SavedInvItem>();
+
     [System.Serializable]
     public class SavedInvItem
     {
         public WeaponData data;
         public int level;
     }
+
     [Header("Data Khởi Đầu")]
     public List<WeaponData> startItems = new List<WeaponData>();
 
     private bool hasInitialized = false;
+
     [SerializeField] private Transform inventoryRoot;
+
     void Start()
     {
         InitData();
@@ -71,6 +76,36 @@ public class InventoryGridManager : MonoBehaviour
 
         hasInitialized = true;
     }
+
+    // ✅ NEW: Cho phép UI khác (Forge/Enhance) reload lại từ GlobalInventorySave
+    // dùng khi Shop mua xong / nâng cấp xong / đổi scene...
+    public void ReloadFromGlobalSave()
+    {
+        RefreshInventorySlots();
+        ClearInventory();
+
+        if (GlobalInventorySave != null && GlobalInventorySave.Count > 0)
+        {
+            Debug.Log($"🔁 [ReloadFromGlobalSave] Reload: {GlobalInventorySave.Count} items");
+
+            foreach (var s in GlobalInventorySave)
+            {
+                if (s == null || s.data == null || s.data.icon == null) continue;
+
+                AddItemBackToInventory(
+                    s.data.icon,
+                    s.data.itemType,
+                    s.data.prefab,
+                    s.data,
+                    Mathf.Max(1, s.level)
+                );
+            }
+        }
+
+        // Cho phép gọi nhiều lần
+        hasInitialized = true;
+    }
+
     // Hàm dọn dẹp
     void ClearInventory()
     {
@@ -79,18 +114,10 @@ public class InventoryGridManager : MonoBehaviour
             if (slot == null) continue;
             slot.sprite = null;
             slot.enabled = false;
-
-
-            InventoryItem itemScript = slot.GetComponentInParent<InventoryItem>(true);
-            if (itemScript != null)
-            {
-                // Nếu cần reset data trong script thì làm ở đây
-            }
         }
     }
 
-
-    // HÀM REFRESH 
+    // HÀM REFRESH
     void RefreshInventorySlots()
     {
         inventorySlots.Clear();
@@ -101,7 +128,6 @@ public class InventoryGridManager : MonoBehaviour
 
         foreach (var itemScript in allItems)
         {
-            // CHỈ lấy icon của slot item (đúng object chứa InventoryItem)
             Transform iconTrans = itemScript.transform.Find("Icon");
             Image iconImg = null;
 
@@ -112,7 +138,7 @@ public class InventoryGridManager : MonoBehaviour
                 inventorySlots.Add(iconImg);
         }
 
-        Debug.Log($"[Refresh] Inventory slots found = {inventorySlots.Count}");
+        Debug.Log($"[Refresh] Inventory slots found = {inventorySlots.Count} | manager={name}");
     }
 
     public bool AddItemBackToInventory(Sprite itemSprite, InventoryItem.ItemType newType, GameObject itemPrefab, WeaponData data, int level)
@@ -127,7 +153,6 @@ public class InventoryGridManager : MonoBehaviour
 
             if (isEmpty)
             {
-                // để tìm script kể cả khi object đang tắt
                 InventoryItem item = slotImage.GetComponentInParent<InventoryItem>(true);
 
                 if (item != null)
@@ -138,7 +163,6 @@ public class InventoryGridManager : MonoBehaviour
                     slotImage.sprite = itemSprite;
                     slotImage.enabled = true;
 
-                    // Nếu object cha đang tắt thì bật nó lên 
                     if (!item.gameObject.activeSelf) item.gameObject.SetActive(true);
 
                     return true;
@@ -146,7 +170,7 @@ public class InventoryGridManager : MonoBehaviour
             }
         }
 
-        Debug.LogWarning($"[Inventory] Túi đầy! Không thể thêm: {data.name}");
+        Debug.LogWarning($"[Inventory] Túi đầy! Không thể thêm: {data.name} | manager={name}");
         return false;
     }
 
@@ -159,9 +183,6 @@ public class InventoryGridManager : MonoBehaviour
         string cleanTarget = targetIconName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
 
         Debug.Log($"🔍 [DEBUG] Đang đi tìm: '{targetIconName}' (Clean: {cleanTarget})");
-        Debug.Log("📋 --- DANH SÁCH ĐỒ THỰC TẾ TRONG TÚI ---");
-
-        bool foundAny = false;
 
         foreach (Image slot in inventorySlots)
         {
@@ -172,27 +193,21 @@ public class InventoryGridManager : MonoBehaviour
             string itemSpriteName = item.GetItemSprite().name;
             string cleanItem = itemSpriteName.ToLower().Replace(" ", "").Replace("_", "").Replace("-", "");
 
-
-            Debug.Log($"   + Slot {slot.name} đang chứa: '{itemSpriteName}' (Clean: {cleanItem})");
-
-            // So sánh
             bool isMatch = (cleanItem == cleanTarget);
 
             if (isMatch)
             {
-                if (item.GetUpgradeLevel() == newLevel ||
-                    item.GetUpgradeLevel() == oldLevel ||
-                    item.GetUpgradeLevel() == 0)
-                {
-                    if (item.GetUpgradeLevel() != newLevel) item.SetUpgradeLevel(newLevel);
-                    item.SetItem(item.GetItemSprite(), item.itemType, null, targetData);
+                if (item.GetUpgradeLevel() != newLevel)
                     item.SetUpgradeLevel(newLevel);
-                    Debug.Log($"✅ [SYNC SUCCESS] Update: {itemSpriteName} -> Lv{newLevel}");
-                    foundAny = true;
-                }
+
+                item.SetItem(item.GetItemSprite(), item.itemType, null, targetData);
+                item.SetUpgradeLevel(newLevel);
+
+                Debug.Log($"✅ [SYNC SUCCESS] Update: {itemSpriteName} -> Lv{newLevel}");
             }
         }
     }
+
     public void SaveInventoryState()
     {
         RefreshInventorySlots();
@@ -205,7 +220,9 @@ public class InventoryGridManager : MonoBehaviour
 
             var item = slotImg.GetComponentInParent<InventoryItem>(true);
             if (item == null) continue;
+
             if (inventoryRoot != null && !item.transform.IsChildOf(inventoryRoot)) continue;
+
             var data = item.GetCurrentData();
             if (data == null) continue;
 
@@ -226,5 +243,16 @@ public class InventoryGridManager : MonoBehaviour
         GlobalInventorySave.AddRange(temp);
 
         Debug.Log($"✅ [Inventory] Saved {GlobalInventorySave.Count} items");
+    }
+
+    // ✅ SHOP sẽ gọi hàm này
+    public bool AddItemFromShop(WeaponData data, int level)
+    {
+        if (data == null || data.icon == null) return false;
+
+        bool ok = AddItemBackToInventory(data.icon, data.itemType, data.prefab, data, Mathf.Max(1, level));
+        if (ok) SaveInventoryState(); // đồng bộ qua scene (GlobalInventorySave)
+
+        return ok;
     }
 }

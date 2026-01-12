@@ -289,6 +289,7 @@ public class GameManager : MonoBehaviour
     public void LoadPotions()
     {
         if (!hasSavedPotions) return;
+
         if (PotionManager.Instance == null)
         {
             Debug.LogWarning("[GM] LoadPotions: PotionManager.Instance NULL");
