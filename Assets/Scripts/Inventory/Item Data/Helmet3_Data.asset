@@ -15,7 +15,7 @@ MonoBehaviour:
   id: helmet3
   displayName: helmet3
   itemType: 1
-  icon: {fileID: 21300000, guid: ce16e334823e4ff4081331417ee9c527, type: 3}
+  icon: {fileID: 21300000, guid: aeb41a6610d728d4cbf4c0dc4b53d81e, type: 3}
   prefab: {fileID: 89677201938818292, guid: 05f2c7a3e4aac3b4782a673f3cfac557, type: 3}
   animationID: 0
   localPos: {x: 0, y: 0, z: 0}
@@ -41,3 +41,7 @@ MonoBehaviour:
   bonusDEF: 50
   bonusMaxHP: 100
   bonusEnergy: 0
+  description: 
+  upgradePercentPerLevel: 5
+  price: 1111
+  buyOnce: 1

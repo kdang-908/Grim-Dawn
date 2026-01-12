@@ -41,3 +41,7 @@ MonoBehaviour:
   bonusDEF: 0
   bonusMaxHP: 0
   bonusEnergy: 0
+  description: 
+  upgradePercentPerLevel: 5
+  price: 3421
+  buyOnce: 1

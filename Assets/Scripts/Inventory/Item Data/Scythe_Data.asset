@@ -15,7 +15,7 @@ MonoBehaviour:
   id: scythe
   displayName: scythe
   itemType: 0
-  icon: {fileID: 21300000, guid: 92503f1c14d725b45801630c1f879f39, type: 3}
+  icon: {fileID: 21300000, guid: 0643ad3c966fc94498e8431570c32795, type: 3}
   prefab: {fileID: 3162010275010185711, guid: 6bf6628d88005be4c8e7c295cea5d12d, type: 3}
   animationID: 1
   localPos: {x: 0.03, y: 1.59, z: 0.055}
@@ -43,3 +43,5 @@ MonoBehaviour:
   bonusEnergy: 20
   description: 
   upgradePercentPerLevel: 5
+  price: 2222
+  buyOnce: 1

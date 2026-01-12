@@ -49,6 +49,10 @@ public class WeaponData : ScriptableObject
     [Tooltip("Mỗi cấp tăng thêm bao nhiêu % so với stat gốc (0.05 = 5%)")]
     public float upgradePercentPerLevel = 5f;
 
+    [Header("Shop")]
+    public int price = 999;     // giá của món (set từng món trong Inspector)
+    public bool buyOnce = true; // mặc định chỉ mua 1 lần
+
     // ========== HÀM TÍNH STAT THEO LEVEL ==========
     float GetMultiplier(int level)
     {
