@@ -57,15 +57,15 @@ public class InventoryUI : MonoBehaviour
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
         {
-            Debug.LogError("[InventoryUI] Player not found (tag Player).");
+            //Debug.LogError("[InventoryUI] Player not found (tag Player).");
             yield break;
         }
 
         var preview = FindFirstObjectByType<UICharacterPreview>();
         if (preview != null)
             preview.BindFromPlayer(player);
-        else
-            Debug.LogError("[InventoryUI] UICharacterPreview not found in scene!");
+        else;
+            //Debug.LogError("[InventoryUI] UICharacterPreview not found in scene!");
     }
 
 

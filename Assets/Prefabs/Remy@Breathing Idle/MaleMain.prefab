@@ -3235,10 +3235,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Niche
   level: 1
-  _maxHP: 1000
-  _atk: 200
-  _def: 20
-  _energy: 60
+  isPlayer: 1
+  maxHP: 1000
+  atk: 120
+  def: 75
+  energy: 60
   maxHP_Total: 0
   atk_Total: 0
   def_Total: 0

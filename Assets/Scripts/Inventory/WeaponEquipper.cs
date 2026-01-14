@@ -17,7 +17,7 @@ public class WeaponEquipper : MonoBehaviour
     {
         if (data == null || data.prefab == null)
         {
-            Debug.LogWarning("[WeaponEquipper] Equip: data or prefab NULL");
+            //Debug.LogWarning("[WeaponEquipper] Equip: data or prefab NULL");
             return;
         }
 
@@ -26,7 +26,7 @@ public class WeaponEquipper : MonoBehaviour
 
         if (socketR == null)
         {
-            Debug.LogError("[WeaponEquipper] socketR NULL (runtime). Check WeaponSocket_R exists in spawned player.");
+            //Debug.LogError("[WeaponEquipper] socketR NULL (runtime). Check WeaponSocket_R exists in spawned player.");
             return;
         }
 
@@ -61,7 +61,7 @@ public class WeaponEquipper : MonoBehaviour
         if (layer != -1)
             SetLayerRecursively(currentWeapon, layer);
 
-        Debug.Log($"[WeaponEquipper] Equipped '{currentWeapon.name}' under '{parent.name}' | localPos={data.localPos} localEuler={data.localEuler}");
+       
     }
 
     public void Unequip()
@@ -75,25 +75,19 @@ public class WeaponEquipper : MonoBehaviour
 
     private void LateBindSocketFromRuntime()
     {
-        // already runtime transform => OK
         if (socketR != null && socketR.gameObject.scene.IsValid())
             return;
 
-        // Find socket in THIS character hierarchy (include inactive)
         var all = GetComponentsInChildren<Transform>(true);
         foreach (var t in all)
         {
-            // robust match: ignore trailing spaces, allow "WeaponSocket_R " etc.
             var n = t.name.Trim();
             if (n == "WeaponSocket_R")
             {
                 socketR = t;
-                Debug.Log("[WeaponEquipper] Rebind socket OK: " + GetPath(socketR));
                 return;
             }
         }
-
-        Debug.LogError("[WeaponEquipper] Không tìm thấy WeaponSocket_R trong runtime player này!");
     }
 
     private static Transform FindChildContains(Transform root, string contains)

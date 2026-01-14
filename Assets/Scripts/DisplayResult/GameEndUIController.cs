@@ -68,13 +68,13 @@ public class GameEndUIController : MonoBehaviour
 
         if (stats == null)
         {
-            Debug.LogError("[GameEndUI] Player không có CharacterStats!");
+            //Debug.LogError("[GameEndUI] Player không có CharacterStats!");
             yield break;
         }
 
         // Hook death event
         stats.onDeath.AddListener(OnPlayerDeath);
-        Debug.Log("[GameEndUI] Đã hook OnDeath");
+        //Debug.Log("[GameEndUI] Đã hook OnDeath");
     }
 
     // ===================== FADE TRANSITION =====================
@@ -146,7 +146,7 @@ public class GameEndUIController : MonoBehaviour
     // ===================== End Game =====================
     public void ShowEndGame()
     {
-        Debug.Log("[GameEndUI] GAME COMPLETED - SHOW THE END");     
+        //Debug.Log("[GameEndUI] GAME COMPLETED - SHOW THE END");     
         gameObject.SetActive(true);
 
         if (victoryScreen != null) victoryScreen.SetActive(false);
@@ -176,7 +176,7 @@ public class GameEndUIController : MonoBehaviour
     /// </summary>
     public void NextMap()
     {
-        Debug.Log("[GameEndUI] Next Map (Button)");
+        //Debug.Log("[GameEndUI] Next Map (Button)");
 
         string current = SceneManager.GetActiveScene().name;
 
@@ -196,12 +196,12 @@ public class GameEndUIController : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning("[GameEndUI] Không tìm thấy CharacterStats để Save");
+                    //Debug.LogWarning("[GameEndUI] Không tìm thấy CharacterStats để Save");
                 }
             }
             else
             {
-                Debug.LogWarning("[GameEndUI] Không tìm thấy Player (tag Player) để Save");
+                //Debug.LogWarning("[GameEndUI] Không tìm thấy Player (tag Player) để Save");
             }
 
             // ✅ Save potions
@@ -249,17 +249,17 @@ public class GameEndUIController : MonoBehaviour
         if (current == nextSceneName)
             targetScene = nextSceneName2;
 
-        Debug.Log($"[GameEndUI] LoadScene => {targetScene}");
+        //Debug.Log($"[GameEndUI] LoadScene => {targetScene}");
         SceneManager.LoadScene(targetScene);
 
-        Debug.Log($"[DEBUG] Saved Inventory Count = {InventoryGridManager.GlobalInventorySave.Count}");
-        Debug.Log($"[DEBUG] HasEquippedSave = {EquipmentManager.HasEquippedSave}");
+        //Debug.Log($"[DEBUG] Saved Inventory Count = {InventoryGridManager.GlobalInventorySave.Count}");
+        //Debug.Log($"[DEBUG] HasEquippedSave = {EquipmentManager.HasEquippedSave}");
     }
 
     // ===================== CONTINUE (ẩn UI, không đổi scene) =====================
     public void ContinueGame()
     {
-        Debug.Log("[GameEndUI] Continue Game");
+        //Debug.Log("[GameEndUI] Continue Game");
 
         if (victoryScreen != null) victoryScreen.SetActive(false);
         if (deathScreen != null) deathScreen.SetActive(false);
@@ -273,7 +273,7 @@ public class GameEndUIController : MonoBehaviour
     // ===================== RETRY =====================
     public void Retry()
     {
-        Debug.Log("[GameEndUI] Retry");
+        //Debug.Log("[GameEndUI] Retry");
 
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;

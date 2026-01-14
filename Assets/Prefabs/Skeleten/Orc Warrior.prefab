@@ -1188,9 +1188,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Orc
   level: 7
-  maxHP: 500
-  atk: 170
-  def: 30
+  isPlayer: 0
+  maxHP: 700
+  atk: 200
+  def: 40
   energy: 60
   maxHP_Total: 0
   atk_Total: 0

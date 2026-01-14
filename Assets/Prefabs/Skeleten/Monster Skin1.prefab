@@ -5871,9 +5871,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Monster
   level: 10
-  maxHP: 800
-  atk: 200
-  def: 40
+  isPlayer: 0
+  maxHP: 1000
+  atk: 240
+  def: 60
   energy: 60
   maxHP_Total: 0
   atk_Total: 0

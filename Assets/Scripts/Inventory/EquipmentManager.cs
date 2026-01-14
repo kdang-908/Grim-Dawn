@@ -20,7 +20,7 @@ public class EquipmentManager : MonoBehaviour
     public Vector3 helmetScaleRuntime = new Vector3(0.23f, 0.2f, 0.22f);
     public Vector3 helmetScaleUI = new Vector3(0.254415f, 0.18957f, 0.21072f);
 
-    private InventoryGridManager gridManager; // Quản lý túi đồ để trả lại vật phẩm khi tháo
+    private InventoryGridManager gridManager;
 
     [Header("Lưu trữ đồ đang mặc")]
     public WeaponData currentWeapon;
@@ -40,18 +40,18 @@ public class EquipmentManager : MonoBehaviour
     private GameObject currentHelmetObj_Runtime;
 
     [Header("3D Weapon Equip (runtime player + preview)")]
-    public WeaponEquipper playerWeaponEquipper;   // runtime PlayerRuntime
-    public WeaponEquipper previewWeaponEquipper;  // Preview_Player (UI)
+    public WeaponEquipper playerWeaponEquipper;
+    public WeaponEquipper previewWeaponEquipper;
 
     [Header("Preview")]
-    public Transform previewRoot;                 // UI_PreviewRoot
+    public Transform previewRoot;
     public string previewLayerName = "UIPreview";
 
     [Header("Animator weapon type")]
     [Tooltip("Giá trị WeaponType khi KHÔNG cầm vũ khí")]
-    public int unarmedWeaponType = 0;            // <<< THÊM DÒNG NÀY
+    public int unarmedWeaponType = 0;
 
-    public bool isFemale = false; // Biến xác định giới tính 
+    public bool isFemale = false;
 
     [System.Serializable]
     public class WeaponIconMap
@@ -73,6 +73,7 @@ public class EquipmentManager : MonoBehaviour
         public Sprite icon;
         public WeaponData data;
     }
+
     [System.Serializable]
     public class EquippedSaveData
     {
@@ -108,10 +109,9 @@ public class EquipmentManager : MonoBehaviour
     void Start()
     {
         gridManager = FindFirstObjectByType<InventoryGridManager>();
-        isFemale = GenderSelector.SelectedIsFemale; // Lấy giới tính từ hệ thống chọn nhân vật
-        Debug.Log($"[EquipmentManager] Khởi tạo với giới tính: {(isFemale ? "NỮ" : "NAM")}");
+        isFemale = GenderSelector.SelectedIsFemale;
+        //Debug.Log($"[EquipmentManager] Khởi tạo với giới tính: {(isFemale ? "NỮ" : "NAM")}");
 
-        // Tự động tìm gốc nhân vật UI nếu chưa kéo vào
         if (previewRoot == null)
         {
             var go = GameObject.Find("UI_PreviewRoot");
@@ -120,52 +120,91 @@ public class EquipmentManager : MonoBehaviour
 
         AutoBindRemoveButtons();
         UpdateButtons();
-        // Restore equip sau khi scene mới load xong UI
+
         StartCoroutine(RestoreEquippedNextFrame());
     }
+
     private IEnumerator RestoreEquippedNextFrame()
     {
-        yield return null; // đợi 1 frame cho UI slot bind xong
-        //RestoreEquippedState();
+        yield return null;
+        // Nếu sau này bạn có RestoreEquippedState() thì gọi ở đây
     }
+
     void UpdateButtons()
     {
-        // Chỉ hiện nút tháo đồ (X) khi ô đó đang có đồ (enabled và có sprite)
         if (btnRemoveHead != null) btnRemoveHead.SetActive(slotHead && slotHead.enabled && slotHead.sprite);
         if (btnRemoveChest != null) btnRemoveChest.SetActive(slotChest && slotChest.enabled && slotChest.sprite);
         if (btnRemoveLegs != null) btnRemoveLegs.SetActive(slotLegs && slotLegs.enabled && slotLegs.sprite);
         if (btnRemoveWeapon != null) btnRemoveWeapon.SetActive(slotWeapon && slotWeapon.enabled && slotWeapon.sprite);
     }
 
-    // ===================== EQUIP UI =====================
+    // Hàm này dùng cho EnhancementPanel để biết item đang được mặc hay không
+    // Check theo reference trước (nhanh và chuẩn), nếu không khớp thì check theo name (phòng trường hợp bị khác instance)
+    public bool IsEquipped(WeaponData data)
+    {
+        if (data == null) return false;
+
+        if (currentWeapon == data) return true;
+        if (currentHelmet == data) return true;
+        if (currentChest == data) return true;
+
+        if (currentWeapon != null && currentWeapon.name == data.name) return true;
+        if (currentHelmet != null && currentHelmet.name == data.name) return true;
+        if (currentChest != null && currentChest.name == data.name) return true;
+
+        return false;
+    }
+
+    // Nếu EnhancementPanel chỉ có sprite (trường hợp data null), có thể gọi hàm này
+    public bool IsEquippedByIcon(Sprite icon)
+    {
+        if (icon == null) return false;
+
+        var w = FindWeaponDataByIcon(icon);
+        if (w != null && IsEquipped(w)) return true;
+
+        var h = FindHelmetDataByIcon(icon);
+        if (h != null && IsEquipped(h)) return true;
+
+        var c = FindChestDataByIcon(icon);
+        if (c != null && IsEquipped(c)) return true;
+
+        // fallback theo sprite name so với slot đang mặc
+        if (slotWeapon != null && slotWeapon.sprite != null && slotWeapon.sprite.name == icon.name) return true;
+        if (slotHead != null && slotHead.sprite != null && slotHead.sprite.name == icon.name) return true;
+        if (slotChest != null && slotChest.sprite != null && slotChest.sprite.name == icon.name) return true;
+
+        return false;
+    }
+
     public Sprite EquipItem(InventoryItem.ItemType type,
-                            Sprite newItemSprite,
-                            GameObject prefab3D,
-                            int upgradeLevel,
-                            out WeaponData oldData,
-                            out int oldLevel)
+                        Sprite newItemSprite,
+                        GameObject prefab3D,
+                        int upgradeLevel,
+                        out WeaponData oldData,
+                        out int oldLevel)
+
     {
         oldData = null;
         oldLevel = 1;
+
         if (newItemSprite == null || newItemSprite.name == "Icon" || newItemSprite.name == "EmptySlot")
         {
-            Debug.Log("[EquipItem] Click vào ô trống, bỏ qua xử lý.");
+            //Debug.Log("[EquipItem] Click vào ô trống, bỏ qua xử lý.");
             return null;
         }
 
         Image targetSlot = GetTargetSlot(type);
         if (targetSlot == null) return null;
-        // Lưu lại hình ảnh món đồ cũ để trả về túi đồ
+
         Sprite oldSprite = (targetSlot.enabled && targetSlot.sprite != null) ? targetSlot.sprite : null;
 
-        // 2. QUAN TRỌNG: Lưu lại DATA cũ trước khi bị ghi đè!
         if (oldSprite != null)
         {
             if (type == InventoryItem.ItemType.Weapon)
             {
                 oldData = currentWeapon;
                 oldLevel = weaponUpgradeLevel;
-                // [CƠ CHẾ AN TOÀN] Nếu currentWeapon bị null (do mặc sẵn từ scene), hãy tìm lại trong database
                 if (oldData == null) oldData = FindWeaponDataByIcon(oldSprite);
             }
             else if (type == InventoryItem.ItemType.Head)
@@ -181,36 +220,35 @@ public class EquipmentManager : MonoBehaviour
                 if (oldData == null) oldData = FindChestDataByIcon(oldSprite);
             }
         }
+
         targetSlot.sprite = newItemSprite;
         targetSlot.enabled = true;
 
         EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
 
-        Debug.Log($"[EquipItem] type={type} icon={newItemSprite.name}, lv={upgradeLevel}");
+        //Debug.Log($"[EquipItem] type={type} icon={newItemSprite.name}, lv={upgradeLevel}");
 
         WeaponData wd = null;
         WeaponData hd = null;
         WeaponData cd = null;
 
-        // VŨ KHÍ
         if (type == InventoryItem.ItemType.Weapon)
         {
             wd = FindWeaponDataByIcon(newItemSprite);
             if (wd != null)
             {
-                currentWeapon = wd; // Gán dữ liệu để Stats đọc
+                currentWeapon = wd;
                 currentWeaponData = wd;
                 weaponUpgradeLevel = Mathf.Max(1, upgradeLevel);
 
-                EquipWeapon3D(wd); // Hiện model 3D
-                if (uiSlot != null) uiSlot.Setup(wd, weaponUpgradeLevel);// Cập nhật Tooltip Data
+                EquipWeapon3D(wd);
+                if (uiSlot != null) uiSlot.Setup(wd, weaponUpgradeLevel);
             }
             else
             {
-                Debug.LogError($"[EquipItem] Không map được icon '{newItemSprite.name}' -> WeaponData.");
+                //Debug.LogError($"[EquipItem] Không map được icon '{newItemSprite.name}' -> WeaponData.");
             }
         }
-        // NÓN
         else if (type == InventoryItem.ItemType.Head)
         {
             hd = FindHelmetDataByIcon(newItemSprite);
@@ -224,10 +262,9 @@ public class EquipmentManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"[EquipItem] Không tìm thấy HelmetData trong helmetMaps cho {newItemSprite.name}.");
+                //Debug.LogWarning($"[EquipItem] Không tìm thấy HelmetData trong helmetMaps cho {newItemSprite.name}.");
             }
         }
-        // GIÁP
         else if (type == InventoryItem.ItemType.Chest)
         {
             cd = FindChestDataByIcon(newItemSprite);
@@ -244,11 +281,11 @@ public class EquipmentManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[EquipItem] Không tìm thấy ChestData cho {newItemSprite.name} trong chestMaps.");
+                //Debug.LogError($"[EquipItem] Không tìm thấy ChestData cho {newItemSprite.name} trong chestMaps.");
             }
         }
 
-        // Cập nhật Stats
+        // Update stats (giữ HP hiện tại)
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) player = GameObject.Find("PlayerRuntime");
 
@@ -258,15 +295,17 @@ public class EquipmentManager : MonoBehaviour
             if (stats != null)
             {
                 stats.UpdateFinalStats(keepCurrentHP: true);
-                Debug.Log("[EquipmentManager] Đã cập nhật Stats cho Player thành công!");
+                //Debug.Log("[EquipmentManager] Đã cập nhật Stats cho Player thành công!");
             }
         }
 
+        // Quan trọng: lưu trạng thái đang mặc, để EnhancementPanel check chính xác
+        SaveEquippedState();
+
         UpdateButtons();
-        return oldSprite; // Trả về món đồ cũ để túi đồ xử lý tiếp
+        return oldSprite;
     }
 
-    // Cho EnhancementPanel/ngoài dùng
     public WeaponData FindHelmetDataByIcon(Sprite icon)
     {
         if (icon == null || helmetMaps == null) return null;
@@ -292,8 +331,6 @@ public class EquipmentManager : MonoBehaviour
         return null;
     }
 
-
-    // Các hàm này dùng để tra cứu từ Icon ra Data
     public WeaponData FindChestDataByIcon(Sprite icon)
     {
         if (icon == null || chestMaps == null) return null;
@@ -313,6 +350,7 @@ public class EquipmentManager : MonoBehaviour
 
         WeaponData dataToReturn = null;
         int levelToReturn = 1;
+
         if (type == InventoryItem.ItemType.Weapon)
         {
             dataToReturn = currentWeapon;
@@ -328,15 +366,15 @@ public class EquipmentManager : MonoBehaviour
             dataToReturn = currentChest;
             levelToReturn = chestUpgradeLevel;
         }
-        // Trả món đồ về túi đồ, nếu thành công thì xóa trên người
+
         if (gridManager != null && gridManager.AddItemBackToInventory(targetSlot.sprite, type, null, dataToReturn, levelToReturn))
         {
             targetSlot.sprite = null;
             targetSlot.enabled = false;
-            // Xóa dữ liệu tooltip khỏi ô trang bị
+
             EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
             if (uiSlot != null) uiSlot.Clear();
-            // Xóa model 3D tương ứng
+
             if (type == InventoryItem.ItemType.Weapon)
                 UnequipWeapon3D();
 
@@ -352,7 +390,6 @@ public class EquipmentManager : MonoBehaviour
                 if (currentChestObj_Runtime != null) Destroy(currentChestObj_Runtime);
             }
 
-            // reset data + level
             if (type == InventoryItem.ItemType.Weapon)
             {
                 currentWeapon = null;
@@ -378,9 +415,12 @@ public class EquipmentManager : MonoBehaviour
                 if (stats != null)
                 {
                     stats.UpdateFinalStats(keepCurrentHP: true);
-                    Debug.Log("[EquipmentManager] Đã cập nhật Stats cho Player thành công (Unequip)!");
+                    //Debug.Log("[EquipmentManager] Đã cập nhật Stats cho Player thành công (Unequip)!");
                 }
             }
+
+            // Sau khi tháo cũng phải lưu lại state, để EnhancementPanel biết món này giờ đã không còn mặc
+            SaveEquippedState();
 
             UpdateButtons();
         }
@@ -401,10 +441,7 @@ public class EquipmentManager : MonoBehaviour
     public void BindPreviewNow()
     {
         var go = GameObject.Find("UI_PreviewRoot");
-        if (go != null)
-        {
-            previewRoot = go.transform;
-        }
+        if (go != null) previewRoot = go.transform;
 
         if (previewRoot == null) return;
 
@@ -462,6 +499,7 @@ public class EquipmentManager : MonoBehaviour
     public void EquipWeapon3D(WeaponData weaponData)
     {
         if (weaponData == null) return;
+
         if (playerWeaponEquipper == null)
         {
             var player = GameObject.FindWithTag("Player");
@@ -485,16 +523,10 @@ public class EquipmentManager : MonoBehaviour
 
     public void UnequipWeapon3D()
     {
-
         if (playerWeaponEquipper != null)
         {
             var anim = playerWeaponEquipper.GetComponentInChildren<Animator>(true);
-            if (anim != null)
-            {
-                // reset về trạng thái đánh tay không
-                anim.SetInteger("WeaponType", unarmedWeaponType);
-            }
-
+            if (anim != null) anim.SetInteger("WeaponType", unarmedWeaponType);
             playerWeaponEquipper.Unequip();
         }
 
@@ -508,7 +540,6 @@ public class EquipmentManager : MonoBehaviour
     {
         if (currentHelmetObj_UI != null) Destroy(currentHelmetObj_UI);
         if (currentHelmetObj_Runtime != null) Destroy(currentHelmetObj_Runtime);
-
         if (hd == null || hd.prefab == null) return;
 
         if (previewRoot == null) BindPreviewNow();
@@ -517,11 +548,9 @@ public class EquipmentManager : MonoBehaviour
         if (previewHeadBone != null)
         {
             currentHelmetObj_UI = Instantiate(hd.prefab, previewHeadBone);
-
             currentHelmetObj_UI.transform.localPosition = isFemale ? hd.femaleHeadPos : hd.headPos;
             currentHelmetObj_UI.transform.localRotation = Quaternion.Euler(isFemale ? hd.femaleHeadEuler : hd.headEuler);
             currentHelmetObj_UI.transform.localScale = isFemale ? hd.femaleHeadScaleUI : hd.headScaleUI;
-
             SetLayerRecursively(currentHelmetObj_UI, previewHeadBone.gameObject.layer);
         }
 
@@ -529,11 +558,9 @@ public class EquipmentManager : MonoBehaviour
         if (runtimeHeadBone != null)
         {
             currentHelmetObj_Runtime = Instantiate(hd.prefab, runtimeHeadBone);
-
             currentHelmetObj_Runtime.transform.localPosition = isFemale ? hd.femaleHeadPos : hd.headPos;
             currentHelmetObj_Runtime.transform.localRotation = Quaternion.Euler(isFemale ? hd.femaleHeadEuler : hd.headEuler);
             currentHelmetObj_Runtime.transform.localScale = isFemale ? hd.femaleHeadScaleRuntime : hd.headScaleRuntime;
-
             SetLayerRecursively(currentHelmetObj_Runtime, 0);
         }
     }
@@ -549,22 +576,18 @@ public class EquipmentManager : MonoBehaviour
         if (previewChestBone != null)
         {
             currentChestObj_UI = Instantiate(cd.prefab, previewChestBone);
-
             currentChestObj_UI.transform.localPosition = isFemale ? cd.femaleChestPos : cd.chestPos;
             currentChestObj_UI.transform.localRotation = Quaternion.Euler(isFemale ? cd.femaleChestEuler : cd.chestEuler);
             currentChestObj_UI.transform.localScale = isFemale ? cd.femaleChestScaleUI : cd.chestScaleUI;
-
             SetLayerRecursively(currentChestObj_UI, previewChestBone.gameObject.layer);
         }
 
         if (runtimeChestBone != null)
         {
             currentChestObj_Runtime = Instantiate(cd.prefab, runtimeChestBone);
-
             currentChestObj_Runtime.transform.localPosition = isFemale ? cd.femaleChestPos : cd.chestPos;
             currentChestObj_Runtime.transform.localRotation = Quaternion.Euler(isFemale ? cd.femaleChestEuler : cd.chestEuler);
             currentChestObj_Runtime.transform.localScale = isFemale ? cd.femaleChestScaleRuntime : cd.chestScaleRuntime;
-
             SetLayerRecursively(currentChestObj_Runtime, 0);
         }
     }
@@ -592,19 +615,13 @@ public class EquipmentManager : MonoBehaviour
     void FindChestBones()
     {
         if (previewChestBone == null && previewRoot != null)
-        {
             previewChestBone = FindBestSpineBone(previewRoot);
-        }
 
         if (runtimeChestBone == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player == null) player = GameObject.Find("PlayerRuntime");
-
-            if (player != null)
-            {
-                runtimeChestBone = FindBestSpineBone(player.transform);
-            }
+            if (player != null) runtimeChestBone = FindBestSpineBone(player.transform);
         }
     }
 
@@ -616,9 +633,7 @@ public class EquipmentManager : MonoBehaviour
         foreach (var t in allChildren)
         {
             if (t.name.Contains("Spine2")) return t;
-
             if (t.name.Contains("Spine1")) bestBone = t;
-
             if (bestBone == null && t.name.EndsWith("Spine")) bestBone = t;
         }
         return bestBone;
@@ -641,22 +656,19 @@ public class EquipmentManager : MonoBehaviour
         b.onClick.AddListener(() => UnequipItem(type));
     }
 
-    // Hàm đệ quy để đổi Layer cho Object (Dùng cho Preview Camera)
     void SetLayerRecursively(GameObject obj, int newLayer)
     {
         if (obj == null) return;
         obj.layer = newLayer;
         foreach (Transform child in obj.transform)
-        {
             SetLayerRecursively(child.gameObject, newLayer);
-        }
     }
+
     public void RefreshEquippedItem(InventoryItem.ItemType type, int newLevel)
     {
         EquipmentSlotUI uiSlot = null;
         WeaponData targetData = null;
 
-        // 1. Cập nhật biến Level và xác định Data
         if (type == InventoryItem.ItemType.Weapon && currentWeapon != null)
         {
             weaponUpgradeLevel = newLevel;
@@ -676,20 +688,12 @@ public class EquipmentManager : MonoBehaviour
             if (slotChest != null) uiSlot = slotChest.GetComponent<EquipmentSlotUI>();
         }
 
-        // 2. Cập nhật UI Slot (để lần sau di chuột vào nó hiện đúng)
         if (uiSlot != null && targetData != null)
-        {
             uiSlot.Setup(targetData, newLevel);
-        }
 
-        // ÉP TOOLTIP VẼ LẠI NGAY LẬP TỨC (NẾU ĐANG HIỆN)
         if (InventoryTooltip.Instance != null && InventoryTooltip.Instance.gameObject.activeSelf)
-        {
-            // Chỉ refresh nếu chuột đang trỏ đúng vào ô đồ vừa đập
             InventoryTooltip.Instance.ShowTooltip(targetData, newLevel);
-        }
 
-        // 3. Tính lại chỉ số nhân vật
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) player = GameObject.Find("PlayerRuntime");
 
@@ -699,10 +703,15 @@ public class EquipmentManager : MonoBehaviour
             if (stats != null)
             {
                 stats.UpdateFinalStats(keepCurrentHP: true);
-                Debug.Log($"[Refresh] Đã cập nhật Stats: {type} lên Lv {newLevel}");
+                //Debug.Log($"[Refresh] Đã cập nhật Stats: {type} lên Lv {newLevel}");
             }
         }
+
+        // Nếu sau này bạn cho phép nâng cấp khi đang mặc thì save lại.
+        // Nhưng theo yêu cầu mới của bạn: sẽ chặn nâng cấp khi đang mặc, nên đoạn này chỉ để an toàn.
+        SaveEquippedState();
     }
+
     public void SaveEquippedState()
     {
         GlobalEquippedSave.weapon = currentWeapon;
@@ -716,9 +725,9 @@ public class EquipmentManager : MonoBehaviour
 
         HasEquippedSave = (currentWeapon != null || currentHelmet != null || currentChest != null);
 
-        Debug.Log($"✅ [EquipSave] weapon={(currentWeapon ? currentWeapon.name : "null")} lv={weaponUpgradeLevel} | " +
-                  $"helmet={(currentHelmet ? currentHelmet.name : "null")} lv={helmetUpgradeLevel} | " +
-                  $"chest={(currentChest ? currentChest.name : "null")} lv={chestUpgradeLevel}");
+        //Debug.Log($"✅ [EquipSave] weapon={(currentWeapon ? currentWeapon.name : "null")} lv={weaponUpgradeLevel} | " +
+        //          $"helmet={(currentHelmet ? currentHelmet.name : "null")} lv={helmetUpgradeLevel} | " +
+        //          $"chest={(currentChest ? currentChest.name : "null")} lv={chestUpgradeLevel}");
     }
 
     public void UnequipAllToInventory()
@@ -726,7 +735,6 @@ public class EquipmentManager : MonoBehaviour
         if (gridManager == null)
             gridManager = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
 
-        // ⚠️ CHỈ unequip khi slot đang thực sự có đồ
         if (currentWeapon != null && slotWeapon != null && slotWeapon.sprite != null)
             UnequipItem(InventoryItem.ItemType.Weapon);
 
@@ -736,6 +744,6 @@ public class EquipmentManager : MonoBehaviour
         if (currentChest != null && slotChest != null && slotChest.sprite != null)
             UnequipItem(InventoryItem.ItemType.Chest);
 
-        Debug.Log("✅ [EquipmentManager] UnequipAllToInventory done (SAFE).");
+        //Debug.Log("✅ [EquipmentManager] UnequipAllToInventory done (SAFE).");
     }
 }

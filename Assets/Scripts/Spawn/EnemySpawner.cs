@@ -32,7 +32,7 @@ public class EnemySpawner : MonoBehaviour
         {
             activated = true;
             finishedSpawning = false;    // mới kích hoạt, chuẩn bị spawn
-            Debug.Log("Spawner ACTIVATED — Player đã kích hoạt vùng spawn");
+            //Debug.Log("Spawner ACTIVATED — Player đã kích hoạt vùng spawn");
 
             StartCoroutine(SpawnRoutine());
         }
@@ -50,14 +50,14 @@ public class EnemySpawner : MonoBehaviour
         }
 
         finishedSpawning = true; // 🔥 báo cho EnemyLeftChecker là đã spawn xong
-        Debug.Log("Spawner hoàn thành, đã spawn đủ quái");
+        //Debug.Log("Spawner hoàn thành, đã spawn đủ quái");
     }
 
     void SpawnEnemy()
     {
         if (enemyPrefab == null)
         {
-            Debug.LogWarning("[EnemySpawner] Chưa gán enemyPrefab!");
+            //Debug.LogWarning("[EnemySpawner] Chưa gán enemyPrefab!");
             return;
         }
 
@@ -68,6 +68,6 @@ public class EnemySpawner : MonoBehaviour
 
         Instantiate(enemyPrefab, pos, Quaternion.identity);
 
-        Debug.Log($"Spawn Skeleton #{spawnedEnemies + 1} tại {pos}");
+        //Debug.Log($"Spawn Skeleton #{spawnedEnemies + 1} tại {pos}");
     }
 }

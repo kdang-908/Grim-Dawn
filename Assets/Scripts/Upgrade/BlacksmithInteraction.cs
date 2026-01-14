@@ -23,7 +23,7 @@ public class BlacksmithInteraction : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[BlacksmithInteraction] Không tìm thấy Player với tag 'Player'");
+            //Debug.LogWarning("[BlacksmithInteraction] Không tìm thấy Player với tag 'Player'");
         }
 
         // lúc đầu tắt Forge UI

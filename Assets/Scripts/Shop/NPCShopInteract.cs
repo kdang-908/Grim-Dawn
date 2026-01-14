@@ -83,3 +83,4 @@ public class NPCShopInteract : MonoBehaviour
         if (isOpen) ToggleShop();
     }
 }
+    

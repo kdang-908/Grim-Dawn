@@ -28,7 +28,7 @@ public class PlayerExperience : MonoBehaviour
             stats = GetComponent<CharacterStats>();
 
         if (stats == null)
-            Debug.LogError("[PlayerExperience] Không tìm thấy CharacterStats trên Player!");
+            //Debug.LogError("[PlayerExperience] Không tìm thấy CharacterStats trên Player!");
 
         // nếu chưa gán AudioSource thì thử tự tìm trên player
         if (audioSource == null)
@@ -43,7 +43,7 @@ public class PlayerExperience : MonoBehaviour
         if (amount <= 0) return;
 
         currentExp += amount;
-        Debug.Log($"[EXP] +{amount} exp. Tổng: {currentExp}/{expToNextLevel}");
+        //Debug.Log($"[EXP] +{amount} exp. Tổng: {currentExp}/{expToNextLevel}");
 
         while (currentExp >= expToNextLevel)
         {
@@ -56,7 +56,7 @@ public class PlayerExperience : MonoBehaviour
     {
         stats.level++;
 
-        Debug.Log($"[LEVEL UP] Level mới: {stats.level}");
+        //Debug.Log($"[LEVEL UP] Level mới: {stats.level}");
 
         // +20% chỉ số
         stats.maxHP = Mathf.RoundToInt(stats.maxHP * 1.2f);
@@ -68,14 +68,14 @@ public class PlayerExperience : MonoBehaviour
         stats.UpdateFinalStats();
         
 
-        Debug.Log(
-            $"[STATS UP] HP={stats.maxHP}, ATK={stats.atk}, DEF={stats.def}, ENERGY={stats.energy}"
-        );
+        //Debug.Log(
+        //    $"[STATS UP] HP={stats.maxHP}, ATK={stats.atk}, DEF={stats.def}, ENERGY={stats.energy}"
+        //);
 
         // tăng EXP cần cho level tiếp theo (+20%)
         expToNextLevel = Mathf.RoundToInt(expToNextLevel * 1.2f);
 
-        Debug.Log($"[EXP] Level {stats.level} → cần {expToNextLevel} exp cho cấp tiếp theo");
+        //Debug.Log($"[EXP] Level {stats.level} → cần {expToNextLevel} exp cho cấp tiếp theo");
 
         // 🔥 GỌI HIỆU ỨNG & ÂM THANH LEVEL UP
         PlayLevelUpEffects();
@@ -90,7 +90,7 @@ public class PlayerExperience : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[PlayerExperience] Chưa gán AudioSource hoặc LevelUpClip!");
+            //Debug.LogWarning("[PlayerExperience] Chưa gán AudioSource hoặc LevelUpClip!");
         }
 
         // ✨ VFX
@@ -106,7 +106,7 @@ public class PlayerExperience : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[PlayerExperience] Chưa gán LevelUpVfxPrefab!");
+            //Debug.LogWarning("[PlayerExperience] Chưa gán LevelUpVfxPrefab!");
         }
     }
 }

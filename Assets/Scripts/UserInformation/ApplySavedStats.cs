@@ -8,7 +8,7 @@ public class ApplySavedStats : MonoBehaviour
         // GameManager đã tự apply trong ApplyAfterSceneLoaded()
         yield return null;
 
-        if (GameManager.Instance != null)
-            Debug.Log("[ApplySavedStats] Skip (handled by GameManager.ApplyAfterSceneLoaded)");
+        if (GameManager.Instance != null) ;
+            //Debug.Log("[ApplySavedStats] Skip (handled by GameManager.ApplyAfterSceneLoaded)");
     }
 }

@@ -36,7 +36,7 @@ public class DamageHitbox : MonoBehaviour
         int damage = Mathf.Max(1, owner.atk - target.def);
         target.TakeDamage(damage);
 
-        Debug.Log($"{owner.characterName} hit {target.characterName} for {damage}");
+        //Debug.Log($"{owner.characterName} hit {target.characterName} for {damage}");
 
         // Đảm bảo mỗi lần vung kiếm chỉ gây 1 hit
         canHit = false;

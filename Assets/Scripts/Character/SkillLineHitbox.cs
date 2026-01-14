@@ -40,7 +40,7 @@ public class SkillLineHitbox : MonoBehaviour
 
         if (owner == null)
         {
-            Debug.LogWarning("[SkillLineHitbox] Owner null");
+            //Debug.LogWarning("[SkillLineHitbox] Owner null");
             return;
         }
 
@@ -84,7 +84,7 @@ public class SkillLineHitbox : MonoBehaviour
     {
         if (vfxPrefab == null)
         {
-            Debug.LogWarning("[SkillLineHitbox] vfxPrefab is null");
+            //Debug.LogWarning("[SkillLineHitbox] vfxPrefab is null");
             return;
         }
 
@@ -99,7 +99,7 @@ public class SkillLineHitbox : MonoBehaviour
         Quaternion spawnRot =Quaternion.LookRotation(forward) *Quaternion.Euler(vfxRotationOffsetEuler);
 
         GameObject vfx = Instantiate(vfxPrefab, spawnPos, spawnRot);
-        Debug.Log("[SkillLineHitbox] Spawn VFX at " + spawnPos);
+        //Debug.Log("[SkillLineHitbox] Spawn VFX at " + spawnPos);
 
         // Nếu prefab có Projectile (của MaykerStudio) -> dùng Fire() theo đúng demo
         Projectile proj = vfx.GetComponent<Projectile>();

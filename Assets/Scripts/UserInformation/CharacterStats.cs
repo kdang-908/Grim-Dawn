@@ -7,6 +7,10 @@ public class CharacterStats : MonoBehaviour
     public string characterName = "N";
     public int level = 1;
 
+    [Header("Role (IMPORTANT)")]
+    [Tooltip("Bật true cho Player. Enemy/Skeleton để false để không ăn bonus từ EquipmentManager.")]
+    public bool isPlayer = false;
+
     [Header("Base Combat Stats (LEVEL UP CHỈ TĂNG Ở ĐÂY)")]
     public int maxHP = 1000;
     public int atk = 120;
@@ -62,13 +66,16 @@ public class CharacterStats : MonoBehaviour
         maxHP_Total = maxHP;
         energy_Total = energy;
 
-        // equipment
-        EquipmentManager em = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
-        if (em != null)
+        // ✅ equipment: CHỈ PLAYER mới được cộng bonus từ EquipmentManager
+        if (isPlayer)
         {
-            if (em.currentWeapon != null) AddBonus(em.currentWeapon, em.weaponUpgradeLevel);
-            if (em.currentHelmet != null) AddBonus(em.currentHelmet, em.helmetUpgradeLevel);
-            if (em.currentChest != null) AddBonus(em.currentChest, em.chestUpgradeLevel);
+            EquipmentManager em = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+            if (em != null)
+            {
+                if (em.currentWeapon != null) AddBonus(em.currentWeapon, em.weaponUpgradeLevel);
+                if (em.currentHelmet != null) AddBonus(em.currentHelmet, em.helmetUpgradeLevel);
+                if (em.currentChest != null) AddBonus(em.currentChest, em.chestUpgradeLevel);
+            }
         }
 
         // giữ máu
@@ -88,7 +95,6 @@ public class CharacterStats : MonoBehaviour
 
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
     }
-
 
     private void AddBonus(WeaponData data, int level)
     {
@@ -110,7 +116,7 @@ public class CharacterStats : MonoBehaviour
         int before = currentHP;
         currentHP -= dmg;
 
-        Debug.Log($"[{characterName}] TakeDamage {dmg} | HP: {before} -> {currentHP}");
+        //Debug.Log($"[{characterName}] TakeDamage {dmg} | HP: {before} -> {currentHP}");
 
         if (currentHP <= 0)
         {
@@ -126,9 +132,11 @@ public class CharacterStats : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        Debug.Log("[CharacterStats] Player chết");
+        //Debug.Log($"[CharacterStats] {characterName} chết");
 
+        // Nếu player có sound chết thì phát, enemy không có cũng không sao
         if (deathSound != null) deathSound.PlayDeathSound();
+
         onDeath?.Invoke();
     }
 

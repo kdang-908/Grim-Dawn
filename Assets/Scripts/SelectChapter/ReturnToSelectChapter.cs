@@ -56,7 +56,7 @@ public class ReturnToSelectChapter : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        Debug.Log("[SelectChapter] OPEN");
+        //Debug.Log("[SelectChapter] OPEN");
     }
 
     IEnumerator CloseRoutine()
@@ -73,6 +73,6 @@ public class ReturnToSelectChapter : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        Debug.Log("[SelectChapter] CLOSE");
+        //Debug.Log("[SelectChapter] CLOSE");
     }
 }

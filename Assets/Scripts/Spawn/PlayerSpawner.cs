@@ -36,7 +36,7 @@ public class PlayerSpawner : MonoBehaviour
     {
         if (playerSpawn == null)
         {
-            Debug.LogError("[PlayerSpawner] playerSpawn NULL!");
+            //Debug.LogError("[PlayerSpawner] playerSpawn NULL!");
             return;
         }
 
@@ -59,7 +59,7 @@ public class PlayerSpawner : MonoBehaviour
 
             if (exist == null)
             {
-                Debug.LogWarning("[PlayerSpawner] Found players but main player is NULL after cleanup.");
+                //Debug.LogWarning("[PlayerSpawner] Found players but main player is NULL after cleanup.");
                 return;
             }
 
@@ -77,7 +77,7 @@ public class PlayerSpawner : MonoBehaviour
         GameObject prefab = GetSelectedPrefab();
         if (prefab == null)
         {
-            Debug.LogError("[PlayerSpawner] Selected prefab NULL. Check GameManager/gameplayPrefabs.");
+            //Debug.LogError("[PlayerSpawner] Selected prefab NULL. Check GameManager/gameplayPrefabs.");
             return;
         }
 
@@ -124,7 +124,7 @@ public class PlayerSpawner : MonoBehaviour
 
                 if (okCam && okArrow)
                 {
-                    Debug.Log("[PlayerSpawner] Minimap bind OK -> " + player.name);
+                    //Debug.Log("[PlayerSpawner] Minimap bind OK -> " + player.name);
                     yield break;
                 }
             }
@@ -132,7 +132,7 @@ public class PlayerSpawner : MonoBehaviour
             yield return new WaitForSeconds(bindTryInterval);
         }
 
-        Debug.LogWarning("[PlayerSpawner] Minimap bind FAILED (timeout). Check MinimapBinder exists & enabled in scene.");
+        //Debug.LogWarning("[PlayerSpawner] Minimap bind FAILED (timeout). Check MinimapBinder exists & enabled in scene.");
     }
 
     // ===== Helpers =====
@@ -164,7 +164,7 @@ public class PlayerSpawner : MonoBehaviour
         {
             if (go != null && go != keep)
             {
-                Debug.LogWarning("[PlayerSpawner] Duplicate player -> Destroy: " + go.name);
+                //Debug.LogWarning("[PlayerSpawner] Duplicate player -> Destroy: " + go.name);
                 Destroy(go);
             }
         }
@@ -192,14 +192,14 @@ public class PlayerSpawner : MonoBehaviour
         var potion = FindObjectOfType<PotionManager>(true);
         if (potion == null)
         {
-            Debug.LogWarning("[PlayerSpawner] PotionManager not found in scene.");
+            //Debug.LogWarning("[PlayerSpawner] PotionManager not found in scene.");
             return;
         }
 
         var stats = playerObj.GetComponent<CharacterStats>();
         if (stats == null)
         {
-            Debug.LogWarning("[PlayerSpawner] CharacterStats not found on player.");
+            //Debug.LogWarning("[PlayerSpawner] CharacterStats not found on player.");
             return;
         }
 

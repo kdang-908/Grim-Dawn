@@ -137,7 +137,7 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         if (itemImage == null || !itemImage.enabled || itemImage.sprite == null ||
             itemImage.sprite.name == "Icon" || itemImage.sprite.name == "EmptySlot")
         {
-            Debug.Log("Đây là ô trống, không gửi lệnh trang bị.");
+            //Debug.Log("Đây là ô trống, không gửi lệnh trang bị.");
             return;
         }
 
@@ -145,7 +145,7 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
             EnhancementPanel.Instance != null &&
             EnhancementPanel.Instance.IsOpen();
 
-        Debug.Log($"[InventoryItem] Click on {name} | enhanceMode={enhanceMode}");
+        //Debug.Log($"[InventoryItem] Click on {name} | enhanceMode={enhanceMode}");
 
         // 🔸 1) Đang ở màn NÂNG CẤP → đưa item sang ô dấu +
         if (enhanceMode)
@@ -178,13 +178,13 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
                 // Nếu có đầy đủ dữ liệu -> Hoán đổi hoàn hảo
                 this.SetItem(returnedSprite, itemType, returnedData.prefab, returnedData);
                 this.SetUpgradeLevel(returnedLevel); // Gán lại level cũ cho món đồ vừa về
-                Debug.Log($"Đã hoán đổi: {returnedData.displayName} về vị trí cũ với Lv {returnedLevel}.");
+                //Debug.Log($"Đã hoán đổi: {returnedData.displayName} về vị trí cũ với Lv {returnedLevel}.");
             }
             else
             {
                 this.SetItem(returnedSprite, itemType, myPrefab, null);
                 this.SetUpgradeLevel(returnedLevel);
-                Debug.LogWarning("Hoán đổi item: Có hình ảnh trả về nhưng không tìm thấy Data.");
+                //Debug.LogWarning("Hoán đổi item: Có hình ảnh trả về nhưng không tìm thấy Data.");
             }
         }
         else

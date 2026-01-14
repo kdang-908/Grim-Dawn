@@ -10,7 +10,7 @@ public class EnhanceInventoryToggle : MonoBehaviour
     {
         if (inventoryPanel == null)
         {
-            Debug.LogWarning("[EnhanceInventoryToggle] Chưa gán Inventory Panel");
+            //Debug.LogWarning("[EnhanceInventoryToggle] Chưa gán Inventory Panel");
             return;
         }
 

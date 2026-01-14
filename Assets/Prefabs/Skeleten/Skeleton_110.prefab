@@ -671,9 +671,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Skeleton
   level: 5
-  maxHP: 300
+  isPlayer: 0
+  maxHP: 500
   atk: 100
-  def: 10
+  def: 20
   energy: 10
   maxHP_Total: 0
   atk_Total: 0

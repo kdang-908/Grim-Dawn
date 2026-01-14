@@ -46,7 +46,7 @@ public class PlayerSpawnFX : MonoBehaviour
 
         if (audioSource != null)
             audioSource.PlayOneShot(spawnSFX);
-        else
-            Debug.LogWarning("[PlayerSpawnFX] Không tìm thấy AudioSource để phát SFX");
+        else;
+            //Debug.LogWarning("[PlayerSpawnFX] Không tìm thấy AudioSource để phát SFX");
     }
 }

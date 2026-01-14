@@ -62,16 +62,16 @@ public class PlayerHPHUD : MonoBehaviour
             if (stats != null)
             {
                 shownFill = stats.HPPercent;
-                Debug.Log($"[PlayerHPHUD] Tìm thấy player: {player.name}, HP: {stats.currentHP}/{stats.maxHP}");
+                //Debug.Log($"[PlayerHPHUD] Tìm thấy player: {player.name}, HP: {stats.currentHP}/{stats.maxHP}");
             }
             else
             {
-                Debug.LogWarning("[PlayerHPHUD] Player không có CharacterStats!");
+                //Debug.LogWarning("[PlayerHPHUD] Player không có CharacterStats!");
             }
         }
         else
         {
-            Debug.LogWarning("[PlayerHPHUD] Không tìm thấy player tag 'Player'!");
+            //Debug.LogWarning("[PlayerHPHUD] Không tìm thấy player tag 'Player'!");
         }
     }
 }

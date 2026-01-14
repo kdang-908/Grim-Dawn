@@ -14,7 +14,6 @@ public class SelectCardUI : MonoBehaviour
 
     public void SelectMap(int mapIndex)
     {
-        // ✅ SAVE trước khi đổi scene
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player != null && GameManager.Instance != null)
         {
@@ -23,9 +22,6 @@ public class SelectCardUI : MonoBehaviour
 
             GameManager.Instance.SavePotions();
 
-            // Nếu bạn có EquipmentManager thì gọi SaveEquipment ở đây
-            // var eq = player.GetComponentInChildren<EquipmentManager>(true);
-            // if (eq != null) eq.SaveEquipmentToGM();
         }
 
         PlayerPrefs.SetInt("SelectedMap", mapIndex);

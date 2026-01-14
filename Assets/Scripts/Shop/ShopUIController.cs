@@ -145,7 +145,7 @@ public class ShopUIController : MonoBehaviour
     {
         if (shopSlots == null || shopSlots.Count == 0)
         {
-            Debug.LogWarning("[Shop] Không tìm thấy ShopSlotUI trong slotsRoot.");
+            //Debug.LogWarning("[Shop] Không tìm thấy ShopSlotUI trong slotsRoot.");
             return;
         }
 
@@ -209,14 +209,14 @@ public class ShopUIController : MonoBehaviour
 
         if (inventory == null)
         {
-            Debug.LogError("[Shop] inventory NULL. Kéo ItemsParent (Inventory thật) vào ShopUIController.Inventory!");
+            //Debug.LogError("[Shop] inventory NULL. Kéo ItemsParent (Inventory thật) vào ShopUIController.Inventory!");
             return;
         }
 
         var gm = GameManager.Instance;
         if (gm == null)
         {
-            Debug.LogError("[Shop] GameManager.Instance NULL.");
+            //Debug.LogError("[Shop] GameManager.Instance NULL.");
             return;
         }
 
@@ -224,7 +224,7 @@ public class ShopUIController : MonoBehaviour
 
         if (!gm.SpendGold(price))
         {
-            Debug.LogWarning($"[Shop] Không đủ vàng. Price={price}, Gold={gm.gold}");
+            //Debug.LogWarning($"[Shop] Không đủ vàng. Price={price}, Gold={gm.gold}");
             RefreshGoldUI();
             return;
         }
@@ -234,7 +234,7 @@ public class ShopUIController : MonoBehaviour
         if (!ok)
         {
             gm.AddGold(price);
-            Debug.LogWarning("[Shop] Túi đầy -> hoàn tiền.");
+            //Debug.LogWarning("[Shop] Túi đầy -> hoàn tiền.");
             RefreshGoldUI();
             return;
         }
@@ -253,7 +253,7 @@ public class ShopUIController : MonoBehaviour
         foreach (var s in shopSlots)
             if (s != null) s.RefreshSoldState();
 
-        Debug.Log($"[Shop] Mua thành công: {selected.displayName} (-{price} gold)");
+        //Debug.Log($"[Shop] Mua thành công: {selected.displayName} (-{price} gold)");
         UpdatePreview(selected);
         RefreshGoldUI();
     }
@@ -264,6 +264,38 @@ public class ShopUIController : MonoBehaviour
         int currentGold = (gm != null) ? gm.gold : 0;
         if (txtGold != null) txtGold.text = currentGold.ToString();
     }
+    public bool IsOwned(WeaponData data)
+    {
+        if (data == null) return false;
+
+        var list = InventoryGridManager.GlobalInventorySave;
+        if (list == null) return false;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            var s = list[i];
+            if (s == null || s.data == null) continue;
+
+            if (s.data == data) return true;
+
+            // buyOnce thì cho fallback theo name
+            if (data.buyOnce && !string.IsNullOrEmpty(s.data.name) && s.data.name == data.name)
+                return true;
+        }
+        return false;
+    }
+    void OnEnable()
+{
+    RefreshAllShopSlots();
+}
+
+public void RefreshAllShopSlots()
+{
+    var slots = GetComponentsInChildren<ShopSlotUI>(true);
+    foreach (var s in slots)
+        s.RefreshLockState();
+}
+
 
 #if UNITY_EDITOR
     [ContextMenu("SHOP/Auto Scan Items (Editor Only)")]

@@ -20,11 +20,11 @@ public class PotionPickup : MonoBehaviour
         if (PotionManager.Instance != null)
         {
             PotionManager.Instance.AddPotions(amount);
-            Debug.Log($"[PotionPickup] +{amount} potion | Total = {PotionManager.Instance}");
+            //Debug.Log($"[PotionPickup] +{amount} potion | Total = {PotionManager.Instance}");
         }
         else
         {
-            Debug.LogWarning("[PotionPickup] PotionManager not found!");
+            //Debug.LogWarning("[PotionPickup] PotionManager not found!");
         }
 
         Destroy(gameObject);

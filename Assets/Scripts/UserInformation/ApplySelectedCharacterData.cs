@@ -16,7 +16,7 @@ public class ApplySelectedCharacterData : MonoBehaviour
         if (stats == null) stats = GetComponentInChildren<CharacterStats>();
         if (stats == null)
         {
-            Debug.LogWarning("[ApplySelectedCharacterData] stats not found");
+            //Debug.LogWarning("[ApplySelectedCharacterData] stats not found");
             return;
         }
 
@@ -29,6 +29,6 @@ public class ApplySelectedCharacterData : MonoBehaviour
         int idx = PlayerPrefs.GetInt("SELECTED_CHAR", 0);
         // idx dùng cho spawn male/female (nếu bạn cần)
 
-        Debug.Log($"[ApplySelectedCharacterData] Applied name='{stats.characterName}', idx={idx}");
+        //Debug.Log($"[ApplySelectedCharacterData] Applied name='{stats.characterName}', idx={idx}");
     }
 }

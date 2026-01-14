@@ -66,4 +66,9 @@ public class ShopSlotUI : MonoBehaviour, IPointerClickHandler
 
         shop.Select(data);
     }
+    public void RefreshLockState()
+    {
+        RefreshSoldState();
+    }
+
 }

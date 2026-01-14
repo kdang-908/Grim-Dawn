@@ -63,7 +63,7 @@ public class UICharacterPreview : MonoBehaviour
         previewLayer = LayerMask.NameToLayer(previewLayerName);
         if (previewLayer < 0)
         {
-            Debug.LogError($"[UICharacterPreview] Layer '{previewLayerName}' not found");
+            //Debug.LogError($"[UICharacterPreview] Layer '{previewLayerName}' not found");
             enabled = false;
             return;
         }
@@ -86,7 +86,7 @@ public class UICharacterPreview : MonoBehaviour
     {
         if (player == null)
         {
-            Debug.LogError("[UICharacterPreview] BindFromPlayer: player NULL");
+            //Debug.LogError("[UICharacterPreview] BindFromPlayer: player NULL");
             return;
         }
 
@@ -108,7 +108,7 @@ public class UICharacterPreview : MonoBehaviour
         var cfg = GetConfigFor(player.name);
         ApplyConfig(cfg, player.name);
 
-        Debug.Log($"[UICharacterPreview] Bind OK -> player='{player.name}', cfg='{cfg.prefabKeyword}', scale={cfg.scale}, yaw={cfg.yaw}");
+        //Debug.Log($"[UICharacterPreview] Bind OK -> player='{player.name}', cfg='{cfg.prefabKeyword}', scale={cfg.scale}, yaw={cfg.yaw}");
     }
 
     private PreviewConfig GetConfigFor(string playerName)

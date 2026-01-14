@@ -50,7 +50,7 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
     // Gán item vào ô nâng cấp
     public void SetItem(InventoryItem item)
     {
-        Debug.Log($"[UpgradeSlot] SetItem from {item.name}");
+        //Debug.Log($"[UpgradeSlot] SetItem from {item.name}");
 
         originalItem = item;
 
@@ -64,13 +64,13 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
 
         if (iconImage == null)
         {
-            Debug.LogWarning("[UpgradeSlot] iconImage = NULL");
+            //Debug.LogWarning("[UpgradeSlot] iconImage = NULL");
             return;
         }
 
         if (sourceImg == null || sourceImg.sprite == null)
         {
-            Debug.LogWarning("[UpgradeSlot] sourceImg hoặc sprite NULL");
+            //Debug.LogWarning("[UpgradeSlot] sourceImg hoặc sprite NULL");
             iconImage.sprite = null;
             iconImage.enabled = false;
         }
@@ -90,7 +90,7 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
 
-            Debug.Log($"[UpgradeSlot] Copied sprite = {sourceImg.sprite.name}, rt={rt.rect}");
+            //Debug.Log($"[UpgradeSlot] Copied sprite = {sourceImg.sprite.name}, rt={rt.rect}");
         }
 
         // 4) Tắt dấu +
@@ -100,7 +100,7 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
     // Trả item về túi
     public void ClearSlot()
     {
-        Debug.Log("[UpgradeSlot] ClearSlot");
+        //Debug.Log("[UpgradeSlot] ClearSlot");
 
         if (originalItem != null)
         {
@@ -137,7 +137,7 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
         {
             bool newActive = !inventoryPanel.activeSelf;
             inventoryPanel.SetActive(newActive);
-            Debug.Log($"[UpgradeSlot] Toggle inventoryPanel -> {newActive}");
+            //Debug.Log($"[UpgradeSlot] Toggle inventoryPanel -> {newActive}");
         }
     }
 
@@ -147,7 +147,7 @@ public class UpgradeSlot : MonoBehaviour, IPointerClickHandler
 
         if (EnhancementPanel.Instance == null)
         {
-            Debug.LogWarning("[UpgradeSlot] EnhancementPanel.Instance NULL");
+            //Debug.LogWarning("[UpgradeSlot] EnhancementPanel.Instance NULL");
             return;
         }
 

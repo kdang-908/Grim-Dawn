@@ -17,12 +17,12 @@ public class SkillAnimRelay : MonoBehaviour
     {
         if (skill != null)
         {
-            Debug.Log("[SkillAnimRelay] OnSkillImpact -> DoSkillAttack");
+            //Debug.Log("[SkillAnimRelay] OnSkillImpact -> DoSkillAttack");
             skill.DoSkillAttack();
         }
         else
         {
-            Debug.LogWarning("[SkillAnimRelay] skill NULL, không gọi được DoSkillAttack");
+            //Debug.LogWarning("[SkillAnimRelay] skill NULL, không gọi được DoSkillAttack");
         }
     }
 
@@ -31,7 +31,7 @@ public class SkillAnimRelay : MonoBehaviour
     {
         if (skill != null)
         {
-            Debug.Log("[SkillAnimRelay] OnSkillEnd");
+            //Debug.Log("[SkillAnimRelay] OnSkillEnd");
             // hiện tại DoSkillAttack tự Destroy VFX rồi, không cần làm gì thêm
         }
     }

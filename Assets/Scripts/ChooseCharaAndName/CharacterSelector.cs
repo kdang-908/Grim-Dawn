@@ -42,26 +42,26 @@ public class CharacterSelector : MonoBehaviour
 
     void OnPlayClicked()
     {
-        Debug.Log("[CharacterSelector] Play clicked");
+        //Debug.Log("[CharacterSelector] Play clicked");
 
         // 1) Check chọn nhân vật
         if (selectedIndex < 0)
         {
-            Debug.LogWarning("[CharacterSelector] Bạn chưa chọn nhân vật.");
+            //Debug.LogWarning("[CharacterSelector] Bạn chưa chọn nhân vật.");
             return;
         }
 
         // 2) Check nhập tên
         if (nameInput == null)
         {
-            Debug.LogError("[CharacterSelector] nameInput chưa được kéo vào Inspector!");
+            //Debug.LogError("[CharacterSelector] nameInput chưa được kéo vào Inspector!");
             return;
         }
 
         string playerName = nameInput.text.Trim();
         if (string.IsNullOrEmpty(playerName) || playerName.Length < 2)
         {
-            Debug.LogWarning("[CharacterSelector] Tên phải có ít nhất 2 ký tự.");
+            //Debug.LogWarning("[CharacterSelector] Tên phải có ít nhất 2 ký tự.");
             return;
         }
 
@@ -73,13 +73,13 @@ public class CharacterSelector : MonoBehaviour
         // 4) Check GameManager
         if (GameManager.Instance == null)
         {
-            Debug.LogError("[CharacterSelector] GameManager.Instance NULL! Scene phải có 1 GameObject gắn GameManager và Awake() set Instance + DontDestroyOnLoad.");
+            //Debug.LogError("[CharacterSelector] GameManager.Instance NULL! Scene phải có 1 GameObject gắn GameManager và Awake() set Instance + DontDestroyOnLoad.");
             return;
         }
 
         // 5) Set data + Start
         GameManager.Instance.SetPlayerData(selectedIndex, playerName);
-        Debug.Log($"[CharacterSelector] Saved: selectedIndex={selectedIndex}, name='{playerName}'");
+        //Debug.Log($"[CharacterSelector] Saved: selectedIndex={selectedIndex}, name='{playerName}'");
 
         GameManager.Instance.StartGameplay();
     }

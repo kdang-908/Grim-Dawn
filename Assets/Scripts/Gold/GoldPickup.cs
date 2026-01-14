@@ -27,11 +27,11 @@ public class GoldPickup : MonoBehaviour
         {
             gm.AddGold(value);
 
-            Debug.Log($"[GoldPickup] Player picked gold = {value} | Total = {gm.gold}");
+            //Debug.Log($"[GoldPickup] Player picked gold = {value} | Total = {gm.gold}");
         }
         else
         {
-            Debug.LogWarning("[GoldPickup] GameManager not found, gold not added!");
+            //Debug.LogWarning("[GoldPickup] GameManager not found, gold not added!");
         }
 
         Destroy(gameObject); 

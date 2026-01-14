@@ -302,14 +302,14 @@ public class HumanController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[HumanController] skillHitbox NULL, không gọi được DoSkillAttack");
+            //Debug.LogWarning("[HumanController] skillHitbox NULL, không gọi được DoSkillAttack");
         }
     }
 
     // Gọi ở cuối clip skill (có thể để trống)
     public void OnSkillEnd()
     {
-        Debug.Log("[HumanController] OnSkillEnd()");
+        //Debug.Log("[HumanController] OnSkillEnd()");
         // Sau này nếu bạn có state isCastingSkill thì reset ở đây
     }
 

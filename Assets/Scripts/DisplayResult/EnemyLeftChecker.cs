@@ -16,7 +16,7 @@ public class EnemyLeftChecker : MonoBehaviour
 
         if (spawner == null)
         {
-            Debug.LogError("[EnemyLeftChecker] Không tìm thấy EnemySpawner!");
+            //Debug.LogError("[EnemyLeftChecker] Không tìm thấy EnemySpawner!");
             return;
         }
 
@@ -38,7 +38,7 @@ public class EnemyLeftChecker : MonoBehaviour
             if (enemies.Length == 0)
             {
                 victoryTriggered = true;
-                Debug.Log("== NO ENEMY LEFT + SPAWN FINISHED => VICTORY ==");
+                //Debug.Log("== NO ENEMY LEFT + SPAWN FINISHED => VICTORY ==");
 
                 TriggerVictoryUI();
             }
@@ -49,7 +49,7 @@ public class EnemyLeftChecker : MonoBehaviour
     {
         if (GameEndUIController.Instance == null)
         {
-            Debug.LogError("[EnemyLeftChecker] GameEndUIController.Instance = NULL");
+            //Debug.LogError("[EnemyLeftChecker] GameEndUIController.Instance = NULL");
             return;
         }
 
@@ -58,13 +58,13 @@ public class EnemyLeftChecker : MonoBehaviour
         //  MAP CUỐI → THE END (KHÔNG HIỆN VICTORY)
         if (currentScene == "SceneMap3")
         {
-            Debug.Log("[EnemyLeftChecker] Final Map cleared → SHOW THE END");
+            //Debug.Log("[EnemyLeftChecker] Final Map cleared → SHOW THE END");
             GameEndUIController.Instance.ShowEndGame();
         }
         else
         {
             // MAP THƯỜNG → VICTORY
-            Debug.Log("[EnemyLeftChecker] Map cleared → SHOW VICTORY");
+            //Debug.Log("[EnemyLeftChecker] Map cleared → SHOW VICTORY");
             GameEndUIController.Instance.ShowVictory();
         }
     }

@@ -709,6 +709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Niche
   level: 1
+  isPlayer: 1
   maxHP: 1000
   atk: 200
   def: 75

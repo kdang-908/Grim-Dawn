@@ -92,14 +92,14 @@ public class GameManager : MonoBehaviour
         var player = GameObject.FindGameObjectWithTag(playerTag);
         if (player == null)
         {
-            Debug.LogWarning("[GM] ApplyAfterSceneLoaded: Player not found");
+            //Debug.LogWarning("[GM] ApplyAfterSceneLoaded: Player not found");
             yield break;
         }
 
         var stats = player.GetComponent<CharacterStats>() ?? player.GetComponentInChildren<CharacterStats>(true);
         if (stats == null)
         {
-            Debug.LogWarning("[GM] ApplyAfterSceneLoaded: CharacterStats not found");
+            //Debug.LogWarning("[GM] ApplyAfterSceneLoaded: CharacterStats not found");
             yield break;
         }
 
@@ -116,14 +116,14 @@ public class GameManager : MonoBehaviour
 
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
 
-        Debug.Log($"[GM] Applied | Scene={SceneManager.GetActiveScene().name} | HP={stats.currentHP}/{stats.maxHP_Total} | LV={stats.level} | UnlockedMax={maxUnlockedMap}");
+        //Debug.Log($"[GM] Applied | Scene={SceneManager.GetActiveScene().name} | HP={stats.currentHP}/{stats.maxHP_Total} | LV={stats.level} | UnlockedMax={maxUnlockedMap}");
     }
 
     public void SetPlayerData(int index, string name)
     {
         selectedCharacter = index;
         playerName = name;
-        Debug.Log($"[GM] SetPlayerData selectedCharacter={selectedCharacter}, name={playerName}");
+        //Debug.Log($"[GM] SetPlayerData selectedCharacter={selectedCharacter}, name={playerName}");
     }
 
     public GameObject GetSelectedPrefab()
@@ -183,7 +183,7 @@ public class GameManager : MonoBehaviour
         var prefab = GetSelectedPrefab();
         if (prefab == null)
         {
-            Debug.LogError("[GM] Selected prefab NULL. Check gameplayPrefabs in Inspector.");
+            //Debug.LogError("[GM] Selected prefab NULL. Check gameplayPrefabs in Inspector.");
             yield break;
         }
 
@@ -235,22 +235,21 @@ public class GameManager : MonoBehaviour
     {
         if (stats == null)
         {
-            Debug.LogWarning("[GM] SavePlayer: stats == null");
+            //Debug.LogWarning("[GM] SavePlayer: stats == null");
             return;
         }
 
         playerData.level = stats.level;
-
         playerData.baseMaxHP = stats.maxHP;
         playerData.baseAtk = stats.atk;
         playerData.baseDef = stats.def;
         playerData.baseEnergy = stats.energy;
-
         playerData.currentHP = stats.currentHP;
+
 
         hasSavedData = true;
 
-        Debug.Log($"[GM] SavePlayer: LV {playerData.level} | BASE HP={playerData.baseMaxHP} | CurHP={playerData.currentHP}");
+        //Debug.Log($"[GM] SavePlayer: LV {playerData.level} | BASE HP={playerData.baseMaxHP} | CurHP={playerData.currentHP}");
     }
 
     // ✅ Nhẹ hơn SavePlayer: chỉ sync HP (fix H heal bị rollback khi load scene)
@@ -268,17 +267,14 @@ public class GameManager : MonoBehaviour
         if (!hasSavedData) return;
 
         stats.level = playerData.level;
-
         stats.maxHP = Mathf.Max(1, playerData.baseMaxHP);
         stats.atk = playerData.baseAtk;
         stats.def = playerData.baseDef;
         stats.energy = playerData.baseEnergy;
-
         stats.UpdateFinalStats(keepCurrentHP: true, keepHPPercent: true);
-
         stats.currentHP = Mathf.Clamp(playerData.currentHP, 1, stats.maxHP_Total);
 
-        Debug.Log($"[GM] LoadPlayer: LV {stats.level} | BASE HP={stats.maxHP} | TOTAL HP={stats.maxHP_Total} | CurHP={stats.currentHP}");
+        //Debug.Log($"[GM] LoadPlayer: LV {stats.level} | BASE HP={stats.maxHP} | TOTAL HP={stats.maxHP_Total} | CurHP={stats.currentHP}");
     }
 
     // POTIONS
@@ -286,14 +282,14 @@ public class GameManager : MonoBehaviour
     {
         if (PotionManager.Instance == null)
         {
-            Debug.LogWarning("[GM] SavePotions: PotionManager.Instance NULL");
+            //Debug.LogWarning("[GM] SavePotions: PotionManager.Instance NULL");
             return;
         }
 
         savedPotions = PotionManager.Instance.GetPotionCount();
         hasSavedPotions = true;
 
-        Debug.Log($"[GM] SavePotions = {savedPotions}");
+        //Debug.Log($"[GM] SavePotions = {savedPotions}");
     }
 
     public void LoadPotions()
@@ -302,12 +298,12 @@ public class GameManager : MonoBehaviour
 
         if (PotionManager.Instance == null)
         {
-            Debug.LogWarning("[GM] LoadPotions: PotionManager.Instance NULL");
+            //Debug.LogWarning("[GM] LoadPotions: PotionManager.Instance NULL");
             return;
         }
 
         PotionManager.Instance.SetPotionCount(savedPotions);
-        Debug.Log($"[GM] LoadPotions = {savedPotions}");
+        //Debug.Log($"[GM] LoadPotions = {savedPotions}");
     }
 
     // UNLOCK MAP
@@ -317,12 +313,12 @@ public class GameManager : MonoBehaviour
     {
         if (mapIndex <= maxUnlockedMap) return;
         maxUnlockedMap = mapIndex;
-        Debug.Log($"[GM] UnlockMap (runtime) -> maxUnlockedMap = {maxUnlockedMap}");
+        //Debug.Log($"[GM] UnlockMap (runtime) -> maxUnlockedMap = {maxUnlockedMap}");
     }
 
     public void ResetUnlock()
     {
         maxUnlockedMap = 0;
-        Debug.Log("[GM] ResetUnlock (runtime) -> only Map1 unlocked");
+        //Debug.Log("[GM] ResetUnlock (runtime) -> only Map1 unlocked");
     }
 }

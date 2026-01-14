@@ -28,7 +28,7 @@ public class MinimapArrowRotate : MonoBehaviour
             if (go != null)
             {
                 target = go.transform;
-                Debug.Log("[MinimapArrow] Auto bind -> " + go.name);
+                //Debug.Log("[MinimapArrow] Auto bind -> " + go.name);
                 yield break;
             }
             yield return null;

@@ -6,25 +6,19 @@ public class EnhancementPanel : MonoBehaviour
 {
     public static EnhancementPanel Instance;
 
-    // ===== SLOT NÂNG CẤP =====
     [Header("Slot nâng cấp")]
     public UpgradeSlot selectSlot;
 
-    // ===== TÚI ĐẬP ĐỒ (Inventory_Forge) =====
     [Header("Forge Inventory (Inventory_Forge)")]
-    [Tooltip("Kéo Canvas_Enhancement/Inventory_Forge vào đây. Túi này chỉ mở khi bấm nút Nâng cấp.")]
     public GameObject inventoryForgePanel;
 
-    // (Giữ lại nếu bạn còn cần đồng bộ level về túi chính)
     [Header("Sync về túi chính (nếu dùng)")]
     public InventoryGridManager mainInventoryManager;
 
-    // ===== LEVEL =====
     [Header("UI Level")]
     public TMP_Text txtLevelFrom;
     public TMP_Text txtLevelTo;
 
-    // ===== CHỈ SỐ TRƯỚC / SAU =====
     [Header("UI Stats (Trước / Sau)")]
     public TMP_Text txtAtkFrom;
     public TMP_Text txtAtkTo;
@@ -35,20 +29,17 @@ public class EnhancementPanel : MonoBehaviour
     public TMP_Text txtEnergyFrom;
     public TMP_Text txtEnergyTo;
 
-    // ===== DÒNG DƯỚI (GOLD, TỈ LỆ, NÚT) =====
     [Header("UI Bottom")]
     public TMP_Text txtSuccessRate;
     public TMP_Text txtCost;
     public Button btnEnhance;
 
-    // ====== ÂM THANH NÂNG CẤP ======
     [Header("Upgrade Sound")]
     public AudioSource audioSource;
     public AudioClip successClip;
     public AudioClip failClip;
     [Range(0f, 1f)] public float sfxVolume = 0.9f;
 
-    // ===== THAM CHIẾU EQUIPMENT MANAGER =====
     [Header("Refs")]
     public EquipmentManager equipmentManager;
 
@@ -57,21 +48,13 @@ public class EnhancementPanel : MonoBehaviour
         Instance = this;
     }
 
-    // ================= XỬ LÝ ẨN HIỆN UI  =================
     private void OnEnable()
     {
-        // ✅ Mở UI đập đồ thì ÉP túi đập đồ tắt trước
-        // (bấm F chỉ mở bảng nâng cấp, chưa mở túi chọn item)
         if (inventoryForgePanel != null)
             inventoryForgePanel.SetActive(false);
 
         RefreshUI();
     }
-
-    // ❌ KHÔNG OnDisable bật túi chính nữa (tránh tự mở inventory phía sau)
-    // private void OnDisable() { }
-
-    // ====================================================================
 
     public bool IsOpen() => gameObject.activeInHierarchy;
 
@@ -83,29 +66,24 @@ public class EnhancementPanel : MonoBehaviour
         if (equipmentManager == null)
             equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
-        // Nếu muốn chắc chắn túi forge tắt từ đầu (phòng trường hợp quên)
         if (inventoryForgePanel != null)
             inventoryForgePanel.SetActive(false);
 
         RefreshUI();
     }
 
-    // ================= NÚT "NÂNG CẤP" (MỞ TÚI ĐẬP ĐỒ) =================
-    // Gắn hàm này cho button "Nâng cấp" trong UI đập đồ
     public void OnClickOpenForgeInventory()
     {
         if (inventoryForgePanel != null)
             inventoryForgePanel.SetActive(true);
     }
 
-    // (Tuỳ chọn) Nút back/close để tắt túi đập đồ
     public void CloseForgeInventory()
     {
         if (inventoryForgePanel != null)
             inventoryForgePanel.SetActive(false);
     }
 
-    // ================= GOLD TỪ GAMEMANAGER =================
     int CurrentGold
     {
         get
@@ -127,50 +105,15 @@ public class EnhancementPanel : MonoBehaviour
         return true;
     }
 
-    // ================= NHẬN ITEM TỪ TÚI (DOUBLE CLICK) =================
-    public void TryInsert(InventoryItem item)
+    // Hàm nhỏ để hiện message ngay trong UI (dùng txtSuccessRate cho tiện, khỏi phải tạo Text mới)
+    void ShowMessage(string msg)
     {
-        if (selectSlot == null)
-        {
-            Debug.LogWarning("[EnhancementPanel] selectSlot NULL");
-            return;
-        }
-
-        if (!selectSlot.IsEmpty)
-        {
-            Debug.Log("[EnhancementPanel] Slot đã có item, bỏ qua");
-            return;
-        }
-
-        selectSlot.SetItem(item);
-        RefreshUI();
+        if (txtSuccessRate != null) txtSuccessRate.text = msg;
+        //Debug.Log("[EnhancementPanel] " + msg);
     }
 
-    // double click ô nâng cấp để trả item
-    public void ReturnItemFromSlot(UpgradeSlot slot)
-    {
-        slot.ClearSlot();
-        RefreshUI();
-    }
-
-    // ================= TỈ LỆ & COST =================
-    float GetSuccessRate(int currentLevel, int nextLevel)
-    {
-        if (currentLevel == 1 && nextLevel == 2) return 1.0f;
-        if (currentLevel == 2 && nextLevel == 3) return 0.75f;
-        if (currentLevel == 3 && nextLevel == 4) return 0.30f;
-        return 0f;
-    }
-
-    int GetCost(int currentLevel, int nextLevel)
-    {
-        if (currentLevel == 1 && nextLevel == 2) return 50;
-        if (currentLevel == 2 && nextLevel == 3) return 80;
-        if (currentLevel == 3 && nextLevel == 4) return 120;
-        return 0;
-    }
-
-    // ================= LẤY WEAPONDATA / ARMORDATA TỪ ICON =================
+    // Trả về WeaponData của item trong túi:
+    // ưu tiên lấy currentData (chuẩn nhất), nếu null thì map icon -> data từ EquipmentManager
     WeaponData GetDataForItem(InventoryItem item)
     {
         if (item != null && item.GetCurrentData() != null)
@@ -192,7 +135,70 @@ public class EnhancementPanel : MonoBehaviour
         return null;
     }
 
-    // ================= CẬP NHẬT STAT CỦA PLAYER SAU KHI ĐẬP =================
+    // Check “đang trang bị” theo data (và fallback icon) để chặn đập đồ
+    bool IsItemEquipped(InventoryItem item)
+    {
+        if (equipmentManager == null || item == null) return false;
+
+        WeaponData data = GetDataForItem(item);
+        if (data != null) return equipmentManager.IsEquipped(data);
+
+        // nếu data vẫn null thì fallback theo sprite icon
+        Sprite sp = item.GetItemSprite();
+        if (sp != null) return equipmentManager.IsEquippedByIcon(sp);
+
+        return false;
+    }
+
+    // Nhận item từ túi khi double click (InventoryItem gọi TryInsert)
+    public void TryInsert(InventoryItem item)
+    {
+        if (selectSlot == null)
+        {
+            //Debug.LogWarning("[EnhancementPanel] selectSlot NULL");
+            return;
+        }
+
+        if (!selectSlot.IsEmpty)
+        {
+            //Debug.Log("[EnhancementPanel] Slot đã có item, bỏ qua");
+            return;
+        }
+
+        // Chặn ngay từ lúc bỏ vào ô nâng cấp
+        if (IsItemEquipped(item))
+        {
+           
+            if (btnEnhance != null) btnEnhance.interactable = false;
+            return;
+        }
+
+        selectSlot.SetItem(item);
+        RefreshUI();
+    }
+
+    public void ReturnItemFromSlot(UpgradeSlot slot)
+    {
+        slot.ClearSlot();
+        RefreshUI();
+    }
+
+    float GetSuccessRate(int currentLevel, int nextLevel)
+    {
+        if (currentLevel == 1 && nextLevel == 2) return 1.0f;
+        if (currentLevel == 2 && nextLevel == 3) return 0.75f;
+        if (currentLevel == 3 && nextLevel == 4) return 0.30f;
+        return 0f;
+    }
+
+    int GetCost(int currentLevel, int nextLevel)
+    {
+        if (currentLevel == 1 && nextLevel == 2) return 50;
+        if (currentLevel == 2 && nextLevel == 3) return 80;
+        if (currentLevel == 3 && nextLevel == 4) return 120;
+        return 0;
+    }
+
     void UpdatePlayerStats()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -206,8 +212,6 @@ public class EnhancementPanel : MonoBehaviour
         }
     }
 
-    // ================= NÚT NÂNG CẤP THẬT (ĐẬP ITEM) =================
-    // Bạn gắn hàm này cho nút "Đập / Enhance" bên trong UI đập đồ
     public void OnClickEnhance()
     {
         if (selectSlot == null || selectSlot.IsEmpty) return;
@@ -215,7 +219,16 @@ public class EnhancementPanel : MonoBehaviour
         InventoryItem itemInBag = selectSlot.originalItem;
         if (itemInBag == null)
         {
-            Debug.LogError("LỖI: Không tìm thấy món đồ gốc trong túi!");
+            //Debug.LogError("LỖI: Không tìm thấy món đồ gốc trong túi!");
+            return;
+        }
+
+        // Chặn bất tử: dù có lách UI, bấm nút vẫn không nâng cấp nếu đang mặc
+        if (IsItemEquipped(itemInBag))
+        {
+            //ShowMessage("Item đang trang bị. Tháo ra mới nâng cấp!");
+            if (btnEnhance != null) btnEnhance.interactable = false;
+            PlayUpgradeSound(false);
             return;
         }
 
@@ -228,7 +241,7 @@ public class EnhancementPanel : MonoBehaviour
 
         if (!TrySpendGold(cost))
         {
-            Debug.Log("Không đủ vàng!");
+            ShowMessage("Không đủ vàng!");
             PlayUpgradeSound(false);
             RefreshUI();
             return;
@@ -240,6 +253,7 @@ public class EnhancementPanel : MonoBehaviour
         if (success)
         {
             PlayUpgradeSound(true);
+
             itemInBag.SetUpgradeLevel(nextLevel);
 
             if (mainInventoryManager != null)
@@ -254,6 +268,8 @@ public class EnhancementPanel : MonoBehaviour
             InventoryItem visualItem = selectSlot.GetComponentInChildren<InventoryItem>();
             if (visualItem != null) visualItem.SetUpgradeLevel(nextLevel);
 
+            // Theo yêu cầu mới: item đang mặc không được đập, nên đoạn refreshEquipped này về cơ bản sẽ không chạy.
+            // Nhưng để an toàn (lỡ có case data mismatch), vẫn giữ.
             if (equipmentManager != null && itemData != null)
             {
                 if (equipmentManager.currentWeapon == itemData) equipmentManager.RefreshEquippedItem(InventoryItem.ItemType.Weapon, nextLevel);
@@ -294,7 +310,6 @@ public class EnhancementPanel : MonoBehaviour
         audioSource.PlayOneShot(clip, sfxVolume);
     }
 
-    // ================= CẬP NHẬT UI THEO LEVEL & STAT =================
     public void RefreshUI()
     {
         if (btnEnhance != null) btnEnhance.interactable = false;
@@ -322,6 +337,18 @@ public class EnhancementPanel : MonoBehaviour
         }
 
         InventoryItem item = selectSlot.originalItem;
+
+        // Nếu item đang trang bị -> khóa luôn UI (đúng yêu cầu: tháo ra mới nâng cấp)
+        if (IsItemEquipped(item))
+        {
+            if (txtLevelFrom != null) txtLevelFrom.text = item.GetUpgradeLevel().ToString();
+            if (txtLevelTo != null) txtLevelTo.text = "-";
+            ClearStatsTexts();
+            ShowMessage("Item đang trang bị. Tháo ra mới nâng cấp!");
+            if (btnEnhance != null) btnEnhance.interactable = false;
+            return;
+        }
+
         int curLevel = item.GetUpgradeLevel();
 
         WeaponData data = GetDataForItem(item);

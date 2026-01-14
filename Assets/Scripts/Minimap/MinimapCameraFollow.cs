@@ -13,16 +13,17 @@ public class MinimapCameraFollow : MonoBehaviour
     public float height = 30f;
     public float followSpeed = 20f;
 
-    void OnEnable()
-    {
-        // Nếu chưa có target thì auto find
-        if (target == null) StartCoroutine(AutoFindPlayer());
-    }
+    
 
     // ✅ để Binder/Spawner gọi
     public void SetTarget(Transform t)
     {
         target = t;
+    }
+    void OnEnable()
+    {
+      
+        if (target == null) StartCoroutine(AutoFindPlayer());
     }
 
     IEnumerator AutoFindPlayer()
@@ -33,7 +34,7 @@ public class MinimapCameraFollow : MonoBehaviour
             if (go != null)
             {
                 target = go.transform;
-                Debug.Log("[MinimapCamera] Auto bind -> " + go.name);
+                //Debug.Log("[MinimapCamera] Auto bind -> " + go.name);
                 yield break;
             }
             yield return null;

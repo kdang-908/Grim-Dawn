@@ -8,12 +8,12 @@ public class GenderSelector : MonoBehaviour
     public void SelectMale()
     {
         SelectedIsFemale = false;
-        Debug.Log("[GenderSelector] Đã chọn: NAM");
+        //Debug.Log("[GenderSelector] Đã chọn: NAM");
     }
 
     public void SelectFemale()
     {
         SelectedIsFemale = true;
-        Debug.Log("[GenderSelector] Đã chọn: NỮ");
+        //Debug.Log("[GenderSelector] Đã chọn: NỮ");
     }
 }
