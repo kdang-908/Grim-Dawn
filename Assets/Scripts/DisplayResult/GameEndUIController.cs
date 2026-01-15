@@ -1,0 +1,285 @@
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
+
+public class GameEndUIController : MonoBehaviour
+{
+    public static GameEndUIController Instance;
+
+    [Header("UI")]
+    public GameObject deathScreen;
+    public GameObject victoryScreen;
+
+    [Header("Timing")]
+    [Tooltip("Delay trước khi hiện UI Death/Victory")]
+    public float showDelay = 1.5f;
+
+    [Tooltip("Giữ lại nếu sau này muốn auto load, hiện tại KHÔNG dùng")]
+    public float autoLoadDelay = 2f;
+
+    [Header("Scene Names")]
+    [Tooltip("Tên scene khi Retry (nếu muốn ép về 1 scene cụ thể)")]
+    public string retrySceneName = "Map";
+
+    [Tooltip("Map kế tiếp thứ 1 (sau Map hiện tại)")]
+    public string nextSceneName = "SceneMap2";
+
+    [Tooltip("Map kế tiếp thứ 2 (sau SceneMap2)")]
+    public string nextSceneName2 = "SceneMap3";
+
+    [Header("End Game")]
+    public GameObject endScreen;
+
+    [Header("End Game Audio")]
+    [SerializeField] private AudioSource endAudioSource;
+    [SerializeField] private AudioClip endMusic;
+
+    [Header("Transition")]
+    [SerializeField] private CanvasGroup screenFader;
+    [SerializeField] private float fadeDuration = 0.8f;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else { Destroy(gameObject); return; }
+
+        gameObject.SetActive(true);
+
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+    }
+
+    private void Start()
+    {
+        StartCoroutine(WaitForPlayerAndHook());
+    }
+
+    IEnumerator WaitForPlayerAndHook()
+    {
+        GameObject player = null;
+        while (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
+            yield return null;
+        }
+
+        CharacterStats stats = player.GetComponent<CharacterStats>()
+                               ?? player.GetComponentInChildren<CharacterStats>(true);
+
+        if (stats == null)
+        {
+            //Debug.LogError("[GameEndUI] Player không có CharacterStats!");
+            yield break;
+        }
+
+        // Hook death event
+        stats.onDeath.AddListener(OnPlayerDeath);
+        //Debug.Log("[GameEndUI] Đã hook OnDeath");
+    }
+
+    // ===================== FADE TRANSITION =====================
+    IEnumerator Fade(float from, float to)
+    {
+        float t = 0f;
+        screenFader.alpha = from;
+
+        while (t < fadeDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            screenFader.alpha = Mathf.Lerp(from, to, t / fadeDuration);
+            yield return null;
+        }
+
+        screenFader.alpha = to;
+    }
+
+    IEnumerator VictoryWithTransition()
+    {
+        // Đợi 1 nhịp cho cảm giác quái chết xong
+        yield return new WaitForSecondsRealtime(showDelay);
+
+        // Fade to black
+        yield return StartCoroutine(Fade(0f, 1f));
+
+        // Hiện Victory (sau màn đen)
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (victoryScreen != null) victoryScreen.SetActive(true);
+
+        // Fade out
+        yield return StartCoroutine(Fade(1f, 0f));
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Time.timeScale = 0f;
+    }
+
+    IEnumerator DeadWithTransition()
+    {
+        yield return new WaitForSecondsRealtime(showDelay);
+
+        yield return Fade(0f, 1f); // fade to black
+
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(true);
+
+        yield return Fade(1f, 0f); // fade out
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Time.timeScale = 0f;
+    }
+
+    // ===================== DEATH =====================
+    public void OnPlayerDeath()
+    {
+        StartCoroutine(DeadWithTransition());
+    }
+
+    // ===================== VICTORY =====================
+    public void ShowVictory()
+    {
+        StartCoroutine(VictoryWithTransition());
+    }
+
+    // ===================== End Game =====================
+    public void ShowEndGame()
+    {
+        //Debug.Log("[GameEndUI] GAME COMPLETED - SHOW THE END");     
+        gameObject.SetActive(true);
+
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(false);
+        if (endScreen != null) endScreen.SetActive(true);
+
+        // Unlock chuột
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Dừng game
+        Time.timeScale = 0f;
+
+        // Play end music
+        if (endAudioSource != null && endMusic != null)
+        {
+            endAudioSource.clip = endMusic;
+            endAudioSource.loop = false;
+            endAudioSource.Play();
+        }
+    }
+
+    /// <summary>
+    /// Gán hàm này cho nút "Next" / "Continue" ở màn hình Victory
+    /// - Nếu đang ở Map => qua SceneMap2 (và unlock Map2)
+    /// - Nếu đang ở SceneMap2 => qua SceneMap3 (và unlock Map3)
+    /// </summary>
+    public void NextMap()
+    {
+        //Debug.Log("[GameEndUI] Next Map (Button)");
+
+        string current = SceneManager.GetActiveScene().name;
+
+        var gm = GameManager.Instance;
+        if (gm != null)
+        {
+            // ✅ Save stats
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                var stats = player.GetComponent<CharacterStats>()
+                           ?? player.GetComponentInChildren<CharacterStats>(true);
+
+                if (stats != null)
+                {
+                    gm.SavePlayer(stats); // LV/HP/ATK/DEF
+                }
+                else
+                {
+                    //Debug.LogWarning("[GameEndUI] Không tìm thấy CharacterStats để Save");
+                }
+            }
+            else
+            {
+                //Debug.LogWarning("[GameEndUI] Không tìm thấy Player (tag Player) để Save");
+            }
+
+            // ✅ Save potions
+            gm.SavePotions();
+
+            // ✅ Save inventory + equip levels (include inactive objects)
+            // 1) Unequip hết về túi (giữ level)
+            var eq = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+            if (eq != null) eq.UnequipAllToInventory();
+
+            // 2) Save inventory
+            var inv = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
+            if (inv != null) inv.SaveInventoryState();
+
+            // 3) Không restore equip ở scene sau nữa
+            EquipmentManager.HasEquippedSave = false;
+
+            // ✅ UNLOCK theo scene hiện tại
+            // Quy ước của bạn: 0=Map1, 1=Map2, 2=Map3
+            if (current == retrySceneName || current == "Map")
+            {
+                // thắng Map1 -> mở Map2
+                gm.UnlockMap(1);
+            }
+            if (current == nextSceneName) // SceneMap2
+            {
+                // thắng Map2 -> mở Map3
+                gm.UnlockMap(2);
+            }
+            else if (current == nextSceneName2) // SceneMap3
+            {
+                // ✅ ĐÃ THẮNG MAP CUỐI
+                ShowEndGame();
+                return;
+            }
+        }
+
+        // Resume time + lock cursor trước khi chuyển scene
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // Chọn scene đích
+        string targetScene = nextSceneName;
+        if (current == nextSceneName)
+            targetScene = nextSceneName2;
+
+        //Debug.Log($"[GameEndUI] LoadScene => {targetScene}");
+        SceneManager.LoadScene(targetScene);
+
+        //Debug.Log($"[DEBUG] Saved Inventory Count = {InventoryGridManager.GlobalInventorySave.Count}");
+        //Debug.Log($"[DEBUG] HasEquippedSave = {EquipmentManager.HasEquippedSave}");
+    }
+
+    // ===================== CONTINUE (ẩn UI, không đổi scene) =====================
+    public void ContinueGame()
+    {
+        //Debug.Log("[GameEndUI] Continue Game");
+
+        if (victoryScreen != null) victoryScreen.SetActive(false);
+        if (deathScreen != null) deathScreen.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        Time.timeScale = 1f;
+    }
+
+    // ===================== RETRY =====================
+    public void Retry()
+    {
+        //Debug.Log("[GameEndUI] Retry");
+
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        string currentScene = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentScene);
+    }
+}

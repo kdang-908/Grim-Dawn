@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class EquipmentManager : MonoBehaviour
 {
@@ -15,16 +16,42 @@ public class EquipmentManager : MonoBehaviour
     public GameObject btnRemoveLegs;
     public GameObject btnRemoveWeapon;
 
+    [Header("Tùy chỉnh kích thước nón")]
+    public Vector3 helmetScaleRuntime = new Vector3(0.23f, 0.2f, 0.22f);
+    public Vector3 helmetScaleUI = new Vector3(0.254415f, 0.18957f, 0.21072f);
+
     private InventoryGridManager gridManager;
 
-    [Header("3D Weapon Equip (ngoài map + preview)")]
-    public WeaponEquipper playerWeaponEquipper;   // Remy ngoài map
-    public WeaponEquipper previewWeaponEquipper;  // Remy preview (UI)
+    [Header("Lưu trữ đồ đang mặc")]
+    public WeaponData currentWeapon;
+    public WeaponData currentHelmet;
+    public WeaponData currentChest;
+
+    [Header("Upgrade level của đồ đang mặc")]
+    public int weaponUpgradeLevel = 1;
+    public int helmetUpgradeLevel = 1;
+    public int chestUpgradeLevel = 1;
+
+    [Header("Xương Nhân Vật (Preview)")]
+    public Transform previewHeadBone;
+
+    private Transform runtimeHeadBone;
+    private GameObject currentHelmetObj_UI;
+    private GameObject currentHelmetObj_Runtime;
+
+    [Header("3D Weapon Equip (runtime player + preview)")]
+    public WeaponEquipper playerWeaponEquipper;
+    public WeaponEquipper previewWeaponEquipper;
 
     [Header("Preview")]
     public Transform previewRoot;
     public string previewLayerName = "UIPreview";
 
+    [Header("Animator weapon type")]
+    [Tooltip("Giá trị WeaponType khi KHÔNG cầm vũ khí")]
+    public int unarmedWeaponType = 0;
+
+    public bool isFemale = false;
 
     [System.Serializable]
     public class WeaponIconMap
@@ -33,24 +60,74 @@ public class EquipmentManager : MonoBehaviour
         public WeaponData data;
     }
 
+    [System.Serializable]
+    public class HelmetIconMap
+    {
+        public Sprite icon;
+        public WeaponData data;
+    }
+
+    [System.Serializable]
+    public class ChestIconMap
+    {
+        public Sprite icon;
+        public WeaponData data;
+    }
+
+    [System.Serializable]
+    public class EquippedSaveData
+    {
+        public WeaponData weapon;
+        public int weaponLv;
+
+        public WeaponData helmet;
+        public int helmetLv;
+
+        public WeaponData chest;
+        public int chestLv;
+    }
+
+    public static EquippedSaveData GlobalEquippedSave = new EquippedSaveData();
+    public static bool HasEquippedSave = false;
+
+    [Header("Map icon -> Helmet Data")]
+    public HelmetIconMap[] helmetMaps;
+
     [Header("Map icon -> WeaponData")]
     public WeaponIconMap[] weaponMaps;
 
-    // nhớ vũ khí đang equip để khi mở inventory sẽ auto hiện preview
+    [Header("Map icon -> Chest Data")]
+    public ChestIconMap[] chestMaps;
+
+    private Transform runtimeChestBone;
+    private Transform previewChestBone;
+    private GameObject currentChestObj_UI;
+    private GameObject currentChestObj_Runtime;
+
     private WeaponData currentWeaponData;
 
     void Start()
     {
         gridManager = FindFirstObjectByType<InventoryGridManager>();
+        isFemale = GenderSelector.SelectedIsFemale;
+        //Debug.Log($"[EquipmentManager] Khởi tạo với giới tính: {(isFemale ? "NỮ" : "NAM")}");
 
-        // ✅ CHỈ TÌM ROOT, KHÔNG BIND SOCKET Ở ĐÂY
         if (previewRoot == null)
         {
             var go = GameObject.Find("UI_PreviewRoot");
             if (go != null) previewRoot = go.transform;
         }
+
         AutoBindRemoveButtons();
         UpdateButtons();
+
+        StartCoroutine(RestoreEquippedNextFrame());
+    }
+
+    private IEnumerator RestoreEquippedNextFrame()
+    {
+        yield return null;
+        // Nếu sau này bạn có RestoreEquippedState() thì gọi ở đây
     }
 
     void UpdateButtons()
@@ -61,53 +138,289 @@ public class EquipmentManager : MonoBehaviour
         if (btnRemoveWeapon != null) btnRemoveWeapon.SetActive(slotWeapon && slotWeapon.enabled && slotWeapon.sprite);
     }
 
-    // ===================== EQUIP UI =====================
-    public Sprite EquipItem(InventoryItem.ItemType type, Sprite newItemSprite)
+    // Hàm này dùng cho EnhancementPanel để biết item đang được mặc hay không
+    // Check theo reference trước (nhanh và chuẩn), nếu không khớp thì check theo name (phòng trường hợp bị khác instance)
+    public bool IsEquipped(WeaponData data)
     {
-        Image targetSlot = GetTargetSlot(type);
-        if (targetSlot == null || newItemSprite == null) return null;
+        if (data == null) return false;
 
-        Sprite old = (targetSlot.enabled && targetSlot.sprite != null) ? targetSlot.sprite : null;
+        if (currentWeapon == data) return true;
+        if (currentHelmet == data) return true;
+        if (currentChest == data) return true;
+
+        if (currentWeapon != null && currentWeapon.name == data.name) return true;
+        if (currentHelmet != null && currentHelmet.name == data.name) return true;
+        if (currentChest != null && currentChest.name == data.name) return true;
+
+        return false;
+    }
+
+    // Nếu EnhancementPanel chỉ có sprite (trường hợp data null), có thể gọi hàm này
+    public bool IsEquippedByIcon(Sprite icon)
+    {
+        if (icon == null) return false;
+
+        var w = FindWeaponDataByIcon(icon);
+        if (w != null && IsEquipped(w)) return true;
+
+        var h = FindHelmetDataByIcon(icon);
+        if (h != null && IsEquipped(h)) return true;
+
+        var c = FindChestDataByIcon(icon);
+        if (c != null && IsEquipped(c)) return true;
+
+        // fallback theo sprite name so với slot đang mặc
+        if (slotWeapon != null && slotWeapon.sprite != null && slotWeapon.sprite.name == icon.name) return true;
+        if (slotHead != null && slotHead.sprite != null && slotHead.sprite.name == icon.name) return true;
+        if (slotChest != null && slotChest.sprite != null && slotChest.sprite.name == icon.name) return true;
+
+        return false;
+    }
+
+    public Sprite EquipItem(InventoryItem.ItemType type,
+                        Sprite newItemSprite,
+                        GameObject prefab3D,
+                        int upgradeLevel,
+                        out WeaponData oldData,
+                        out int oldLevel)
+
+    {
+        oldData = null;
+        oldLevel = 1;
+
+        if (newItemSprite == null || newItemSprite.name == "Icon" || newItemSprite.name == "EmptySlot")
+        {
+            //Debug.Log("[EquipItem] Click vào ô trống, bỏ qua xử lý.");
+            return null;
+        }
+
+        Image targetSlot = GetTargetSlot(type);
+        if (targetSlot == null) return null;
+
+        Sprite oldSprite = (targetSlot.enabled && targetSlot.sprite != null) ? targetSlot.sprite : null;
+
+        if (oldSprite != null)
+        {
+            if (type == InventoryItem.ItemType.Weapon)
+            {
+                oldData = currentWeapon;
+                oldLevel = weaponUpgradeLevel;
+                if (oldData == null) oldData = FindWeaponDataByIcon(oldSprite);
+            }
+            else if (type == InventoryItem.ItemType.Head)
+            {
+                oldData = currentHelmet;
+                oldLevel = helmetUpgradeLevel;
+                if (oldData == null) oldData = FindHelmetDataByIcon(oldSprite);
+            }
+            else if (type == InventoryItem.ItemType.Chest)
+            {
+                oldData = currentChest;
+                oldLevel = chestUpgradeLevel;
+                if (oldData == null) oldData = FindChestDataByIcon(oldSprite);
+            }
+        }
 
         targetSlot.sprite = newItemSprite;
         targetSlot.enabled = true;
 
-        Debug.Log($"[EquipItem] type={type} icon={newItemSprite.name}");
+        EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
+
+        //Debug.Log($"[EquipItem] type={type} icon={newItemSprite.name}, lv={upgradeLevel}");
+
+        WeaponData wd = null;
+        WeaponData hd = null;
+        WeaponData cd = null;
 
         if (type == InventoryItem.ItemType.Weapon)
         {
-            WeaponData wd = FindWeaponDataByIcon(newItemSprite);
-            Debug.Log("[EquipItem] FindWeaponDataByIcon = " + (wd ? wd.name : "NULL"));
-
+            wd = FindWeaponDataByIcon(newItemSprite);
             if (wd != null)
             {
+                currentWeapon = wd;
                 currentWeaponData = wd;
+                weaponUpgradeLevel = Mathf.Max(1, upgradeLevel);
+
                 EquipWeapon3D(wd);
+                if (uiSlot != null) uiSlot.Setup(wd, weaponUpgradeLevel);
             }
             else
             {
-                Debug.LogError($"[EquipItem] Không map được icon '{newItemSprite.name}' -> WeaponData. Check weaponMaps!");
+                //Debug.LogError($"[EquipItem] Không map được icon '{newItemSprite.name}' -> WeaponData.");
+            }
+        }
+        else if (type == InventoryItem.ItemType.Head)
+        {
+            hd = FindHelmetDataByIcon(newItemSprite);
+            if (hd != null)
+            {
+                currentHelmet = hd;
+                helmetUpgradeLevel = Mathf.Max(1, upgradeLevel);
+
+                EquipHelmet3D(hd);
+                if (uiSlot != null) uiSlot.Setup(hd, helmetUpgradeLevel);
+            }
+            else
+            {
+                //Debug.LogWarning($"[EquipItem] Không tìm thấy HelmetData trong helmetMaps cho {newItemSprite.name}.");
+            }
+        }
+        else if (type == InventoryItem.ItemType.Chest)
+        {
+            cd = FindChestDataByIcon(newItemSprite);
+            if (cd != null)
+            {
+                currentChest = cd;
+                chestUpgradeLevel = Mathf.Max(1, upgradeLevel);
+
+                slotChest.sprite = newItemSprite;
+                slotChest.enabled = true;
+
+                EquipChest3D(cd);
+                if (uiSlot != null) uiSlot.Setup(cd, chestUpgradeLevel);
+            }
+            else
+            {
+                //Debug.LogError($"[EquipItem] Không tìm thấy ChestData cho {newItemSprite.name} trong chestMaps.");
             }
         }
 
+        // Update stats (giữ HP hiện tại)
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) player = GameObject.Find("PlayerRuntime");
+
+        if (player != null)
+        {
+            CharacterStats stats = player.GetComponent<CharacterStats>();
+            if (stats != null)
+            {
+                stats.UpdateFinalStats(keepCurrentHP: true);
+                //Debug.Log("[EquipmentManager] Đã cập nhật Stats cho Player thành công!");
+            }
+        }
+
+        // Quan trọng: lưu trạng thái đang mặc, để EnhancementPanel check chính xác
+        SaveEquippedState();
+
         UpdateButtons();
-        return old;
+        return oldSprite;
+    }
+
+    public WeaponData FindHelmetDataByIcon(Sprite icon)
+    {
+        if (icon == null || helmetMaps == null) return null;
+        foreach (var m in helmetMaps)
+        {
+            if (m != null && m.icon != null && (m.icon == icon || m.icon.name == icon.name))
+                return m.data;
+        }
+        return null;
+    }
+
+    public WeaponData FindWeaponDataByIcon(Sprite icon)
+    {
+        if (icon == null || weaponMaps == null) return null;
+        foreach (var m in weaponMaps)
+        {
+            if (m != null && m.data != null && m.icon != null)
+            {
+                if (m.icon == icon || m.icon.name == icon.name)
+                    return m.data;
+            }
+        }
+        return null;
+    }
+
+    public WeaponData FindChestDataByIcon(Sprite icon)
+    {
+        if (icon == null || chestMaps == null) return null;
+        foreach (var m in chestMaps)
+        {
+            if (m != null && m.icon != null && (m.icon == icon || m.icon.name == icon.name))
+                return m.data;
+        }
+        return null;
     }
 
     public void UnequipItem(InventoryItem.ItemType type)
     {
-        Debug.Log($"[UnequipItem] called type={type}");
         Image targetSlot = GetTargetSlot(type);
         if (targetSlot == null) return;
         if (!targetSlot.enabled || targetSlot.sprite == null) return;
 
-        if (gridManager != null && gridManager.AddItemBackToInventory(targetSlot.sprite, type))
+        WeaponData dataToReturn = null;
+        int levelToReturn = 1;
+
+        if (type == InventoryItem.ItemType.Weapon)
+        {
+            dataToReturn = currentWeapon;
+            levelToReturn = weaponUpgradeLevel;
+        }
+        else if (type == InventoryItem.ItemType.Head)
+        {
+            dataToReturn = currentHelmet;
+            levelToReturn = helmetUpgradeLevel;
+        }
+        else if (type == InventoryItem.ItemType.Chest)
+        {
+            dataToReturn = currentChest;
+            levelToReturn = chestUpgradeLevel;
+        }
+
+        if (gridManager != null && gridManager.AddItemBackToInventory(targetSlot.sprite, type, null, dataToReturn, levelToReturn))
         {
             targetSlot.sprite = null;
             targetSlot.enabled = false;
 
+            EquipmentSlotUI uiSlot = targetSlot.GetComponent<EquipmentSlotUI>();
+            if (uiSlot != null) uiSlot.Clear();
+
             if (type == InventoryItem.ItemType.Weapon)
                 UnequipWeapon3D();
+
+            if (type == InventoryItem.ItemType.Head)
+            {
+                if (currentHelmetObj_UI != null) Destroy(currentHelmetObj_UI);
+                if (currentHelmetObj_Runtime != null) Destroy(currentHelmetObj_Runtime);
+            }
+
+            if (type == InventoryItem.ItemType.Chest)
+            {
+                if (currentChestObj_UI != null) Destroy(currentChestObj_UI);
+                if (currentChestObj_Runtime != null) Destroy(currentChestObj_Runtime);
+            }
+
+            if (type == InventoryItem.ItemType.Weapon)
+            {
+                currentWeapon = null;
+                weaponUpgradeLevel = 1;
+            }
+            else if (type == InventoryItem.ItemType.Head)
+            {
+                currentHelmet = null;
+                helmetUpgradeLevel = 1;
+            }
+            else if (type == InventoryItem.ItemType.Chest)
+            {
+                currentChest = null;
+                chestUpgradeLevel = 1;
+            }
+
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null) player = GameObject.Find("PlayerRuntime");
+
+            if (player != null)
+            {
+                CharacterStats stats = player.GetComponent<CharacterStats>();
+                if (stats != null)
+                {
+                    stats.UpdateFinalStats(keepCurrentHP: true);
+                    //Debug.Log("[EquipmentManager] Đã cập nhật Stats cho Player thành công (Unequip)!");
+                }
+            }
+
+            // Sau khi tháo cũng phải lưu lại state, để EnhancementPanel biết món này giờ đã không còn mặc
+            SaveEquippedState();
 
             UpdateButtons();
         }
@@ -125,128 +438,82 @@ public class EquipmentManager : MonoBehaviour
         return null;
     }
 
-    WeaponData FindWeaponDataByIcon(Sprite icon)
-    {
-        if (icon == null || weaponMaps == null) return null;
-
-        foreach (var m in weaponMaps)
-        {
-            if (m == null || m.data == null || m.icon == null) continue;
-            if (m.icon == icon) return m.data;
-            if (m.icon.name == icon.name) return m.data;
-        }
-        return null;
-    }
-
-    // ===================== PREVIEW BIND (CHỈ GỌI KHI UI OPEN) =====================
     public void BindPreviewNow()
     {
-        // ✅ tìm đúng UI_PreviewRoot nào thực sự chứa WeaponSocket_R
-        if (previewRoot == null || !previewRoot.gameObject.scene.IsValid())
-        {
-            previewRoot = FindPreviewRootContainsSocket();
-        }
+        var go = GameObject.Find("UI_PreviewRoot");
+        if (go != null) previewRoot = go.transform;
 
-        if (previewRoot == null)
-        {
-            Debug.LogError("[BindPreviewNow] Không tìm thấy UI_PreviewRoot chứa WeaponSocket_R");
-            return;
-        }
+        if (previewRoot == null) return;
 
         LateBindPreviewEquipperIfNeeded();
 
-        // ✅ nếu đang có weapon thì auto hiện preview khi mở UI
         if (currentWeaponData != null && previewWeaponEquipper != null)
         {
             int layer = LayerMask.NameToLayer(previewLayerName);
             previewWeaponEquipper.Equip(currentWeaponData, layer);
-            Debug.Log("[BindPreviewNow] Auto preview equipped: " + currentWeaponData.name);
         }
-    }
-
-    Transform FindPreviewRootContainsSocket()
-    {
-        var all = Object.FindObjectsByType<Transform>(
-            FindObjectsInactive.Include,
-            FindObjectsSortMode.None
-        );
-
-        foreach (var t in all)
-        {
-            if (t.name != "UI_PreviewRoot") continue;
-
-            foreach (var c in t.GetComponentsInChildren<Transform>(true))
-            {
-                if (c.name == "WeaponSocket_R")
-                {
-                    Debug.Log("[FindPreviewRoot] Picked: " + GetPath(t));
-                    return t;
-                }
-            }
-        }
-
-        return null;
     }
 
     void LateBindPreviewEquipperIfNeeded()
     {
-        if (previewWeaponEquipper != null && previewWeaponEquipper.socketR != null)
-            return;
+        if (previewRoot == null) return;
 
-        if (previewRoot == null)
+        if (previewHeadBone == null)
         {
-            Debug.LogError("[Preview] previewRoot NULL");
-            return;
-        }
-
-        // ✅ tìm socket trong previewRoot (kể cả inactive)
-        Transform socket = null;
-        foreach (var t in previewRoot.GetComponentsInChildren<Transform>(true))
-        {
-            if (t.name == "WeaponSocket_R")
+            foreach (var t in previewRoot.GetComponentsInChildren<Transform>(true))
             {
-                socket = t;
-                break;
+                if (t.name.Contains("Head"))
+                {
+                    previewHeadBone = t;
+                    break;
+                }
             }
         }
 
-        if (socket == null)
-        {
-            Debug.LogError("[Preview] Không tìm thấy WeaponSocket_R trong " + GetPath(previewRoot));
-            return;
-        }
-
-        var anim = socket.GetComponentInParent<Animator>(true);
-        if (anim == null)
-        {
-            Debug.LogError("[Preview] Không tìm thấy Animator cho preview model (parent của socket)");
-            return;
-        }
-
-        previewWeaponEquipper = anim.GetComponent<WeaponEquipper>();
         if (previewWeaponEquipper == null)
-            previewWeaponEquipper = anim.gameObject.AddComponent<WeaponEquipper>();
+        {
+            Transform socket = null;
+            foreach (var t in previewRoot.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name.Trim() == "WeaponSocket_R")
+                {
+                    socket = t;
+                    break;
+                }
+            }
 
-        previewWeaponEquipper.socketR = socket;
-
-        Debug.Log("[Preview] Bind OK socket path=" + GetPath(socket));
+            if (socket != null)
+            {
+                var anim = socket.GetComponentInParent<Animator>(true);
+                if (anim != null)
+                {
+                    previewWeaponEquipper = anim.GetComponent<WeaponEquipper>();
+                    if (previewWeaponEquipper == null)
+                        previewWeaponEquipper = anim.gameObject.AddComponent<WeaponEquipper>();
+                    previewWeaponEquipper.socketR = socket;
+                }
+            }
+        }
     }
 
-    // ===================== EQUIP 3D =====================
     public void EquipWeapon3D(WeaponData weaponData)
     {
         if (weaponData == null) return;
-        int weaponType = weaponData.animationID;
-        playerWeaponEquipper.GetComponent<Animator>().SetInteger("WeaponType", weaponType);
-        currentWeaponData = weaponData;
 
-        // 1) ngoài map luôn equip được
         if (playerWeaponEquipper == null)
-            Debug.LogError("[EquipWeapon3D] playerWeaponEquipper NULL -> kéo WeaponEquipper của Remy ngoài map vào EquipmentManager!");
-        else
-            playerWeaponEquipper.Equip(weaponData);
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+                playerWeaponEquipper = player.GetComponentInChildren<WeaponEquipper>(true);
+        }
 
-        // 2) preview chỉ equip nếu đã bind rồi
+        if (playerWeaponEquipper != null)
+        {
+            var anim = playerWeaponEquipper.GetComponentInChildren<Animator>(true);
+            if (anim != null) anim.SetInteger("WeaponType", weaponData.animationID);
+            playerWeaponEquipper.Equip(weaponData);
+        }
+
         if (previewWeaponEquipper != null)
         {
             int layer = LayerMask.NameToLayer(previewLayerName);
@@ -256,19 +523,122 @@ public class EquipmentManager : MonoBehaviour
 
     public void UnequipWeapon3D()
     {
-        playerWeaponEquipper.GetComponent<Animator>().SetInteger("WeaponType", 0);
+        if (playerWeaponEquipper != null)
+        {
+            var anim = playerWeaponEquipper.GetComponentInChildren<Animator>(true);
+            if (anim != null) anim.SetInteger("WeaponType", unarmedWeaponType);
+            playerWeaponEquipper.Unequip();
+        }
+
+        if (previewWeaponEquipper != null)
+            previewWeaponEquipper.Unequip();
+
         currentWeaponData = null;
-
-        if (playerWeaponEquipper != null) playerWeaponEquipper.Unequip();
-        if (previewWeaponEquipper != null) previewWeaponEquipper.Unequip();
     }
 
-    static string GetPath(Transform t)
+    void EquipHelmet3D(WeaponData hd)
     {
-        string p = t.name;
-        while (t.parent != null) { t = t.parent; p = t.name + "/" + p; }
-        return p;
+        if (currentHelmetObj_UI != null) Destroy(currentHelmetObj_UI);
+        if (currentHelmetObj_Runtime != null) Destroy(currentHelmetObj_Runtime);
+        if (hd == null || hd.prefab == null) return;
+
+        if (previewRoot == null) BindPreviewNow();
+        if (previewHeadBone == null) LateBindPreviewEquipperIfNeeded();
+
+        if (previewHeadBone != null)
+        {
+            currentHelmetObj_UI = Instantiate(hd.prefab, previewHeadBone);
+            currentHelmetObj_UI.transform.localPosition = isFemale ? hd.femaleHeadPos : hd.headPos;
+            currentHelmetObj_UI.transform.localRotation = Quaternion.Euler(isFemale ? hd.femaleHeadEuler : hd.headEuler);
+            currentHelmetObj_UI.transform.localScale = isFemale ? hd.femaleHeadScaleUI : hd.headScaleUI;
+            SetLayerRecursively(currentHelmetObj_UI, previewHeadBone.gameObject.layer);
+        }
+
+        FindRuntimeHeadBone();
+        if (runtimeHeadBone != null)
+        {
+            currentHelmetObj_Runtime = Instantiate(hd.prefab, runtimeHeadBone);
+            currentHelmetObj_Runtime.transform.localPosition = isFemale ? hd.femaleHeadPos : hd.headPos;
+            currentHelmetObj_Runtime.transform.localRotation = Quaternion.Euler(isFemale ? hd.femaleHeadEuler : hd.headEuler);
+            currentHelmetObj_Runtime.transform.localScale = isFemale ? hd.femaleHeadScaleRuntime : hd.headScaleRuntime;
+            SetLayerRecursively(currentHelmetObj_Runtime, 0);
+        }
     }
+
+    void EquipChest3D(WeaponData cd)
+    {
+        if (currentChestObj_UI != null) Destroy(currentChestObj_UI);
+        if (currentChestObj_Runtime != null) Destroy(currentChestObj_Runtime);
+        if (cd == null || cd.prefab == null) return;
+
+        FindChestBones();
+
+        if (previewChestBone != null)
+        {
+            currentChestObj_UI = Instantiate(cd.prefab, previewChestBone);
+            currentChestObj_UI.transform.localPosition = isFemale ? cd.femaleChestPos : cd.chestPos;
+            currentChestObj_UI.transform.localRotation = Quaternion.Euler(isFemale ? cd.femaleChestEuler : cd.chestEuler);
+            currentChestObj_UI.transform.localScale = isFemale ? cd.femaleChestScaleUI : cd.chestScaleUI;
+            SetLayerRecursively(currentChestObj_UI, previewChestBone.gameObject.layer);
+        }
+
+        if (runtimeChestBone != null)
+        {
+            currentChestObj_Runtime = Instantiate(cd.prefab, runtimeChestBone);
+            currentChestObj_Runtime.transform.localPosition = isFemale ? cd.femaleChestPos : cd.chestPos;
+            currentChestObj_Runtime.transform.localRotation = Quaternion.Euler(isFemale ? cd.femaleChestEuler : cd.chestEuler);
+            currentChestObj_Runtime.transform.localScale = isFemale ? cd.femaleChestScaleRuntime : cd.chestScaleRuntime;
+            SetLayerRecursively(currentChestObj_Runtime, 0);
+        }
+    }
+
+    void FindRuntimeHeadBone()
+    {
+        if (runtimeHeadBone != null) return;
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) player = GameObject.Find("PlayerRuntime");
+
+        if (player != null)
+        {
+            foreach (var t in player.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name.Contains("Head"))
+                {
+                    runtimeHeadBone = t;
+                    break;
+                }
+            }
+        }
+    }
+
+    void FindChestBones()
+    {
+        if (previewChestBone == null && previewRoot != null)
+            previewChestBone = FindBestSpineBone(previewRoot);
+
+        if (runtimeChestBone == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null) player = GameObject.Find("PlayerRuntime");
+            if (player != null) runtimeChestBone = FindBestSpineBone(player.transform);
+        }
+    }
+
+    Transform FindBestSpineBone(Transform root)
+    {
+        Transform bestBone = null;
+        var allChildren = root.GetComponentsInChildren<Transform>(true);
+
+        foreach (var t in allChildren)
+        {
+            if (t.name.Contains("Spine2")) return t;
+            if (t.name.Contains("Spine1")) bestBone = t;
+            if (bestBone == null && t.name.EndsWith("Spine")) bestBone = t;
+        }
+        return bestBone;
+    }
+
     void AutoBindRemoveButtons()
     {
         Bind(btnRemoveHead, InventoryItem.ItemType.Head);
@@ -279,18 +649,101 @@ public class EquipmentManager : MonoBehaviour
 
     void Bind(GameObject btn, InventoryItem.ItemType type)
     {
-        if (btn == null) { Debug.LogWarning($"[Bind] btn null: {type}"); return; }
-
+        if (btn == null) return;
         var b = btn.GetComponent<Button>();
-        if (b == null) { Debug.LogWarning($"[Bind] no Button on {btn.name}"); return; }
-
+        if (b == null) return;
         b.onClick.RemoveAllListeners();
-        b.onClick.AddListener(() =>
-        {
-            Debug.Log($"[CLICK X] {type}  btn={btn.name}");
-            UnequipItem(type);
-        });
+        b.onClick.AddListener(() => UnequipItem(type));
+    }
 
-        Debug.Log($"[Bind OK] {type} -> {btn.name}");
+    void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null) return;
+        obj.layer = newLayer;
+        foreach (Transform child in obj.transform)
+            SetLayerRecursively(child.gameObject, newLayer);
+    }
+
+    public void RefreshEquippedItem(InventoryItem.ItemType type, int newLevel)
+    {
+        EquipmentSlotUI uiSlot = null;
+        WeaponData targetData = null;
+
+        if (type == InventoryItem.ItemType.Weapon && currentWeapon != null)
+        {
+            weaponUpgradeLevel = newLevel;
+            targetData = currentWeapon;
+            if (slotWeapon != null) uiSlot = slotWeapon.GetComponent<EquipmentSlotUI>();
+        }
+        else if (type == InventoryItem.ItemType.Head && currentHelmet != null)
+        {
+            helmetUpgradeLevel = newLevel;
+            targetData = currentHelmet;
+            if (slotHead != null) uiSlot = slotHead.GetComponent<EquipmentSlotUI>();
+        }
+        else if (type == InventoryItem.ItemType.Chest && currentChest != null)
+        {
+            chestUpgradeLevel = newLevel;
+            targetData = currentChest;
+            if (slotChest != null) uiSlot = slotChest.GetComponent<EquipmentSlotUI>();
+        }
+
+        if (uiSlot != null && targetData != null)
+            uiSlot.Setup(targetData, newLevel);
+
+        if (InventoryTooltip.Instance != null && InventoryTooltip.Instance.gameObject.activeSelf)
+            InventoryTooltip.Instance.ShowTooltip(targetData, newLevel);
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) player = GameObject.Find("PlayerRuntime");
+
+        if (player != null)
+        {
+            CharacterStats stats = player.GetComponent<CharacterStats>();
+            if (stats != null)
+            {
+                stats.UpdateFinalStats(keepCurrentHP: true);
+                //Debug.Log($"[Refresh] Đã cập nhật Stats: {type} lên Lv {newLevel}");
+            }
+        }
+
+        // Nếu sau này bạn cho phép nâng cấp khi đang mặc thì save lại.
+        // Nhưng theo yêu cầu mới của bạn: sẽ chặn nâng cấp khi đang mặc, nên đoạn này chỉ để an toàn.
+        SaveEquippedState();
+    }
+
+    public void SaveEquippedState()
+    {
+        GlobalEquippedSave.weapon = currentWeapon;
+        GlobalEquippedSave.weaponLv = weaponUpgradeLevel;
+
+        GlobalEquippedSave.helmet = currentHelmet;
+        GlobalEquippedSave.helmetLv = helmetUpgradeLevel;
+
+        GlobalEquippedSave.chest = currentChest;
+        GlobalEquippedSave.chestLv = chestUpgradeLevel;
+
+        HasEquippedSave = (currentWeapon != null || currentHelmet != null || currentChest != null);
+
+        //Debug.Log($"✅ [EquipSave] weapon={(currentWeapon ? currentWeapon.name : "null")} lv={weaponUpgradeLevel} | " +
+        //          $"helmet={(currentHelmet ? currentHelmet.name : "null")} lv={helmetUpgradeLevel} | " +
+        //          $"chest={(currentChest ? currentChest.name : "null")} lv={chestUpgradeLevel}");
+    }
+
+    public void UnequipAllToInventory()
+    {
+        if (gridManager == null)
+            gridManager = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
+
+        if (currentWeapon != null && slotWeapon != null && slotWeapon.sprite != null)
+            UnequipItem(InventoryItem.ItemType.Weapon);
+
+        if (currentHelmet != null && slotHead != null && slotHead.sprite != null)
+            UnequipItem(InventoryItem.ItemType.Head);
+
+        if (currentChest != null && slotChest != null && slotChest.sprite != null)
+            UnequipItem(InventoryItem.ItemType.Chest);
+
+        //Debug.Log("✅ [EquipmentManager] UnequipAllToInventory done (SAFE).");
     }
 }

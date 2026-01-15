@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1fe1b2a578fcf64aaf7c7f381daf541, type: 3}
+  m_Name: Spear2_Data
+  m_EditorClassIdentifier: 
+  id: spear2
+  displayName: spear2
+  itemType: 0
+  icon: {fileID: 21300000, guid: db0411b78ad319644a64962704742907, type: 3}
+  prefab: {fileID: 4393979199820378818, guid: ed41aacd681a1324791ef9c26b001d7c, type: 3}
+  animationID: 1
+  localPos: {x: -5.516, y: -4.944, z: 25.256}
+  localEuler: {x: -15.301, y: -68.97, z: 141.752}
+  localScale: {x: 7, y: 7, z: 7}
+  headPos: {x: 0.002, y: 0.09, z: 0.001}
+  headEuler: {x: -14.6, y: 0.7, z: -4.7}
+  headScaleUI: {x: 0.15, y: 0.15, z: 0.15}
+  headScaleRuntime: {x: 0.23, y: 0.2, z: 0.22}
+  femaleHeadPos: {x: 0.002, y: 0.08, z: 0.001}
+  femaleHeadEuler: {x: -10, y: 0, z: 0}
+  femaleHeadScaleUI: {x: 0.35, y: 0.35, z: 0.35}
+  femaleHeadScaleRuntime: {x: 0.2, y: 0.18, z: 0.2}
+  chestPos: {x: 0, y: 0, z: 0}
+  chestEuler: {x: 0, y: 0, z: 0}
+  chestScaleUI: {x: 1, y: 1, z: 1}
+  chestScaleRuntime: {x: 1, y: 1, z: 1}
+  femaleChestPos: {x: 0, y: 0, z: 0}
+  femaleChestEuler: {x: 0, y: 0, z: 0}
+  femaleChestScaleUI: {x: 1, y: 1, z: 1}
+  femaleChestScaleRuntime: {x: 1, y: 1, z: 1}
+  bonusATK: 117
+  bonusDEF: 0
+  bonusMaxHP: 0
+  bonusEnergy: 2

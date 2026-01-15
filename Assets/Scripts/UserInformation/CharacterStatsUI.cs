@@ -11,25 +11,52 @@ public class CharacterStatsUI : MonoBehaviour
     public TMP_Text txtDEF;
     public TMP_Text txtEnergy;
 
-    [Header("Data")]
-    public CharacterStats stats; // kéo Player (hoặc hero object) có CharacterStats vào
+    [Header("Auto bind")]
+    public string playerTag = "Player";
+    public bool autoFindPlayer = true;
+
+    [Header("Data (optional)")]
+    public CharacterStats stats;
 
     void OnEnable()
     {
+        if (autoFindPlayer && stats == null) TryBindPlayer();
         Refresh();
+    }
+
+    void Update()
+    {
+        if (autoFindPlayer && stats == null)
+        {
+            TryBindPlayer();
+            Refresh();
+            return;
+        }
+        Refresh();
+    }
+
+    public void TryBindPlayer()
+    {
+        var player = GameObject.FindGameObjectWithTag(playerTag);
+        if (player == null) return;
+
+        stats = player.GetComponent<CharacterStats>();
+        if (stats == null) stats = player.GetComponentInChildren<CharacterStats>();
     }
 
     public void Refresh()
     {
         if (stats == null) return;
 
-        txtName.text = stats.characterName;
-        txtLevel.text = "Level: " + stats.level;
+        if (txtName) txtName.text = $"Name: {stats.characterName}";
+        if (txtLevel) txtLevel.text = $"Level: {stats.level}";
 
-        // Hiện kiểu panel (1 số) hoặc kiểu combat (current/max) đều được:
-        txtHP.text = "HP: " + stats.maxHP;
-        txtATK.text = "ATK: " + stats.atk;
-        txtDEF.text = "DEF: " + stats.def;
-        txtEnergy.text = "Energy: " + stats.energy;
+        // Hiển thị HP hiện tại 
+        if (txtHP) txtHP.text = $"HP: {stats.maxHP_Total}";
+
+        // HIỂN THỊ CHỈ SỐ ĐÃ CỘNG ĐỒ (_Total)
+        if (txtATK) txtATK.text = $"ATK: {stats.atk_Total}";
+        if (txtDEF) txtDEF.text = $"DEF: {stats.def_Total}";
+        if (txtEnergy) txtEnergy.text = $"Energy: {stats.energy_Total}";
     }
 }

@@ -1,49 +1,50 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class TrashButton : MonoBehaviour
 {
     private Button btn;
-    private Image iconImage;
+    private InventoryItem ownerItem;
 
-    // Không cần biến deletePopup nữa vì ta sẽ gọi trực tiếp
-
-    void Start()
+    void Awake()
     {
         btn = GetComponent<Button>();
-
-        // Tìm Icon (giữ nguyên code cũ)
-        if (transform.parent != null)
-        {
-            Transform itemBtn = transform.parent.Find("ItemButton");
-            if (itemBtn != null)
-            {
-                Transform iconTrans = itemBtn.Find("Icon");
-                if (iconTrans != null)
-                {
-                    iconImage = iconTrans.GetComponent<Image>();
-                }
-            }
-        }
-
+        btn.onClick.RemoveAllListeners();
         btn.onClick.AddListener(OnClickDelete);
+    }
+
+    InventoryItem FindOwnerItem()
+    {
+        var slotRoot = transform.parent; // InventorySlot
+        if (slotRoot == null) return null;
+
+        return slotRoot.GetComponentInChildren<InventoryItem>(true);
     }
 
     void OnClickDelete()
     {
-        if (iconImage != null)
+        ownerItem = FindOwnerItem();
+        if (ownerItem == null)
         {
-            // --- SỬA: Gọi qua biến Instance ---
-            // Kiểm tra xem Popup có tồn tại không
-            if (InventoryDeletePopup.Instance != null)
-            {
-                InventoryDeletePopup.Instance.ShowConfirmation(iconImage);
-            }
-            else
-            {
-                // Nếu vẫn lỗi thì debug để biết đường sửa
-                Debug.LogError("LỖI: Không tìm thấy InventoryDeletePopup. Hãy đảm bảo Script đã được gắn vào Panel!");
-            }
+            //Debug.LogWarning("[TrashButton] ownerItem null");
+            return;
         }
+
+        var grid = ownerItem.GetComponentInParent<InventoryGridManager>(true);
+        if (grid == null)
+        {
+            //Debug.LogError("[TrashButton] Không tìm thấy InventoryGridManager của slot này");
+            return;
+        }
+
+        var popup = InventoryDeletePopup.Instance;
+        if (popup == null)
+        {
+            //Debug.LogError("[TrashButton] InventoryDeletePopup.Instance null");
+            return;
+        }
+
+        popup.ShowConfirmation(ownerItem, grid);
     }
 }

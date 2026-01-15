@@ -11,7 +11,7 @@ public class CharacterSelector : MonoBehaviour
     public TMP_InputField nameInput;
     public Image maleBackground;   // Ô xanh phía sau model nam
     public Image femaleBackground; // Ô xanh phía sau model nữ
-    public Color normalColor = new Color(0.49f, 0.78f, 0.99f); // màu xanh nhạt
+    public Color normalColor = new Color(0.49f, 0.78f, 0.99f,0f); // màu xanh nhạt
     public Color selectedColor = Color.yellow;                 // màu khi chọn
 
 
@@ -42,23 +42,47 @@ public class CharacterSelector : MonoBehaviour
 
     void OnPlayClicked()
     {
-        Debug.Log("Play clicked");
+        //Debug.Log("[CharacterSelector] Play clicked");
 
-        if (selectedIndex == -1)
+        // 1) Check chọn nhân vật
+        if (selectedIndex < 0)
         {
-            Debug.LogWarning("Bạn chưa chọn nhân vật (Male/Female).");
+            //Debug.LogWarning("[CharacterSelector] Bạn chưa chọn nhân vật.");
+            return;
+        }
+
+        // 2) Check nhập tên
+        if (nameInput == null)
+        {
+            //Debug.LogError("[CharacterSelector] nameInput chưa được kéo vào Inspector!");
             return;
         }
 
         string playerName = nameInput.text.Trim();
         if (string.IsNullOrEmpty(playerName) || playerName.Length < 2)
         {
-            Debug.LogWarning("Tên phải có ít nhất 2 ký tự.");
+            //Debug.LogWarning("[CharacterSelector] Tên phải có ít nhất 2 ký tự.");
             return;
         }
 
+        // 3) Lưu PlayerPrefs (phòng khi GameManager chưa kịp có)
+        PlayerPrefs.SetInt("SelectedGender", selectedIndex);   
+        PlayerPrefs.SetString("PlayerName", playerName);
+        PlayerPrefs.Save();
+
+        // 4) Check GameManager
+        if (GameManager.Instance == null)
+        {
+            //Debug.LogError("[CharacterSelector] GameManager.Instance NULL! Scene phải có 1 GameObject gắn GameManager và Awake() set Instance + DontDestroyOnLoad.");
+            return;
+        }
+
+        // 5) Set data + Start
         GameManager.Instance.SetPlayerData(selectedIndex, playerName);
-        //GameManager.Instance.LoadMapAdditive();
+        //Debug.Log($"[CharacterSelector] Saved: selectedIndex={selectedIndex}, name='{playerName}'");
+
         GameManager.Instance.StartGameplay();
     }
+
 }
+    

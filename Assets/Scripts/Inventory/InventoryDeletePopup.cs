@@ -3,59 +3,81 @@ using UnityEngine.UI;
 
 public class InventoryDeletePopup : MonoBehaviour
 {
-    // --- MỚI: Tạo biến Instance (Số điện thoại nóng) ---
     public static InventoryDeletePopup Instance;
 
-    [Header("Kéo 2 nút Có và Không vào đây")]
     public Button btnYes;
     public Button btnNo;
 
-    private Image itemPendingDelete;
+    private InventoryItem pendingItem;
+    private InventoryGridManager targetGrid;
 
-    // Đổi từ Start thành Awake để chạy sớm nhất có thể
     void Awake()
     {
-        // Gán chính mình vào biến Instance
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        // tắt popup ban đầu
+        gameObject.SetActive(false);
+
+        if (btnYes != null)
+        {
+            btnYes.onClick.RemoveAllListeners();
+            btnYes.onClick.AddListener(OnConfirmDelete);
         }
 
-        btnYes.onClick.AddListener(OnConfirmDelete);
-        btnNo.onClick.AddListener(OnCancelDelete);
+        if (btnNo != null)
+        {
+            btnNo.onClick.RemoveAllListeners();
+            btnNo.onClick.AddListener(OnCancelDelete);
+        }
     }
 
-    void Start()
+    public void ShowConfirmation(InventoryItem item, InventoryGridManager grid)
     {
-        // Tự tắt đi khi bắt đầu game
-        gameObject.SetActive(false);
-    }
+        pendingItem = item;
+        targetGrid = grid;
 
-    public void ShowConfirmation(Image itemIcon)
-    {
-        itemPendingDelete = itemIcon;
-        gameObject.SetActive(true); // Bật lên
+        gameObject.SetActive(true);
+        transform.SetAsLastSibling(); // nổi lên trên cùng
     }
 
     void OnConfirmDelete()
     {
-        if (itemPendingDelete != null)
+        if (pendingItem == null || targetGrid == null)
         {
-            itemPendingDelete.sprite = null;
-            itemPendingDelete.enabled = false;
-            Debug.Log("Đã xóa đồ!");
+            ClosePopup();
+            return;
         }
+
+        var data = pendingItem.GetCurrentData();
+        if (data == null)
+        {
+            ClosePopup();
+            return;
+        }
+
+        bool ok = targetGrid.RemoveItem(data);
+        //Debug.Log(ok ? $"Đã xóa: {data.name}" : $"Xóa thất bại: {data.name}");
+
         ClosePopup();
     }
 
-    void OnCancelDelete()
-    {
-        ClosePopup();
-    }
+    void OnCancelDelete() => ClosePopup();
 
     void ClosePopup()
     {
-        itemPendingDelete = null;
+        pendingItem = null;
+        targetGrid = null;
+
         gameObject.SetActive(false);
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 }
