@@ -1261,10 +1261,11 @@ MonoBehaviour:
   resetUnlockOnStart: 1
   playerData:
     level: 0
-    maxHP: 0
+    baseMaxHP: 0
+    baseAtk: 0
+    baseDef: 0
+    baseEnergy: 0
     currentHP: 0
-    atk: 0
-    def: 0
   hasSavedData: 0
   savedPotions: 0
   hasSavedPotions: 0
@@ -3239,6 +3240,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3105923055598246481, guid: 6f3e000c9b72ef64f938f1cff1cc22cc, type: 3}
+      propertyPath: hitboxPrefab
+      value: 
+      objectReference: {fileID: 1310828096357852026}
     - target: {fileID: 7937665204232613861, guid: 6f3e000c9b72ef64f938f1cff1cc22cc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.36
@@ -3284,6 +3289,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6f3e000c9b72ef64f938f1cff1cc22cc, type: 3}
+--- !u!1 &1310828096357852026 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3574493202033842776, guid: 6f3e000c9b72ef64f938f1cff1cc22cc, type: 3}
+  m_PrefabInstance: {fileID: 1310828096357852025}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7904391760318991490
 PrefabInstance:
   m_ObjectHideFlags: 0

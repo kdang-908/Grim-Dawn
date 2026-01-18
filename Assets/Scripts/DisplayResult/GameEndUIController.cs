@@ -34,6 +34,10 @@ public class GameEndUIController : MonoBehaviour
     [SerializeField] private AudioSource endAudioSource;
     [SerializeField] private AudioClip endMusic;
 
+    public InventoryGridManager mainInventory;
+    public EquipmentManager equipmentManager;
+
+
     [Header("Transition")]
     [SerializeField] private CanvasGroup screenFader;
     [SerializeField] private float fadeDuration = 0.8f;
@@ -209,15 +213,29 @@ public class GameEndUIController : MonoBehaviour
 
             // ✅ Save inventory + equip levels (include inactive objects)
             // 1) Unequip hết về túi (giữ level)
-            var eq = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
-            if (eq != null) eq.UnequipAllToInventory();
+            // 1) Unequip hết về túi (giữ level) - DÙNG REFERENCE KÉO TAY
+            if (equipmentManager != null)
+            {
+                //equipmentManager.UnequipAllToInventory();
+            }
+            else
+            {
+                //Debug.LogWarning("[GameEndUI] equipmentManager chưa được kéo trong Inspector!");
+            }
 
-            // 2) Save inventory
-            var inv = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
-            if (inv != null) inv.SaveInventoryState();
+            // 2) Save inventory - DÙNG TÚI CHÍNH (ItemsParent)
+            if (mainInventory != null)
+            {
+                mainInventory.SaveInventoryState();
+            }
+            else
+            {
+                //Debug.LogWarning("[GameEndUI] mainInventory (túi chính) chưa được kéo trong Inspector!");
+            }
+
 
             // 3) Không restore equip ở scene sau nữa
-            EquipmentManager.HasEquippedSave = false;
+            //EquipmentManager.HasEquippedSave = false;
 
             // ✅ UNLOCK theo scene hiện tại
             // Quy ước của bạn: 0=Map1, 1=Map2, 2=Map3
@@ -250,7 +268,22 @@ public class GameEndUIController : MonoBehaviour
             targetScene = nextSceneName2;
 
         //Debug.Log($"[GameEndUI] LoadScene => {targetScene}");
+        // ✅ BLOCK nếu map chưa unlock (khóa thật ở logic, không chỉ UI)
+        if (gm != null)
+        {
+            int targetIndex = GetMapIndexFromScene(targetScene);
+
+            // nếu scene không nằm trong hệ map thì cho qua (hoặc bạn muốn chặn thì tùy)
+            if (targetIndex >= 0 && !gm.IsMapUnlocked(targetIndex))
+            {
+                Debug.LogWarning($"[GameEndUI] Map bị khóa: {targetScene} | maxUnlockedMap={gm.maxUnlockedMap}");
+                return; // KHÔNG CHUYỂN SCENE
+            }
+        }
+
+        // Load scene
         SceneManager.LoadScene(targetScene);
+
 
         //Debug.Log($"[DEBUG] Saved Inventory Count = {InventoryGridManager.GlobalInventorySave.Count}");
         //Debug.Log($"[DEBUG] HasEquippedSave = {EquipmentManager.HasEquippedSave}");
@@ -282,4 +315,12 @@ public class GameEndUIController : MonoBehaviour
         string currentScene = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(currentScene);
     }
+    private int GetMapIndexFromScene(string sceneName)
+    {
+        if (sceneName == "Map" || sceneName == retrySceneName) return 0;   // Map1
+        if (sceneName == nextSceneName) return 1;                          // SceneMap2
+        if (sceneName == nextSceneName2) return 2;                         // SceneMap3
+        return -1;
+    }
+
 }

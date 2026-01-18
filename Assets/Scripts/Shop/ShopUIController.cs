@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,21 +38,22 @@ public class ShopUIController : MonoBehaviour
     public Button btnBuy;
 
     [Header("Player Inventory (PHẢI KÉO TAY)")]
-    public InventoryGridManager inventory; // ✅ KÉO ItemsParent (Inventory thật) vào đây
+    public InventoryGridManager inventory;
 
     [Header("Sync other inventories (Forge/Enhancement)")]
-    public InventoryGridManager[] extraInventoriesToRefresh; // ✅ KÉO Inventory_Forge vào đây
+    public InventoryGridManager[] extraInventoriesToRefresh;
 
     [Header("Fallback Price (nếu WeaponData chưa có price)")]
     public int fallbackPrice = 999;
 
-    // ====== BOUGHT STATE (mua 1 lần trong lúc play) ======
-    // soldIds chỉ giúp khóa NGAY trong scene hiện tại.
-    // Qua scene khác sẽ reset -> nên ta sẽ check thêm GlobalInventorySave (đã sở hữu) để khóa xuyên scene.
-    private HashSet<string> soldIds = new HashSet<string>();
-
     private List<ShopSlotUI> shopSlots = new List<ShopSlotUI>();
     private WeaponData selected;
+
+    // auto-find
+    private EquipmentManager equipmentManager;
+
+    // tránh StopAllCoroutines()
+    private Coroutine refreshCo;
 
     void Awake()
     {
@@ -76,20 +78,31 @@ public class ShopUIController : MonoBehaviour
 
     void Start()
     {
+        equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+
         BuildShop();
 
         if (btnBuy != null)
+        {
+            btnBuy.onClick.RemoveAllListeners();
             btnBuy.onClick.AddListener(BuySelected);
+        }
 
         UpdatePreview(null);
         RefreshGoldUI();
     }
 
-    // ====== ID + PRICE ======
-    string GetItemId(WeaponData data)
+    void OnEnable()
     {
-        return data != null ? data.name : "";
+        if (equipmentManager == null)
+            equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+
+        if (refreshCo != null) StopCoroutine(refreshCo);
+        refreshCo = StartCoroutine(RefreshShopWhenEquippedReady());
     }
+
+    // ====== ID + PRICE ======
+    string GetItemId(WeaponData data) => data != null ? data.name : "";
 
     int GetPrice(WeaponData data)
     {
@@ -97,7 +110,7 @@ public class ShopUIController : MonoBehaviour
         return (data.price > 0) ? data.price : fallbackPrice;
     }
 
-    // ✅ NEW: check đã sở hữu trong save chung (xuyên scene)
+    // ✅ check đã sở hữu trong save chung (túi)
     bool IsOwnedInGlobal(WeaponData data)
     {
         if (data == null) return false;
@@ -113,41 +126,35 @@ public class ShopUIController : MonoBehaviour
             if (s == null || s.data == null) continue;
             if (GetItemId(s.data) == id) return true;
         }
-
         return false;
     }
 
-    // ✅ SOLD = (đã mua trong scene này) OR (đã sở hữu trong GlobalInventorySave)
-    public bool IsSold(WeaponData data)
+    // ✅ check đang trang bị
+    bool IsEquipped(WeaponData data)
     {
         if (data == null) return false;
 
-        // 1) khóa ngay trong scene hiện tại
-        if (soldIds.Contains(GetItemId(data)))
-            return true;
+        if (equipmentManager == null)
+            equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
-        // 2) khóa xuyên scene (đã mua trước đó -> inventory save chung có)
-        // chỉ khóa với item buyOnce
-        if (data.buyOnce && IsOwnedInGlobal(data))
-            return true;
+        if (equipmentManager == null) return false;
 
-        return false;
+        return equipmentManager.IsEquipped(data);
     }
 
-    void MarkSold(WeaponData data)
+    // ✅ khóa mua theo yêu cầu
+    public bool IsSold(WeaponData data)
     {
-        if (data == null) return;
-        soldIds.Add(GetItemId(data));
+        if (data == null) return false;
+        if (!data.buyOnce) return false;
+
+        return IsOwnedInGlobal(data) || IsEquipped(data);
     }
 
     // ====== BUILD SHOP ======
     public void BuildShop()
     {
-        if (shopSlots == null || shopSlots.Count == 0)
-        {
-            //Debug.LogWarning("[Shop] Không tìm thấy ShopSlotUI trong slotsRoot.");
-            return;
-        }
+        if (shopSlots == null || shopSlots.Count == 0) return;
 
         for (int i = 0; i < shopSlots.Count; i++)
         {
@@ -155,7 +162,6 @@ public class ShopUIController : MonoBehaviour
             shopSlots[i].Setup(d, this);
         }
 
-        // ✅ refresh trạng thái sold cho slot ngay khi build
         foreach (var s in shopSlots)
             if (s != null) s.RefreshSoldState();
     }
@@ -190,7 +196,6 @@ public class ShopUIController : MonoBehaviour
 
         RefreshGoldUI();
 
-        // ✅ nếu đã mua / đã sở hữu -> khóa nút mua
         if (btnBuy != null)
             btnBuy.interactable = (data != null && !sold);
     }
@@ -200,60 +205,40 @@ public class ShopUIController : MonoBehaviour
     {
         if (selected == null) return;
 
-        // ✅ đã mua rồi (kể cả qua scene) thì khỏi mua
         if (IsSold(selected))
         {
             UpdatePreview(selected);
             return;
         }
 
-        if (inventory == null)
-        {
-            //Debug.LogError("[Shop] inventory NULL. Kéo ItemsParent (Inventory thật) vào ShopUIController.Inventory!");
-            return;
-        }
+        if (inventory == null) return;
 
         var gm = GameManager.Instance;
-        if (gm == null)
-        {
-            //Debug.LogError("[Shop] GameManager.Instance NULL.");
-            return;
-        }
+        if (gm == null) return;
 
         int price = GetPrice(selected);
 
         if (!gm.SpendGold(price))
         {
-            //Debug.LogWarning($"[Shop] Không đủ vàng. Price={price}, Gold={gm.gold}");
             RefreshGoldUI();
             return;
         }
 
-        // 1) add item vào inventory thật
         bool ok = inventory.AddItemFromShop(selected, 1);
         if (!ok)
         {
             gm.AddGold(price);
-            //Debug.LogWarning("[Shop] Túi đầy -> hoàn tiền.");
             RefreshGoldUI();
             return;
         }
 
-        // 2) sync UI khác (Forge/Enhance) để cũng thấy item
         if (extraInventoriesToRefresh != null && extraInventoriesToRefresh.Length > 0)
         {
             foreach (var inv in extraInventoriesToRefresh)
                 if (inv != null) inv.ReloadFromGlobalSave();
         }
 
-        // 3) đánh dấu sold
-        if (selected.buyOnce)
-            MarkSold(selected);
-
-        foreach (var s in shopSlots)
-            if (s != null) s.RefreshSoldState();
-
-        //Debug.Log($"[Shop] Mua thành công: {selected.displayName} (-{price} gold)");
+        RefreshAllShopSlots();
         UpdatePreview(selected);
         RefreshGoldUI();
     }
@@ -264,38 +249,63 @@ public class ShopUIController : MonoBehaviour
         int currentGold = (gm != null) ? gm.gold : 0;
         if (txtGold != null) txtGold.text = currentGold.ToString();
     }
-    public bool IsOwned(WeaponData data)
+
+    public void RefreshAllShopSlots()
     {
-        if (data == null) return false;
-
-        var list = InventoryGridManager.GlobalInventorySave;
-        if (list == null) return false;
-
-        for (int i = 0; i < list.Count; i++)
+        var slots = GetComponentsInChildren<ShopSlotUI>(true);
+        foreach (var s in slots)
         {
-            var s = list[i];
-            if (s == null || s.data == null) continue;
-
-            if (s.data == data) return true;
-
-            // buyOnce thì cho fallback theo name
-            if (data.buyOnce && !string.IsNullOrEmpty(s.data.name) && s.data.name == data.name)
-                return true;
+            if (s == null) continue;
+            s.RefreshSoldState();
+            s.RefreshLockState();
         }
-        return false;
     }
-    void OnEnable()
-{
-    RefreshAllShopSlots();
-}
 
-public void RefreshAllShopSlots()
-{
-    var slots = GetComponentsInChildren<ShopSlotUI>(true);
-    foreach (var s in slots)
-        s.RefreshLockState();
-}
+    // =========================================================
+    // ✅ FIX CHÍNH: ĐỢI EquipmentManager restore xong rồi mới refresh
+    // - chờ tối đa 60 frame (≈ 1 giây)
+    // - nếu HasEquippedSave=false thì vẫn refresh bình thường
+    // =========================================================
+    IEnumerator RefreshShopWhenEquippedReady()
+    {
+        // đợi 1 frame để scene settle
+        yield return null;
 
+        // tìm lại equipmentManager (phòng trường hợp object spawn trễ)
+        if (equipmentManager == null)
+            equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+
+        // Nếu game có dữ liệu equip (HasEquippedSave=true) thì đợi tới khi
+        // currentWeapon/currentHelmet/currentChest đã được restore
+        if (EquipmentManager.HasEquippedSave)
+        {
+            int maxFrames = 60; // tăng nếu máy yếu
+            while (maxFrames-- > 0)
+            {
+                if (equipmentManager == null)
+                    equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+
+                // restore xong khi equipmentManager tồn tại và đã set xong data
+                if (equipmentManager != null &&
+                    (equipmentManager.currentWeapon != null ||
+                     equipmentManager.currentHelmet != null ||
+                     equipmentManager.currentChest != null))
+                {
+                    break;
+                }
+
+                yield return null;
+            }
+        }
+        else
+        {
+            // không có đồ mặc save -> khỏi đợi lâu
+            yield return null;
+        }
+
+        RefreshAllShopSlots();
+        if (selected != null) UpdatePreview(selected);
+    }
 
 #if UNITY_EDITOR
     [ContextMenu("SHOP/Auto Scan Items (Editor Only)")]

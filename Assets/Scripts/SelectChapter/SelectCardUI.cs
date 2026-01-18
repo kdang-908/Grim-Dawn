@@ -14,14 +14,29 @@ public class SelectCardUI : MonoBehaviour
 
     public void SelectMap(int mapIndex)
     {
+        var gm = GameManager.Instance;
+
+        // ✅ CHECK LOCK TRƯỚC KHI LOAD
+        bool unlocked = (gm == null) ? (mapIndex == 0) : gm.IsMapUnlocked(mapIndex);
+        if (!unlocked)
+        {
+            // rung card nếu bị khóa
+            if (!isShaking)
+            {
+                if (shakeCo != null) StopCoroutine(shakeCo);
+                shakeCo = StartCoroutine(ShakeOnce());
+            }
+            return; // ❌ KHÔNG CHUYỂN MAP
+        }
+
+        // ✅ Save (chỉ khi unlocked)
         var player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null && GameManager.Instance != null)
+        if (player != null && gm != null)
         {
             var stats = player.GetComponent<CharacterStats>() ?? player.GetComponentInChildren<CharacterStats>(true);
-            if (stats != null) GameManager.Instance.SavePlayer(stats);
+            if (stats != null) gm.SavePlayer(stats);
 
-            GameManager.Instance.SavePotions();
-
+            gm.SavePotions();
         }
 
         PlayerPrefs.SetInt("SelectedMap", mapIndex);
@@ -33,6 +48,7 @@ public class SelectCardUI : MonoBehaviour
             case 2: SceneManager.LoadScene("SceneMap3"); break;
         }
     }
+
 
 
     IEnumerator ShakeOnce()
