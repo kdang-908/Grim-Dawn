@@ -623,6 +623,9 @@ MonoBehaviour:
   skillHitbox: {fileID: 0}
   skillCooldown: 1
   isUIOpen: 0
+  hitboxPrefab: {fileID: 6859978219227365380}
+  hitboxParentName: WeaponSocket_R
+  hitboxObjectName: PlayerHitbox
 --- !u!95 &5051355836625422228
 Animator:
   serializedVersion: 7

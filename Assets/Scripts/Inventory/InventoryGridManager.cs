@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Collections;
 
 public class InventoryGridManager : MonoBehaviour
 {
@@ -32,14 +31,11 @@ public class InventoryGridManager : MonoBehaviour
     // ✅ registry các manager đang sống để refresh nhẹ (không FindObjectsOfType)
     private static readonly HashSet<InventoryGridManager> Alive = new HashSet<InventoryGridManager>();
 
-    // tránh load/seed lại liên tục khi scene load
     private bool hasSeededOrLoadedOnce = false;
 
     void OnEnable()
     {
         Alive.Add(this);
-
-        // ✅ Khi mở panel (false -> true): load lại từ Global để nhìn thấy đồ mới nhất
         EnsureLoaded(forceReloadFromGlobal: true);
     }
 
@@ -50,7 +46,6 @@ public class InventoryGridManager : MonoBehaviour
 
     void Awake()
     {
-        // Nếu panel active ngay lúc load scene
         if (gameObject.activeInHierarchy)
             EnsureLoaded();
     }
@@ -69,31 +64,30 @@ public class InventoryGridManager : MonoBehaviour
         RefreshInventorySlots();
 
         if (inventoryRoot == null || inventorySlots.Count == 0)
-        {
-            //Debug.LogWarning($"[InventoryGridManager] EnsureLoaded fail: inventoryRoot/slots invalid | manager={name}");
             return;
-        }
+
         if (forceReloadFromGlobal)
         {
-            ClearInventory();
+            ClearInventoryUIOnly();
             LoadFromGlobalSaveToUI();
             hasSeededOrLoadedOnce = true;
             return;
         }
+
         if (hasSeededOrLoadedOnce) return;
 
-        ClearInventory();
+        ClearInventoryUIOnly();
+
         if (GlobalInventorySave != null && GlobalInventorySave.Count > 0)
         {
-            //Debug.Log($"[Inventory] Load Global: {GlobalInventorySave.Count} items | manager={name}");
             LoadFromGlobalSaveToUI();
             hasSeededOrLoadedOnce = true;
             return;
         }
+
         if (!seededOnce && isMainSeeder)
         {
             seededOnce = true;
-            //Debug.Log($"[Inventory] Seed startItems: {startItems.Count} | manager={name}");
 
             if (startItems != null && startItems.Count > 0)
             {
@@ -102,31 +96,26 @@ public class InventoryGridManager : MonoBehaviour
                     var itemData = startItems[i];
                     if (itemData == null || itemData.icon == null) continue;
 
+                    // add vào UI
                     AddItemBackToInventory(itemData.icon, itemData.itemType, itemData.prefab, itemData, 1);
-                }
 
-                SaveInventoryState(); 
+                    // add vào GLOBAL (SOURCE OF TRUTH)
+                    GlobalInventorySave.Add(new SavedInvItem { data = itemData, level = 1 });
+                }
             }
         }
-        else
-        {
-            //Debug.Log($"[Inventory] No Global, skip seed | isMainSeeder={isMainSeeder} seededOnce={seededOnce} | manager={name}");
-        }
 
+        // cuối cùng đổ UI theo Global để đồng bộ
+        ReloadFromGlobalSave();
         hasSeededOrLoadedOnce = true;
     }
 
     public void ReloadFromGlobalSave()
     {
         RefreshInventorySlots();
+        if (inventoryRoot == null || inventorySlots.Count == 0) return;
 
-        if (inventoryRoot == null || inventorySlots.Count == 0)
-        {
-            //Debug.LogWarning($"[InventoryGridManager] ReloadFromGlobalSave fail: inventoryRoot/slots invalid | manager={name}");
-            return;
-        }
-
-        ClearInventory();
+        ClearInventoryUIOnly();
         LoadFromGlobalSaveToUI();
         hasSeededOrLoadedOnce = true;
     }
@@ -140,8 +129,7 @@ public class InventoryGridManager : MonoBehaviour
             var s = GlobalInventorySave[i];
             if (s == null || s.data == null || s.data.icon == null) continue;
 
-            if (HasItemInUI(s.data)) continue;
-
+            // ✅ Đặt item vào slot trống (KHÔNG check HasItemInUI theo buyOnce nữa để tránh bỏ sót)
             AddItemBackToInventory(
                 s.data.icon,
                 s.data.itemType,
@@ -152,7 +140,7 @@ public class InventoryGridManager : MonoBehaviour
         }
     }
 
-    void ClearInventory()
+    void ClearInventoryUIOnly()
     {
         for (int i = 0; i < inventorySlots.Count; i++)
         {
@@ -176,10 +164,7 @@ public class InventoryGridManager : MonoBehaviour
         inventorySlots.Clear();
 
         if (inventoryRoot == null)
-        {
-            //Debug.LogError($"[InventoryGridManager] inventoryRoot NULL ở '{name}'. Hãy kéo inventoryRoot đúng parent chứa slot của túi này!");
             return;
-        }
 
         var allItems = inventoryRoot.GetComponentsInChildren<InventoryItem>(true);
 
@@ -191,45 +176,14 @@ public class InventoryGridManager : MonoBehaviour
             if (iconImg != null)
                 inventorySlots.Add(iconImg);
         }
-
-        //Debug.Log($"[Inventory] Slots found = {inventorySlots.Count} | manager={name}");
     }
 
     // =========================
-    // DUPLICATE CHECK
-    // =========================
-    bool HasItemInUI(WeaponData data)
-    {
-        if (data == null) return false;
-
-        for (int i = 0; i < inventorySlots.Count; i++)
-        {
-            var slot = inventorySlots[i];
-            if (slot == null || slot.sprite == null) continue;
-
-            var item = slot.GetComponentInParent<InventoryItem>(true);
-            if (item == null) continue;
-
-            var d = item.GetCurrentData();
-            if (d == null) continue;
-
-            if (d == data) return true;
-
-            if (data.buyOnce && !string.IsNullOrEmpty(d.name) && d.name == data.name)
-                return true;
-        }
-        return false;
-    }
-
-    // =========================
-    // ADD / SAVE
+    // ADD (UI)
     // =========================
     public bool AddItemBackToInventory(Sprite itemSprite, InventoryItem.ItemType newType, GameObject itemPrefab, WeaponData data, int level)
     {
         if (itemSprite == null) return false;
-
-        if (data != null && data.buyOnce && HasItemInUI(data))
-            return false;
 
         for (int i = 0; i < inventorySlots.Count; i++)
         {
@@ -252,60 +206,11 @@ public class InventoryGridManager : MonoBehaviour
                 return true;
             }
         }
-
-        //Debug.LogWarning($"[Inventory] Túi đầy! Không thể thêm: {(data != null ? data.name : "NULL")} | manager={name}");
         return false;
     }
 
-    public void SaveInventoryState()
-    {
-        RefreshInventorySlots();
-        if (inventoryRoot == null) return;
-
-        var temp = new List<SavedInvItem>();
-
-        for (int i = 0; i < inventorySlots.Count; i++)
-        {
-            var slotImg = inventorySlots[i];
-            if (slotImg == null || slotImg.sprite == null) continue;
-
-            var item = slotImg.GetComponentInParent<InventoryItem>(true);
-            if (item == null) continue;
-
-            if (!item.transform.IsChildOf(inventoryRoot)) continue;
-
-            var data = item.GetCurrentData();
-            if (data == null) continue;
-
-            temp.Add(new SavedInvItem
-            {
-                data = data,
-                level = Mathf.Max(1, item.GetUpgradeLevel())
-            });
-        }
-
-        // ✅ LUÔN LƯU (kể cả 0) để khỏi bị “không lưu dữ liệu”
-        GlobalInventorySave.Clear();
-        GlobalInventorySave.AddRange(temp);
-
-        //Debug.Log($"[Inventory] Saved Global = {GlobalInventorySave.Count} | by manager={name}");
-
-        // ✅ Refresh nhẹ: chỉ refresh manager đang active (đang mở)
-        RefreshActiveManagers();
-    }
-
-    static void RefreshActiveManagers()
-    {
-        foreach (var m in Alive)
-        {
-            if (m == null) continue;
-            if (!m.isActiveAndEnabled) continue; // chỉ refresh cái đang mở
-            m.ReloadFromGlobalSave();
-        }
-    }
-
     // =========================
-    // SHOP
+    // ✅ SHOP -> add vào GLOBAL trước, rồi Reload UI
     // =========================
     public bool AddItemFromShop(WeaponData data, int level)
     {
@@ -313,6 +218,9 @@ public class InventoryGridManager : MonoBehaviour
 
         EnsureLoaded();
 
+        int lv = Mathf.Max(1, level);
+
+        // buyOnce => không cho mua trùng
         if (data.buyOnce)
         {
             for (int i = 0; i < GlobalInventorySave.Count; i++)
@@ -323,101 +231,162 @@ public class InventoryGridManager : MonoBehaviour
                 if (s.data == data) return false;
                 if (!string.IsNullOrEmpty(s.data.name) && s.data.name == data.name) return false;
             }
-
-            if (HasItemInUI(data)) return false;
         }
 
-        bool ok = AddItemBackToInventory(data.icon, data.itemType, data.prefab, data, Mathf.Max(1, level));
-        if (ok) SaveInventoryState();
-
-        return ok;
+        GlobalInventorySave.Add(new SavedInvItem { data = data, level = lv });
+        ReloadFromGlobalSave();
+        RefreshActiveManagers();
+        return true;
     }
 
     // =========================
-    // SYNC LEVEL (ENHANCE)
+    // ✅ EQUIP: remove khỏi GLOBAL (source of truth) + reload UI
     // =========================
-    public void SyncItemLevel(WeaponData targetData, int oldLevel, int newLevel)
-    {
-        if (targetData == null) return;
-
-        EnsureLoaded();
-
-        for (int i = 0; i < inventorySlots.Count; i++)
-        {
-            var slot = inventorySlots[i];
-            if (slot == null) continue;
-
-            var item = slot.GetComponentInParent<InventoryItem>(true);
-            if (item == null || item.GetItemSprite() == null) continue;
-
-            var d = item.GetCurrentData();
-            if (d == null) continue;
-
-            if (d == targetData || (targetData.buyOnce && d.name == targetData.name))
-            {
-                item.SetUpgradeLevel(newLevel);
-                item.SetItem(item.GetItemSprite(), item.itemType, null, targetData);
-            }
-        }
-
-        SaveInventoryState();
-    }
-
-    // =========================
-    // ✅ REMOVE ITEM (Fix lỗi InventoryDeletePopup)
-    // =========================
-    public bool RemoveItem(WeaponData data)
+    public bool RemoveItemForEquip(WeaponData data, int level)
     {
         if (data == null) return false;
 
         EnsureLoaded();
 
-        bool removedUI = false;
+        int targetLevel = Mathf.Max(1, level);
 
-        // 1) Xóa khỏi UI slot
-        for (int i = 0; i < inventorySlots.Count; i++)
+        // remove 1 item khỏi GLOBAL
+        for (int i = GlobalInventorySave.Count - 1; i >= 0; i--)
         {
-            var slot = inventorySlots[i];
-            if (slot == null) continue;
+            var s = GlobalInventorySave[i];
+            if (s == null || s.data == null) continue;
 
-            var item = slot.GetComponentInParent<InventoryItem>(true);
-            if (item == null) continue;
+            bool match = (s.data == data && Mathf.Max(1, s.level) == targetLevel) ||
+                         (data.buyOnce && s.data.name == data.name && Mathf.Max(1, s.level) == targetLevel);
 
-            var d = item.GetCurrentData();
-            if (d == null) continue;
-
-            bool match = (d == data) || (data.buyOnce && d.name == data.name);
-            if (!match) continue;
-
-            slot.sprite = null;
-            slot.enabled = false;
-
-            item.SetItem(null, item.itemType, null, null);
-            item.SetUpgradeLevel(1);
-
-            removedUI = true;
-            break;
+            if (match)
+            {
+                GlobalInventorySave.RemoveAt(i);
+                ReloadFromGlobalSave();
+                RefreshActiveManagers();
+                return true;
+            }
         }
 
-        // 2) Xóa khỏi GlobalInventorySave
+        return false;
+    }
+
+    // =========================
+    // ✅ UNEQUIP: add lại GLOBAL + reload UI
+    // =========================
+    public bool AddBackFromEquip(WeaponData data, int level)
+    {
+        if (data == null || data.icon == null) return false;
+
+        EnsureLoaded();
+
+        GlobalInventorySave.Add(new SavedInvItem
+        {
+            data = data,
+            level = Mathf.Max(1, level)
+        });
+
+        ReloadFromGlobalSave();
+        RefreshActiveManagers();
+        return true;
+    }
+
+    // =========================
+    // ✅ DELETE VĨNH VIỄN (thùng rác)
+    // =========================
+    public bool DeleteItemForever(WeaponData data, int level)
+    {
+        if (data == null) return false;
+
+        EnsureLoaded();
+
+        int targetLevel = Mathf.Max(1, level);
+
+        for (int i = GlobalInventorySave.Count - 1; i >= 0; i--)
+        {
+            var s = GlobalInventorySave[i];
+            if (s == null || s.data == null) continue;
+
+            bool match = (s.data == data && Mathf.Max(1, s.level) == targetLevel) ||
+                         (data.buyOnce && s.data.name == data.name && Mathf.Max(1, s.level) == targetLevel);
+
+            if (match)
+            {
+                GlobalInventorySave.RemoveAt(i);
+                ReloadFromGlobalSave();
+                RefreshActiveManagers();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static void RefreshActiveManagers()
+    {
+        foreach (var m in Alive)
+        {
+            if (m == null) continue;
+            if (!m.isActiveAndEnabled) continue;
+            m.ReloadFromGlobalSave();
+        }
+    }
+    // =============================
+    // BACKWARD COMPATIBILITY (Fix lỗi CS1061)
+    // =============================
+
+    // 1) InventoryDeletePopup gọi RemoveItem()
+    public bool RemoveItem(WeaponData data)
+    {
+        if (data == null) return false;
+
         for (int i = GlobalInventorySave.Count - 1; i >= 0; i--)
         {
             var s = GlobalInventorySave[i];
             if (s == null || s.data == null) continue;
 
             bool match = (s.data == data) || (data.buyOnce && s.data.name == data.name);
-            if (match) GlobalInventorySave.RemoveAt(i);
+            if (match)
+            {
+                GlobalInventorySave.RemoveAt(i);
+                ReloadFromGlobalSave();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 2) GameEndUIController gọi SaveInventoryState()
+    public void SaveInventoryState()
+    {
+        // bản an toàn: không quét UI ghi đè Global
+        ReloadFromGlobalSave();
+    }
+
+    // 3) EnhancementPanel gọi SyncItemLevel()
+    public void SyncItemLevel(WeaponData targetData, int oldLevel, int newLevel)
+    {
+        if (targetData == null) return;
+
+        int oldLv = Mathf.Max(1, oldLevel);
+        int newLv = Mathf.Max(1, newLevel);
+
+        for (int i = 0; i < GlobalInventorySave.Count; i++)
+        {
+            var s = GlobalInventorySave[i];
+            if (s == null || s.data == null) continue;
+
+            bool match = (s.data == targetData && Mathf.Max(1, s.level) == oldLv) ||
+                         (targetData.buyOnce && s.data.name == targetData.name && Mathf.Max(1, s.level) == oldLv);
+
+            if (match)
+            {
+                s.level = newLv;
+                GlobalInventorySave[i] = s;
+                break;
+            }
         }
 
-        // 3) Save + refresh nhẹ
-        StartCoroutine(DelayedSave());
-
-        return removedUI;
+        ReloadFromGlobalSave();
     }
 
-    IEnumerator DelayedSave()
-    {
-        yield return null;
-        SaveInventoryState();
-    }
 }

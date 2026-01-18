@@ -3171,6 +3171,9 @@ MonoBehaviour:
   skillHitbox: {fileID: 0}
   skillCooldown: 1
   isUIOpen: 0
+  hitboxPrefab: {fileID: 2366044913542105383}
+  hitboxParentName: WeaponSocket_R
+  hitboxObjectName: PlayerHitbox
 --- !u!54 &8098037336797364032
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -89,6 +89,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForEndOfFrame();
         yield return null;
 
+        // ✅ refresh inventory UI ngay khi đổi scene (kể cả khi chưa mở túi)
+        RefreshInventoryAfterSceneLoaded();
+
         var player = GameObject.FindGameObjectWithTag(playerTag);
         if (player == null)
         {
@@ -115,6 +118,9 @@ public class GameManager : MonoBehaviour
         LoadPotions();
 
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+
+        // ✅ refresh lại inventory/equip thêm lần nữa sau khi stats/potion xong
+        RefreshInventoryAfterSceneLoaded();
 
         //Debug.Log($"[GM] Applied | Scene={SceneManager.GetActiveScene().name} | HP={stats.currentHP}/{stats.maxHP_Total} | LV={stats.level} | UnlockedMax={maxUnlockedMap}");
     }
@@ -177,6 +183,10 @@ public class GameManager : MonoBehaviour
 
             LoadPotions();
             FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+
+            // ✅ đảm bảo inventory UI sync sau khi spawn/reuse player
+            RefreshInventoryAfterSceneLoaded();
+
             yield break;
         }
 
@@ -213,6 +223,9 @@ public class GameManager : MonoBehaviour
 
         LoadPotions();
         FindFirstObjectByType<CharacterStatsUI>()?.Refresh();
+
+        // ✅ sync inventory UI
+        RefreshInventoryAfterSceneLoaded();
     }
 
     // GOLD
@@ -245,7 +258,6 @@ public class GameManager : MonoBehaviour
         playerData.baseDef = stats.def;
         playerData.baseEnergy = stats.energy;
         playerData.currentHP = stats.currentHP;
-
 
         hasSavedData = true;
 
@@ -320,5 +332,25 @@ public class GameManager : MonoBehaviour
     {
         maxUnlockedMap = 0;
         //Debug.Log("[GM] ResetUnlock (runtime) -> only Map1 unlocked");
+    }
+
+    // =========================================================
+    // ✅ GIỮ INVENTORY KHI ĐỔI MAP (GỘP CHUNG TRONG GAMEMANAGER)
+    // =========================================================
+    void RefreshInventoryAfterSceneLoaded()
+    {
+        // Inventory panel có thể đang tắt nên include inactive
+        var inv = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
+        if (inv != null)
+        {
+            inv.ReloadFromGlobalSave();
+        }
+
+        // (tuỳ chọn) refresh preview weapon/helmet nếu cần
+        var equip = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
+        if (equip != null)
+        {
+            equip.BindPreviewNow();
+        }
     }
 }

@@ -11,32 +11,23 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         public GameObject helmetPrefab;
     }
     public HeadIconMap[] headMaps;
+
     public enum ItemType { Weapon, Head, Chest, Legs }
     public ItemType itemType;
 
     private GameObject myPrefab;
     [SerializeField] private Image itemImage;
-    private GameObject itemPrefab;
     private EquipmentManager equipmentManager;
     private GameObject removeButtonObj;
 
-    // Data hiện tại của món đồ
     private WeaponData currentData;
 
     [Header("Upgrade")]
-    public int upgradeLevel = 1;             // cấp hiện tại
+    public int upgradeLevel = 1;
     public const int MaxUpgradeLevel = 4;
 
-    // --- HÀM ĐỂ ENHANCEMENT PANEL LẤY DATA ---
-    public WeaponData GetCurrentData()
-    {
-        return currentData;
-    }
-
-    public int GetUpgradeLevel()
-    {
-        return upgradeLevel;
-    }
+    public WeaponData GetCurrentData() => currentData;
+    public int GetUpgradeLevel() => upgradeLevel;
 
     public void SetUpgradeLevel(int level)
     {
@@ -53,10 +44,8 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         if (itemImage == null) itemImage = GetComponent<Image>();
         if (itemImage == null) itemImage = GetComponentInChildren<Image>(true);
 
-        // ✅ include inactive để vẫn tìm được EquipmentManager dù inventoryPanel đang tắt
         equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
-        // Icon -> ItemButton -> InventorySlot -> RemoveButton
         if (transform.parent != null && transform.parent.parent != null)
         {
             Transform slotTransform = transform.parent.parent;
@@ -67,47 +56,36 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         RefreshRemoveButton();
     }
 
-    // ================= XỬ LÝ SỰ KIỆN UI (FIX LỖI TOOLTIP) =================
-
-    // 1. Khi tắt object (đóng túi đồ) -> Tắt Tooltip ngay lập tức
     private void OnDisable()
     {
         if (InventoryTooltip.Instance != null)
-        {
             InventoryTooltip.Instance.HideTooltip();
-        }
     }
 
-    // 2. Khi di chuột vào -> Hiện Tooltip
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (itemImage.enabled && currentData != null && InventoryTooltip.Instance != null)
-        {
             InventoryTooltip.Instance.ShowTooltip(currentData, upgradeLevel);
-        }
     }
 
-    // 3. Khi di chuột ra -> Tắt Tooltip
     public void OnPointerExit(PointerEventData eventData)
     {
         if (InventoryTooltip.Instance != null)
-        {
             InventoryTooltip.Instance.HideTooltip();
-        }
     }
-
-    // ======================================================================
 
     public void SetItem(Sprite sprite, ItemType type, GameObject prefab, WeaponData data)
     {
         itemType = type;
         myPrefab = prefab;
-        currentData = data; // Lưu lại data
+        currentData = data;
+
         if (itemImage != null)
         {
             itemImage.sprite = sprite;
             itemImage.enabled = (sprite != null);
         }
+
         RefreshRemoveButton();
     }
 
@@ -118,6 +96,9 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
             itemImage.sprite = null;
             itemImage.enabled = false;
         }
+        currentData = null;
+        myPrefab = null;
+        SetUpgradeLevel(1);
         RefreshRemoveButton();
     }
 
@@ -128,16 +109,48 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         if (removeButtonObj.activeSelf != show) removeButtonObj.SetActive(show);
     }
 
+    // ✅ helper: remove item khỏi GlobalInventorySave theo data + level
+    private void RemoveThisFromGlobal()
+    {
+        if (currentData == null) return;
+
+        int lv = Mathf.Max(1, upgradeLevel);
+
+        for (int i = InventoryGridManager.GlobalInventorySave.Count - 1; i >= 0; i--)
+        {
+            var s = InventoryGridManager.GlobalInventorySave[i];
+            if (s == null || s.data == null) continue;
+
+            bool match = (s.data == currentData && Mathf.Max(1, s.level) == lv) ||
+                         (currentData.buyOnce && s.data.name == currentData.name && Mathf.Max(1, s.level) == lv);
+
+            if (match)
+            {
+                InventoryGridManager.GlobalInventorySave.RemoveAt(i);
+                break; // remove 1 cái thôi
+            }
+        }
+    }
+
+    // ✅ helper: add item về GlobalInventorySave
+    private void AddToGlobal(WeaponData data, int lv)
+    {
+        if (data == null) return;
+        InventoryGridManager.GlobalInventorySave.Add(new InventoryGridManager.SavedInvItem
+        {
+            data = data,
+            level = Mathf.Max(1, lv)
+        });
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        // chỉ nhận chuột trái
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
 
         if (itemImage == null || !itemImage.enabled || itemImage.sprite == null ||
             itemImage.sprite.name == "Icon" || itemImage.sprite.name == "EmptySlot")
         {
-            //Debug.Log("Đây là ô trống, không gửi lệnh trang bị.");
             return;
         }
 
@@ -145,55 +158,79 @@ public class InventoryItem : MonoBehaviour, IPointerClickHandler, IPointerEnterH
             EnhancementPanel.Instance != null &&
             EnhancementPanel.Instance.IsOpen();
 
-        //Debug.Log($"[InventoryItem] Click on {name} | enhanceMode={enhanceMode}");
-
-        // 🔸 1) Đang ở màn NÂNG CẤP → đưa item sang ô dấu +
         if (enhanceMode)
         {
             EnhancementPanel.Instance.TryInsert(this);
-            return; // ⛔ không equip
+            return;
         }
 
-        // 🔸 2) Bình thường → EQUIP / tháo trang bị như cũ
         if (equipmentManager == null)
             equipmentManager = FindFirstObjectByType<EquipmentManager>(FindObjectsInactive.Include);
 
         if (equipmentManager == null) return;
 
+        // ✅ Lưu lại data+level của item hiện tại (item sẽ được equip)
+        WeaponData thisData = currentData;
+        int thisLevel = Mathf.Max(1, upgradeLevel);
+        Sprite thisSprite = itemImage.sprite;
+
         WeaponData returnedData;
-        int returnedLevel; // Biến hứng level trả về
+        int returnedLevel;
 
         Sprite returnedSprite = equipmentManager.EquipItem(
             itemType,
-            itemImage.sprite,
+            thisSprite,
             myPrefab,
-            upgradeLevel,
+            thisLevel,
             out returnedData,
-            out returnedLevel); // Nhận level từ EquipmentManager
+            out returnedLevel
+        );
+
+        // ✅ 1) Item đang click đã được equip -> PHẢI remove khỏi GLOBAL
+        // (nếu không, đóng/mở túi nó sẽ hiện lại)
+        RemoveThisFromGlobal();
 
         if (returnedSprite != null)
         {
+            // có đồ cũ trả về -> set vào slot inventory hiện tại
             if (returnedData != null)
             {
-                // Nếu có đầy đủ dữ liệu -> Hoán đổi hoàn hảo
                 this.SetItem(returnedSprite, itemType, returnedData.prefab, returnedData);
-                this.SetUpgradeLevel(returnedLevel); // Gán lại level cũ cho món đồ vừa về
-                //Debug.Log($"Đã hoán đổi: {returnedData.displayName} về vị trí cũ với Lv {returnedLevel}.");
+                this.SetUpgradeLevel(returnedLevel);
+
+                // ✅ 2) đồ cũ trả về phải add lại GLOBAL (để không mất khi reopen)
+                AddToGlobal(returnedData, returnedLevel);
             }
             else
             {
                 this.SetItem(returnedSprite, itemType, myPrefab, null);
                 this.SetUpgradeLevel(returnedLevel);
-                //Debug.LogWarning("Hoán đổi item: Có hình ảnh trả về nhưng không tìm thấy Data.");
+                // returnedData null thì không add global vì không biết data
             }
         }
         else
         {
+            // không có đồ cũ trả về -> ô inventory trống
             ClearItem();
         }
 
+        // ✅ reload UI từ global để chắc chắn đóng/mở không lệch
+        var gm = FindFirstObjectByType<InventoryGridManager>(FindObjectsInactive.Include);
+        if (gm != null) gm.ReloadFromGlobalSave();
+
         RefreshRemoveButton();
         equipmentManager.BindPreviewNow();
+
+        // ✅ refresh shop lock state ngay lập tức (khỏi cần đóng/mở shop)
+        var shop = FindFirstObjectByType<ShopUIController>(FindObjectsInactive.Include);
+        if (shop != null) shop.RefreshAllShopSlots();
+
+    }
+    public WeaponData GetWeaponData()
+    {
+        // ✅ TRẢ VỀ BIẾN WeaponData MÀ InventoryItem ĐANG GIỮ
+        // Bạn đổi đúng tên biến thật của bạn ở dòng return này.
+        return currentData;
     }
 
     public Sprite GetItemSprite()
